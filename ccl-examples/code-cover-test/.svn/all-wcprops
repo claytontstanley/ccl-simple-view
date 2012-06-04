@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/publicsvn/openmcl/!svn/ver/15218/release/1.8/source/examples/code-cover-test
+END
+code-cover-server.lisp
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/publicsvn/openmcl/!svn/ver/15218/release/1.8/source/examples/code-cover-test/code-cover-server.lisp
+END
+package.lisp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/publicsvn/openmcl/!svn/ver/15218/release/1.8/source/examples/code-cover-test/package.lisp
+END
+code-cover-test.asd
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/publicsvn/openmcl/!svn/ver/15218/release/1.8/source/examples/code-cover-test/code-cover-test.asd
+END
+code-cover-test.lisp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/publicsvn/openmcl/!svn/ver/15218/release/1.8/source/examples/code-cover-test/code-cover-test.lisp
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/publicsvn/openmcl/!svn/ver/15218/release/1.8/source/examples/code-cover-test/README.txt
+END
