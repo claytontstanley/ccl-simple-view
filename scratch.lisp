@@ -10,6 +10,12 @@
 
 (current-directory)
 
+(load "~/src/actr6/load-act-r-6.lisp")
+
+(inspect 'add-visual-items-to-rpm-window)
+
+(make-instance 'rpm-real-window)
+
 (make-instance 'tiny-demo-drawing-view)
 
 (use-package :easygui-demo)
@@ -17,7 +23,6 @@
 *package*
 
 (inspect 'print)
-
 (in-package :easygui)
 
 (LET ((VIEW
