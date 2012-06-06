@@ -19,12 +19,8 @@
   (list (easygui:point-x (view-size view))
         (easygui:point-y (view-size view))))
 
-(#/redColor ns:ns-color)
-(easygui:make-rgb :red 255 :green 0 :blue 0)
-
-(defun color-symbol->system-color (symb)
-  (destructuring-bind (red green blue) (color-symbol->rgb symb)
-    (easygui:make-rgb :red red :green green :blue blue)))
+;(#/redColor ns:ns-color)
+;(easygui:make-rgb :red 255 :green 0 :blue 0)
 
 (defmethod draw-view-rectangle ((view liner) rectangle)
   (declare (ignore rectangle))
@@ -37,6 +33,3 @@
        ns:ns-bezier-path
        (ns:make-ns-point startx starty) 
        (ns:make-ns-point endx endy)))))
-
-
-

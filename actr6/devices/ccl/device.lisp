@@ -1,3 +1,7 @@
+(defun color-symbol->system-color (symb)
+  (destructuring-bind (red green blue) (color-symbol->rgb symb)
+    (easygui:make-rgb :red red :green green :blue blue)))
+
 (let ((rgb-list
         (list
           'Grey (list 84 84 84)
