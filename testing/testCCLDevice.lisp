@@ -1,8 +1,9 @@
 
 #-:act-r-6.0 (load "~/src/actr6/load-act-r-6.lisp")
 
-;(start-environment)
+
 ;(visible-virtuals-available?)
+;(start-environment)
 ;(stop-environment)
 
 #+clozure (require :cocoa)
@@ -49,7 +50,8 @@
               :height 400
               :x 20
               :y 600
-              :title *win-title*))
+              :title *win-title*
+              ))
 
 (select-rpm-window *win*)
 (assert (string-equal
@@ -119,8 +121,8 @@
 (sleep .5)
 
 
-;(remove-all-items-from-rpm-window *win*)
+(remove-all-items-from-rpm-window *win*)
 
-;(close-rpm-window *win*)
+(close-rpm-window *win*)
 
 ;(assert (null (open-rpm-window? *win*)))

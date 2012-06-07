@@ -172,7 +172,7 @@
   "Make and return a window for use with the UWI"
   (if visible
     (if (and (visible-virtuals-available?) (null class))
-      (make-instance 'visible-virtual-window :title title 
+      (make-instance 'visible-virtual-window :window-title title 
                      :width width :height height :x-pos x :y-pos y)
       (make-instance (if class class 'rpm-real-window) 
                      :title title 
@@ -228,7 +228,6 @@
                          :size vs
                          :fore-color (color-symbol->system-color color))))))
 
-#|
 
 
 ;;; ALLOW-EVENT-MANAGER  [Method]
@@ -237,8 +236,6 @@
 
 (defmethod allow-event-manager ((win rpm-real-window))
   (event-dispatch))
-
-|#
 
 #|
 This library is free software; you can redistribute it and/or
