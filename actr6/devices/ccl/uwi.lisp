@@ -57,12 +57,18 @@
 (defclass rpm-real-window (rpm-window easygui:window)
   ())
 
+(defmethod easygui::initialize-view :after ((window rpm-real-window))
+  (let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
+    (setf (slot-value view 'easygui::parent) window)
+    (setf (easygui::content-view window) view)
+    (easygui::window-show window)))
+
 ;;; VIEW-KEY-EVENT-HANDLER  [Method]
 ;;; Description : The method called when a key is pressed.  It
 ;;;             : just calls the rpm-window-key-event-handler which is
 ;;;             : to be defined by the modeler.
 
-(defmethod view-key-event-handler ((device rpm-real-window) key)
+(defmethod easygui::view-key-event-handler ((device rpm-real-window) key)
   (rpm-window-key-event-handler device key))
 
 ;;; RPM-WINDOW-KEY-EVENT-HANDLER  [Method]
@@ -81,10 +87,10 @@
 ;;;             : The rpm-window-click-event-handler is supposed 
 ;;;             : to be defined by the modeler.
 
-(defmethod view-click-event-handler ((device rpm-real-window) position)
+(defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
   (rpm-window-click-event-handler
-    device 
-    (list (easygui:point-x position) (easygui:point-y position)))
+    view
+    (list (easygui:point-x location) (easygui:point-y location)))
   (call-next-method))
 
 ;;; RPM-WINDOW-CLICK-EVENT-HANDLER  [Method]
@@ -96,6 +102,9 @@
   (declare (ignore device position))
   (call-next-method))
 
+(defmethod rpm-window-click-event-handler ((view easygui:view) position)
+  (rpm-window-click-event-handler (easygui:view-container view) position))
+
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; These are the UWI Methods.
 ;;;; ---------------------------------------------------------------------- ;;;;
@@ -103,9 +112,8 @@
 ;;; OPEN-RPM-WINDOW?  [Method]
 ;;; Description : Returns t if the window is open and nil if not.
 
-;TODO Write this one
 (defmethod open-rpm-window? ((win rpm-real-window))
-  (wptr win))
+  (#/isVisible (easygui::cocoa-ref win)))
 
 ;;; CLOSE-RPM-WINDOW  [Method]
 ;;; Description : Closes the window.
@@ -126,8 +134,6 @@
 
 (defmethod add-visual-items-to-rpm-window ((win rpm-real-window) &rest items)
   (apply #'easygui:add-subviews win items))
-;(view-draw-contents win)
-;(event-dispatch))
 
 ;;; REMOVE-VISUAL-ITEMS-FROM-RPM-WINDOW  [Method]
 ;;; Description : Take the specified items out of the subviews of the
@@ -135,14 +141,12 @@
 
 (defmethod remove-visual-items-from-rpm-window ((win rpm-real-window) &rest items)
   (apply #'easygui:remove-subviews win items))
-;(view-draw-contents win)
-;(event-dispatch))
 
 ;;; REMOVE-ALL-ITEMS-FROM-RPM-WINDOW  [Method]
 ;;; Description : Remove all the subvies of the window and redisplay it.
 
 (defmethod remove-all-items-from-rpm-window ((win rpm-real-window))
-  (remove-visual-items-from-rpm-window win (easygui:view-subviews win)))
+  (apply #'remove-visual-items-from-rpm-window win (easygui:view-subviews win)))
 
 ;;; RPM-WINDOW-TITLE  [Method]
 ;;; Description : Return the title of the window.
@@ -163,8 +167,6 @@
 ;;;             : visible-virtual for the real window unless the user explicitly
 ;;;             : specifies the class to use.
 
-;TODO Write all below
-;
 (defun make-rpm-window (&key (visible nil) (class nil) (title "RPM Window") 
                              (width 100) (height 100) (x 0 ) (y 0))
   "Make and return a window for use with the UWI"
@@ -173,7 +175,8 @@
       (make-instance 'visible-virtual-window :title title 
                      :width width :height height :x-pos x :y-pos y)
       (make-instance (if class class 'rpm-real-window) 
-                     :title title :size (easygui::point width height) 
+                     :title title 
+                     :size (easygui::point width height) 
                      :position (easygui::point x y)))
     (make-instance (if class class 'rpm-virtual-window) :title title 
                    :width width :height height :x-pos x :y-pos y)))
@@ -190,6 +193,8 @@
                     :size (easygui::point width height)
                     :title text
                     :action action
+                    ;TODO Figure out if/how color should be used for the button
+                    ;:fore-color (color-symbol->system-color 'blue)
                     :default-button-p nil))
 
 ;;; MAKE-STATIC-TEXT-FOR-RPM-WINDOW  [Method]
@@ -203,18 +208,7 @@
                  :position (easygui::point x y)
                  :size (easygui::point width height)
                  :text text
-                 ;:color 
-                 ))
-#|(let ((item (make-dialog-item 'static-text-dialog-item
-                                               (make-point x y)
-                                               (make-point width height)
-                                               text
-                                               )))
-                   (set-part-color item :text (color-symbol->system-color color))
-                   item))|#
-
-
-
+                 :fore-color (color-symbol->system-color color)))
 
 ;;; MAKE-LINE-FOR-RPM-WINDOW  [Method]
 ;;; Description : Build and return the appropriate liner object for the

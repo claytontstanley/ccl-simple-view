@@ -5,10 +5,13 @@
 (require :easygui)
 (load "src/mcl-migration/ccl-examples/cocoa/easygui/example/view-hierarchy.lisp")
 (load "src/mcl-migration/ccl-examples/cocoa/easygui/example/tiny.lisp")
+(load "src/mcl-migration/ccl-examples/cocoa/easygui/example/currency-converter.lisp")
+
 (make-instance 'easygui-user::view-hierarchy-demo-window)
 (make-instance 'easygui-demo::tiny-demo-window)
+(make-instance 'easygui-demo::converter-window)
 
-(current-directory)
+(current-director)
 
 (load "~/src/actr6/load-act-r-6.lisp")
 
