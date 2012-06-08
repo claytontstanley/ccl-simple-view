@@ -80,38 +80,34 @@
 
 (setf (symbol-function 'make-point) #'easygui:point)
 
-(defclass color-dialog (easygui:window)
-  ((easygui::text :initarg :window-title)
-   (easygui::size :initarg :view-size)
-   (easygui::position :initarg :view-position)))
+(defclass view-text-via-title-mixin (easygui::view-text-via-title-mixin)
+  ((easygui::text :initarg :window-title)))
 
-(defclass td-liner (easygui::td-liner)
-  ((easygui::foreground :initarg :color)
-   (easygui::size :initarg :view-size)
-   (easygui::position :initarg :view-position)))
+(defclass view-text-via-stringvalue-mixin (easygui::view-text-via-stringvalue-mixin)
+  ((easygui::text :initarg :text)))
 
-(defclass bu-liner (easygui::bu-liner)
-  ((easygui::foreground :initarg :color)
-   (easygui::size :initarg :view-size)
-   (easygui::position :initarg :view-position)))
-
-(defclass button-dialog-item (easygui:push-button-view)
+(defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position)
-   (easygui::text :initarg :window-title)
-   (easygui::default-button-p :initarg :default-button)))
+   (easygui::foreground :initarg :color)))
 
-(defclass static-text-dialog-item (easygui:static-text-view)
-  ((easygui::size :initarg :view-size)
-   (easygui::position :initarg :view-position)
-   (easygui::text :initarg :window-title)))
+(defclass color-dialog (view-text-via-title-mixin view-mixin easygui:window) ())
+
+(defclass td-liner (view-mixin easygui::td-liner) ())
+
+(defclass bu-liner (view-mixin easygui::bu-liner) ())
+
+(defclass button-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:push-button-view)
+   ((easygui::default-button-p :initarg :default-button)))
+
+(defclass static-text-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:static-text-view) ())
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   (apply #'make-instance 
          class
          :view-position position
          :view-size size
-         :window-title text
+         :text text
          :action action
          attributes))
 
@@ -120,8 +116,6 @@
   (declare (ignore part))
   (easygui:set-fore-color view new-color))
 
-(defmethod easygui::view-key-event-handler ((device rpm-real-window) key)
-  (view-key-event-handler device key))
 
 (defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
@@ -129,12 +123,6 @@
 (defmethod view-click-event-handler ((device easygui:view) position)
   (awhen (easygui:view-container device) 
     (view-click-event-handler it position)))
-
-(defmethod easygui::initialize-view :after ((window rpm-real-window))
-  (let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
-    (setf (slot-value view 'easygui::parent) window)
-    (setf (easygui::content-view window) view)
-    (easygui::window-show window)))
 
 ;;; RPM-REAL-WINDOW  [Class]
 ;;; Description : This is the UWI's window class to produce an MCL.
@@ -144,6 +132,18 @@
 
 (defclass rpm-real-window (rpm-window color-dialog)
   ())
+
+; TODO: Figure out why these two methods below are coupled with rpm-real-window above.
+; Once this is done, all code to enable ccl to interpret mcl's uwi.lisp file will be
+; above rpm-real-window, and can then be loaded as a patch before mcl's uwi.lisp is loaded
+(defmethod easygui::initialize-view :after ((window rpm-real-window))
+  (let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
+    (setf (slot-value view 'easygui::parent) window)
+    (setf (easygui::content-view window) view)
+    (easygui::window-show window)))
+
+(defmethod easygui::view-key-event-handler ((device rpm-real-window) key)
+  (view-key-event-handler device key))
 
 ;;; VIEW-KEY-EVENT-HANDLER  [Method]
 ;;; Description : The method called when a key is pressed.  It
