@@ -124,6 +124,15 @@
   (awhen (easygui:view-container device) 
     (view-click-event-handler it position)))
 
+(defmethod easygui::initialize-view :after ((window color-dialog))
+  (let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
+    (setf (slot-value view 'easygui::parent) window)
+    (setf (easygui::content-view window) view)
+    (easygui::window-show window)))
+
+(defmethod easygui::view-key-event-handler ((device color-dialog) key)
+  (view-key-event-handler device key))
+
 ;;; RPM-REAL-WINDOW  [Class]
 ;;; Description : This is the UWI's window class to produce an MCL.
 ;;;             : It inherits from the MCL dialog class (a real window) and
@@ -132,18 +141,6 @@
 
 (defclass rpm-real-window (rpm-window color-dialog)
   ())
-
-; TODO: Figure out why these two methods below are coupled with rpm-real-window above.
-; Once this is done, all code to enable ccl to interpret mcl's uwi.lisp file will be
-; above rpm-real-window, and can then be loaded as a patch before mcl's uwi.lisp is loaded
-(defmethod easygui::initialize-view :after ((window rpm-real-window))
-  (let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
-    (setf (slot-value view 'easygui::parent) window)
-    (setf (easygui::content-view window) view)
-    (easygui::window-show window)))
-
-(defmethod easygui::view-key-event-handler ((device rpm-real-window) key)
-  (view-key-event-handler device key))
 
 ;;; VIEW-KEY-EVENT-HANDLER  [Method]
 ;;; Description : The method called when a key is pressed.  It
