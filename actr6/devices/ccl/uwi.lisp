@@ -48,13 +48,61 @@
 (require 'cocoa)
 (require 'easygui)
 
+(defmethod add-subviews ((view easygui:view) &rest subviews)
+  (when subviews
+    (apply #'easygui:add-subviews view subviews)))
+
+(defmethod remove-subviews ((view easygui:view) &rest subviews)
+  (when subviews
+    (apply #'easygui:remove-subviews view subviews)))
+
+(defmethod subviews ((view easygui:view) &optional subview-type)
+  (easygui:view-subviews view))
+
+(defmethod window-select ((view easygui:view))
+  (easygui:window-show view))
+
+(defmethod window-close ((view easygui:view))
+  (easygui:perform-close view))
+
+(defmethod wptr ((view easygui:view))
+  (#/isVisible (easygui::cocoa-ref view)))
+
+(defun view-draw-contents (win)
+  ())
+
+(defun event-dispatch ()
+  ())
+
+(defmethod window-title ((view easygui:view))
+  ;TODO: Maybe use easygui:view-text method here?
+  (easygui::window-title view))
+
+(setf (symbol-function 'make-point) #'easygui:point)
+
+(defclass color-dialog (easygui:window)
+  ((easygui::text :initarg :window-title)
+   (easygui::size :initarg :view-size)
+   (easygui::position :initarg :view-position)))
+
+(defclass td-liner (easygui::td-liner)
+  ((easygui::foreground :initarg :color)
+   (easygui::size :initarg :view-size)
+   (easygui::position :initarg :view-position)))
+
+(defclass bu-liner (easygui::bu-liner)
+  ((easygui::foreground :initarg :color)
+   (easygui::size :initarg :view-size)
+   (easygui::position :initarg :view-position)))
+
+
 ;;; RPM-REAL-WINDOW  [Class]
 ;;; Description : This is the UWI's window class to produce an MCL.
 ;;;             : It inherits from the MCL dialog class (a real window) and
 ;;;             : the rpm-window class which is an abstract class used by the
 ;;;             : ACT-R GUI interface.
 
-(defclass rpm-real-window (rpm-window easygui:window)
+(defclass rpm-real-window (rpm-window color-dialog)
   ())
 
 (defmethod easygui::initialize-view :after ((window rpm-real-window))
@@ -113,49 +161,55 @@
 ;;; Description : Returns t if the window is open and nil if not.
 
 (defmethod open-rpm-window? ((win rpm-real-window))
-  (#/isVisible (easygui::cocoa-ref win)))
+  (wptr win))
 
 ;;; CLOSE-RPM-WINDOW  [Method]
 ;;; Description : Closes the window.
 
 (defmethod close-rpm-window  ((win rpm-real-window))
-  (easygui:perform-close win))
+  (window-close win))
 
 ;;; SELECT-RPM-WINDOW  [Method]
 ;;; Description : Brings the specified window to the foreground.
 
 (defmethod select-rpm-window ((win rpm-real-window))
-  (easygui:window-show win))
+  (window-select win))
 
 ;;; ADD-VISUAL-ITEMS-TO-RPM-WINDOW  [Method]
 ;;; Description : Makes the specified items subviews of the window and
 ;;;             : calls view-draw-contents and event-dispatch to make sure
 ;;;             : that they show up.
 
-(defmethod add-visual-items-to-rpm-window ((win rpm-real-window) &rest items)
-  (when items
-    (apply #'easygui:add-subviews win items)))
+(defmethod add-visual-items-to-rpm-window ((win rpm-real-window) &rest items )
+  (dolist (item items)
+    (add-subviews win item))
+  (view-draw-contents win)
+  (event-dispatch))
 
 ;;; REMOVE-VISUAL-ITEMS-FROM-RPM-WINDOW  [Method]
 ;;; Description : Take the specified items out of the subviews of the
 ;;;             : window and make it redraw.
 
-(defmethod remove-visual-items-from-rpm-window ((win rpm-real-window) &rest items)
-  (when items
-    (apply #'easygui:remove-subviews win items)))
+(defmethod remove-visual-items-from-rpm-window ((win rpm-real-window) 
+                                                &rest items)
+  (dolist (item items)
+    (remove-subviews win item))
+  (view-draw-contents win)
+  (event-dispatch))
 
 ;;; REMOVE-ALL-ITEMS-FROM-RPM-WINDOW  [Method]
 ;;; Description : Remove all the subvies of the window and redisplay it.
 
 (defmethod remove-all-items-from-rpm-window ((win rpm-real-window))
-  (apply #'remove-visual-items-from-rpm-window win (easygui:view-subviews win)))
+  (apply #'remove-subviews win (subviews win))
+  (view-draw-contents win)
+  (event-dispatch))
 
 ;;; RPM-WINDOW-TITLE  [Method]
 ;;; Description : Return the title of the window.
 
 (defmethod rpm-window-title ((win rpm-real-window))
-  ;TODO: Maybe use easygui:view-text method here?
-  (easygui::window-title win))
+  (window-title win))
 
 ;;; RPM-WINDOW-VISIBLE-STATUS  [Method]
 ;;; Description : Return t to indicate that this is a visible window.
@@ -178,11 +232,11 @@
       (make-instance 'visible-virtual-window :window-title title 
                      :width width :height height :x-pos x :y-pos y)
       (make-instance (if class class 'rpm-real-window) 
-                     :title title 
-                     :size (easygui::point width height) 
-                     :position (easygui::point x y)))
-    (make-instance (if class class 'rpm-virtual-window) :title title 
+                     :window-title title :view-size (make-point width height) 
+                     :view-position (make-point x y)))
+    (make-instance (if class class 'rpm-virtual-window) :window-title title 
                    :width width :height height :x-pos x :y-pos y)))
+
 
 ;;; MAKE-BUTTON-FOR-RPM-WINDOW  [Method]
 ;;; Description : Build and return a button-dialog-item based on the
