@@ -123,6 +123,6 @@
 
 (remove-all-items-from-rpm-window *win*)
 
-(close-rpm-window *win*)
+;(close-rpm-window *win*)
 
 ;(assert (null (open-rpm-window? *win*)))

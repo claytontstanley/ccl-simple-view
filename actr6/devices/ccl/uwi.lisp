@@ -95,6 +95,46 @@
    (easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position)))
 
+(defclass button-dialog-item (easygui:push-button-view)
+  ((easygui::size :initarg :view-size)
+   (easygui::position :initarg :view-position)
+   (easygui::text :initarg :window-title)
+   (easygui::default-button-p :initarg :default-button)))
+
+(defclass static-text-dialog-item (easygui:static-text-view)
+  ((easygui::size :initarg :view-size)
+   (easygui::position :initarg :view-position)
+   (easygui::text :initarg :window-title)))
+
+(defun make-dialog-item (class position size text &optional action &rest attributes)
+  (apply #'make-instance 
+         class
+         :view-position position
+         :view-size size
+         :window-title text
+         :action action
+         attributes))
+
+
+(defmethod set-part-color ((view easygui:view) part new-color)
+  (declare (ignore part))
+  (easygui:set-fore-color view new-color))
+
+(defmethod easygui::view-key-event-handler ((device rpm-real-window) key)
+  (view-key-event-handler device key))
+
+(defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
+  (view-click-event-handler view location))
+
+(defmethod view-click-event-handler ((device easygui:view) position)
+  (awhen (easygui:view-container device) 
+    (view-click-event-handler it position)))
+
+(defmethod easygui::initialize-view :after ((window rpm-real-window))
+  (let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
+    (setf (slot-value view 'easygui::parent) window)
+    (setf (easygui::content-view window) view)
+    (easygui::window-show window)))
 
 ;;; RPM-REAL-WINDOW  [Class]
 ;;; Description : This is the UWI's window class to produce an MCL.
@@ -105,18 +145,12 @@
 (defclass rpm-real-window (rpm-window color-dialog)
   ())
 
-(defmethod easygui::initialize-view :after ((window rpm-real-window))
-  (let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
-    (setf (slot-value view 'easygui::parent) window)
-    (setf (easygui::content-view window) view)
-    (easygui::window-show window)))
-
 ;;; VIEW-KEY-EVENT-HANDLER  [Method]
 ;;; Description : The method called when a key is pressed.  It
 ;;;             : just calls the rpm-window-key-event-handler which is
 ;;;             : to be defined by the modeler.
 
-(defmethod easygui::view-key-event-handler ((device rpm-real-window) key)
+(defmethod view-key-event-handler ((device rpm-real-window) key)
   (rpm-window-key-event-handler device key))
 
 ;;; RPM-WINDOW-KEY-EVENT-HANDLER  [Method]
@@ -135,10 +169,9 @@
 ;;;             : The rpm-window-click-event-handler is supposed 
 ;;;             : to be defined by the modeler.
 
-(defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
-  (rpm-window-click-event-handler
-    view
-    (list (easygui:point-x location) (easygui:point-y location)))
+(defmethod view-click-event-handler ((device rpm-real-window) position)
+  (rpm-window-click-event-handler device 
+                                  (list (point-h position) (point-v position)))
   (call-next-method))
 
 ;;; RPM-WINDOW-CLICK-EVENT-HANDLER  [Method]
@@ -150,8 +183,6 @@
   (declare (ignore device position))
   (call-next-method))
 
-(defmethod rpm-window-click-event-handler ((view easygui:view) position)
-  (rpm-window-click-event-handler (easygui:view-container view) position))
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; These are the UWI Methods.
@@ -245,47 +276,59 @@
 (defmethod make-button-for-rpm-window ((win rpm-real-window) &key (x 0) (y 0) 
                                                              (text "Ok") (action nil) (height 18)  
                                                              (width 60) (color 'gray))
-  (make-instance 'easygui::push-button-view
-                    :position (easygui::point x y)
-                    :size (easygui::point width height)
-                    :title text
-                    :action action
-                    ;TODO Figure out if/how color should be used for the button
-                    ;:fore-color (color-symbol->system-color 'blue)
-                    :default-button-p nil))
+  (make-dialog-item 'button-dialog-item
+                    (make-point x y)
+                    (make-point width height)
+                    text
+                    action
+                    :default-button nil))
 
 ;;; MAKE-STATIC-TEXT-FOR-RPM-WINDOW  [Method]
 ;;; Description : Build and return a static-text-dialog-item based on the
 ;;;             : parameters supplied.
 
-(defmethod make-static-text-for-rpm-window ((win rpm-real-window)
+(defmethod make-static-text-for-rpm-window ((win rpm-real-window) 
                                             &key (x 0) (y 0) (text "") 
                                             (height 20) (width 80) (color 'black))
-  (make-instance 'easygui::static-text-view
-                 :position (easygui::point x y)
-                 :size (easygui::point width height)
-                 :text text
-                 :fore-color (color-symbol->system-color color)))
+  (let ((item (make-dialog-item 'static-text-dialog-item
+                                (make-point x y)
+                                (make-point width height)
+                                text
+                                )))
+    (set-part-color item :text (color-symbol->system-color color))
+    item))
+
 
 ;;; MAKE-LINE-FOR-RPM-WINDOW  [Method]
 ;;; Description : Build and return the appropriate liner object for the
 ;;;             : window based on the parameters supplied.
 
-(defmethod make-line-for-rpm-window ((wind rpm-real-window) start-pt end-pt &optional (color 'black))
-  (destructuring-bind (startx starty) start-pt
-    (destructuring-bind (endx endy) end-pt
-        (unless (> endx startx)
-          (rotatef startx endx)
-          (rotatef starty endy))
-        (let ((vs (easygui:point (+ 1 (abs (- endx startx)))
-                                 (+ 1 (abs (- endy starty)))))
-              (vp (easygui:point startx (min starty endy))))
-          (make-instance (if (> endy starty) 'easygui::bu-liner 'easygui::td-liner)
-                         :position vp
-                         :size vs
-                         :fore-color (color-symbol->system-color color))))))
-
-
+(defmethod make-line-for-rpm-window ((wind rpm-real-window) start-pt end-pt 
+                                                            &optional (color 'black))
+  (let* ((gx (> (first end-pt) (first start-pt)))
+         (gy (> (second end-pt) (second start-pt)))
+         (vs (make-point (+ 1 (abs (- (first end-pt) (first start-pt))))
+                         (+ 1 (abs (- (second end-pt) (second start-pt)))))))
+    (cond ((and gx gy)
+           (make-instance 'td-liner
+                          :color (color-symbol->system-color color)
+                          :view-position (make-point (first start-pt) (second start-pt)) 
+                          :view-size vs))
+          ((and (not gx) (not gy))
+           (make-instance 'td-liner
+                          :color (color-symbol->system-color color)
+                          :view-position (make-point (first end-pt) (second end-pt)) 
+                          :view-size vs))
+          ((and gx (not gy))
+           (make-instance 'bu-liner
+                          :color (color-symbol->system-color color)
+                          :view-position (make-point (first start-pt) (second end-pt))
+                          :view-size vs))
+          (t
+           (make-instance 'bu-liner
+                          :color (color-symbol->system-color color)
+                          :view-position (make-point (first end-pt) (second start-pt))
+                          :view-size vs)))))
 
 ;;; ALLOW-EVENT-MANAGER  [Method]
 ;;; Description : Call event-dispatch.  This is used while waiting for
