@@ -91,6 +91,7 @@
 #+(and :clean-actr (not :packaged-actr) :allegro-ide) (in-package :cg-user)
 #-(or (not :clean-actr) :packaged-actr :allegro-ide) (in-package :cl-user)
 
+#|
 (defparameter *crosshair-cursor* 
   (#_getcursor #$crosscursor) "Crosshair cursor")
 
@@ -101,7 +102,7 @@
   "Return the 'location' (integer) average of <x> and <y>."
   (declare (fixnum x) (fixnum y))
   (floor (/ (+ x y) 2)))
-
+|#
 
 ;;;; ---------------------------------------------------------------------- ;;;;;;;
 ;;;; MCL screen-to-icon interface
@@ -109,7 +110,7 @@
 
 
 
-(defmethod build-vis-locs-for ((self window) (vis-mod vision-module))
+(defmethod build-vis-locs-for ((self easygui:window) (vis-mod vision-module))
   (let ((base-ls (flatten
                     (mapcar #'(lambda (obj) (build-vis-locs-for obj vis-mod))
                             (get-sub-objects self)))))
@@ -117,7 +118,7 @@
    ;   (fill-default-dimensions feat))
     base-ls))
 
-(defmethod vis-loc-to-obj ((device window) loc)
+(defmethod vis-loc-to-obj ((device easygui:window) loc)
   (case (chunk-slot-value-fct loc 'kind)
     (cursor
        (fill-default-vis-obj-slots (car (define-chunks (isa cursor))) loc))))
@@ -125,19 +126,18 @@
 (defgeneric get-sub-objects (view)
   (:documentation  "Grabbing the sub-objects of a view by default returns the subviews."))
 
-(defmethod get-sub-objects ((v view))
-  (subviews v))
+(defmethod get-sub-objects ((v easygui:view))
+  (easygui:view-subviews v))
 
 
-
-(defmethod build-vis-locs-for ((self view) (vis-mod vision-module))
+(defmethod build-vis-locs-for ((self easygui:view) (vis-mod vision-module))
   (let ((subs (get-sub-objects self))
         (outlis nil))
     (dolist (sub subs outlis)
       (push (build-vis-locs-for sub vis-mod) outlis))))
 
 
-
+#|
 (defmethod build-vis-locs-for ((self dialog-item) (vis-mod vision-module))
   (declare (ignore vis-mod))
   (let ((f (car (define-chunks-fct `((isa visual-location
@@ -228,7 +228,7 @@
     
     feats))
 
-
+|#
 
 
 #| Not adding these in at this point - only the basics which are shared
@@ -327,7 +327,7 @@
 
 |#
 
-
+#|
 (defmethod button-p (obj)
   (declare (ignore obj))
   nil)
@@ -336,7 +336,39 @@
   (declare (ignore obj))
   t)
 
-(defmethod build-vis-locs-for ((self static-text-dialog-item)
+|#
+
+(defun font-info (font-spec)
+  (values 0 0))
+
+(defun point-v (point)
+  (easygui:point-y point))
+
+(defun point-h (point)
+  (easygui:point-x point))
+
+(defun string-width (&rest args)
+  1)
+
+(defmethod view-position ((view easygui:view))
+  (easygui:view-position view))
+
+(defmethod dialog-item-text ((view easygui:static-text-view))
+  (easygui:view-text view))
+
+(defmethod view-font ((view easygui:static-text-view))
+  (easygui:view-font view))
+
+(defmethod part-color ((view easygui:static-text-view))
+  (easygui:get-fore-color view))
+
+(defmethod view-key-event-handler ((device easygui:window) key)
+  (easygui::view-key-event-handler device key))
+
+(defun event-dispatch ()
+  ())
+
+(defmethod build-vis-locs-for ((self easygui:static-text-view)
                                (vis-mod vision-module))
   (let ((text (dialog-item-text self)))
     (unless (equal text "")
@@ -345,9 +377,9 @@
              (accum nil)
              (textlines (string-to-lines text))
              (width-fct #'(lambda (str) (string-width str font-spec)))
-             (color (system-color->symbol (aif (part-color self :text)
-                                           it
-                                           *black-color*))))
+             (color (aif (part-color self)
+                      (system-color->symbol it)
+                      'black)))
         (multiple-value-bind (ascent descent) (font-info font-spec)
           (setf start-y (point-v (view-position self)))
           (dolist (item textlines)
@@ -366,29 +398,37 @@
         (dolist (x accum accum)
           (set-chunk-slot-value-fct x 'color color)
           (setf (chunk-visual-object x) self))))))
-  
 
-(defmethod xstart ((self static-text-dialog-item))
+
+(defmethod xstart ((self easygui:static-text-view))
    (let ((left-x (point-h (view-position self)))
          (text-width (string-width (dialog-item-text self)
                                      (view-font self)))
          (text-justification (text-just self))
          )
      (ecase text-justification
-       (#.#$tejustleft (1+ left-x))
-       (#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))
-       (#.#$tejustright (+ 1 left-x (- (width self) text-width))))))
+       ;(#.#$tejustleft (1+ left-x))
+       ; Hardcoding to left justification for now
+       ; TODO: Fix this
+       ('left (1+ left-x)))))
+       ;(#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))
+       ;(#.#$tejustright (+ 1 left-x (- (width self) text-width))))))
+
  
-(defmethod text-just ((self static-text-dialog-item))
+#|(defmethod text-just ((self static-text-dialog-item))
    (if (null (slot-value self 'ccl::text-justification))
      #.#$tejustleft
      (or (cdr (assq (slot-value self 'ccl::text-justification)
                         '((:left . #.#$tejustleft)
                           (:center . #.#$tejustcenter)
                           (:right . #.#$tejustright))))
-             (require-type (slot-value self 'ccl::text-justification) 'fixnum))))
+             (require-type (slot-value self 'ccl::text-justification) 'fixnum))))|#
+
+(defmethod text-just ((self easygui:static-text-view))
+  'left)
  
 
+#|
 
 (defmethod cursor-to-vis-loc ((the-window window))
   (let ((pos (view-mouse-position the-window))
@@ -660,15 +700,18 @@
 ;;;; RPM device methods.
 ;;;; ---------------------------------------------------------------------- ;;;;
 
+|#
+
+
 ;;; DEVICE-HANDLE-KEYPRESS      [Method]
 ;;; Description : Just call VIEW-KEY-EVENT-HANDLER and make sure that the 
 ;;;             : event gets dealt with.
 
-(defmethod device-handle-keypress ((device window) key)
+(defmethod device-handle-keypress ((device easygui:window) key)
   (view-key-event-handler device key)
   (event-dispatch))
 
-
+#|
 ;;; VIEW-KEY-EVENT-HANDLER      [Method]
 ;;; Description : ACT-R couldn't actually type into editiable text dialog
 ;;;             : items because the default method required that 
@@ -771,6 +814,8 @@
   )
 
 
+|#
+
 #|
 (defmethod do-update :after ((mstr-proc master-process) current-time 
                                &key (real-wait nil))
@@ -779,7 +824,7 @@
 |#
 
 
-
+#|
 
 (defmethod populate-loc-to-key-array ((ar array))
   "Sets all the keys in the array that need to be set"
@@ -996,9 +1041,15 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; color text stuff
 
+|#
 
+(defun system-color->symbol (color)
+  (let ((red (easygui:rgb-red color))
+        (green (easygui:rgb-green color))
+        (blue (easygui:rgb-blue color)))
+    (rgb->color-symbol (list red green blue))))
 
-
+#|
 (defun system-color->symbol (color)
   "Given an MCL color code, return a symbol representing that color.  Unknown colors get mapped to COLOR-RRRRR-GGGGG-BBBBB."
   (if (null color)
@@ -1024,11 +1075,15 @@
                                  (color-green color) 
                                  (color-blue color)))))))
 
+|#
+
 (defun color-symbol->system-color (symb)
   (destructuring-bind (red green blue) (color-symbol->rgb symb)
     (easygui:make-rgb :red red :green green :blue blue)))
 
 
+
+#|
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; handling mouse movement under MCL 5.0 and OS X.
 
@@ -1068,6 +1123,8 @@
                         :unsigned-fullword))
     ))
 
+
+|#
 
 (let ((rgb-list
         (list
@@ -1236,8 +1293,14 @@
           'gold (list 205 127 50)
           'silver (list 230 232 250))))
   (defun color-symbol->rgb (symb)
-    (getf rgb-list symb)))
-    
+    (getf rgb-list symb))
+  (defun rgb->color-symbol (rgb)
+    (loop for item on rgb-list by #'cddr
+          do (destructuring-bind (cur-symb cur-rgb) (list (first item) (second item))
+               (when (equal cur-rgb rgb)
+                 (return-from rgb->color-symbol cur-symb))))))
+
+
 #|
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public

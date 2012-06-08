@@ -133,14 +133,16 @@
 ;;;             : that they show up.
 
 (defmethod add-visual-items-to-rpm-window ((win rpm-real-window) &rest items)
-  (apply #'easygui:add-subviews win items))
+  (when items
+    (apply #'easygui:add-subviews win items)))
 
 ;;; REMOVE-VISUAL-ITEMS-FROM-RPM-WINDOW  [Method]
 ;;; Description : Take the specified items out of the subviews of the
 ;;;             : window and make it redraw.
 
 (defmethod remove-visual-items-from-rpm-window ((win rpm-real-window) &rest items)
-  (apply #'easygui:remove-subviews win items))
+  (when items
+    (apply #'easygui:remove-subviews win items)))
 
 ;;; REMOVE-ALL-ITEMS-FROM-RPM-WINDOW  [Method]
 ;;; Description : Remove all the subvies of the window and redisplay it.
@@ -152,6 +154,7 @@
 ;;; Description : Return the title of the window.
 
 (defmethod rpm-window-title ((win rpm-real-window))
+  ;TODO: Maybe use easygui:view-text method here?
   (easygui::window-title win))
 
 ;;; RPM-WINDOW-VISIBLE-STATUS  [Method]
