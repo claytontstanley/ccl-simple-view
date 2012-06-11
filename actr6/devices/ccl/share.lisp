@@ -103,6 +103,7 @@
 
 (defclass static-text-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:static-text-view) ())
 
+
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   (apply #'make-instance 
          class

@@ -1,5 +1,12 @@
 (print (list-all-packages))
 
+(open-shared-library "/Users/claytonstanley/src/mcl-migration/actr6/devices/ccl/libtypetest.dylib")
+(inspect ccl::*shared-libraries*)
+(#_void_void_test :void)
+(external-call "_void_void_test" :void)
+(external-call "_sc_sc_test" -128)
+(inspect #_?void_void_test)
+(#_void_void_test)
 
 (require :cocoa)
 (require :easygui)
