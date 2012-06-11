@@ -8,9 +8,10 @@
 #-:act-r-6.0 (load "~/src/actr6/load-act-r-6.lisp")
 #+clozure (require :cocoa)
 #+clozure (require :easygui)
-#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/uwi.lisp")
-#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/device.lisp")
 #+clozure (load "~/src/mcl-migration/easygui/extensions.lisp")
+#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/share.lisp")
+#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/device.lisp")
+#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/uwi.lisp")
 
 (defun flash-text (&optional (text "!!!!"))
   (setf *view* (make-static-text-for-rpm-window
@@ -123,6 +124,6 @@
 
 (remove-all-items-from-rpm-window *win*)
 
-;(close-rpm-window *win*)
+(close-rpm-window *win*)
 
-;(assert (null (open-rpm-window? *win*)))
+(assert (null (open-rpm-window? *win*)))

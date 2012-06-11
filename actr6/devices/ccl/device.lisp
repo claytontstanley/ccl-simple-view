@@ -110,7 +110,7 @@
 
 
 
-(defmethod build-vis-locs-for ((self easygui:window) (vis-mod vision-module))
+(defmethod build-vis-locs-for ((self window) (vis-mod vision-module))
   (let ((base-ls (flatten
                     (mapcar #'(lambda (obj) (build-vis-locs-for obj vis-mod))
                             (get-sub-objects self)))))
@@ -118,7 +118,7 @@
    ;   (fill-default-dimensions feat))
     base-ls))
 
-(defmethod vis-loc-to-obj ((device easygui:window) loc)
+(defmethod vis-loc-to-obj ((device window) loc)
   (case (chunk-slot-value-fct loc 'kind)
     (cursor
        (fill-default-vis-obj-slots (car (define-chunks (isa cursor))) loc))))
@@ -126,11 +126,12 @@
 (defgeneric get-sub-objects (view)
   (:documentation  "Grabbing the sub-objects of a view by default returns the subviews."))
 
-(defmethod get-sub-objects ((v easygui:view))
-  (easygui:view-subviews v))
+(defmethod get-sub-objects ((v view))
+  (subviews v))
 
 
-(defmethod build-vis-locs-for ((self easygui:view) (vis-mod vision-module))
+
+(defmethod build-vis-locs-for ((self view) (vis-mod vision-module))
   (let ((subs (get-sub-objects self))
         (outlis nil))
     (dolist (sub subs outlis)
@@ -338,37 +339,7 @@
 
 |#
 
-(defun font-info (font-spec)
-  (values 0 0))
-
-(defun point-v (point)
-  (easygui:point-y point))
-
-(defun point-h (point)
-  (easygui:point-x point))
-
-(defun string-width (&rest args)
-  1)
-
-(defmethod view-position ((view easygui:view))
-  (easygui:view-position view))
-
-(defmethod dialog-item-text ((view easygui:static-text-view))
-  (easygui:view-text view))
-
-(defmethod view-font ((view easygui:static-text-view))
-  (easygui:view-font view))
-
-(defmethod part-color ((view easygui:static-text-view))
-  (easygui:get-fore-color view))
-
-(defmethod view-key-event-handler ((device easygui:window) key)
-  (easygui::view-key-event-handler device key))
-
-(defun event-dispatch ()
-  ())
-
-(defmethod build-vis-locs-for ((self easygui:static-text-view)
+(defmethod build-vis-locs-for ((self static-text-dialog-item)
                                (vis-mod vision-module))
   (let ((text (dialog-item-text self)))
     (unless (equal text "")
@@ -377,9 +348,9 @@
              (accum nil)
              (textlines (string-to-lines text))
              (width-fct #'(lambda (str) (string-width str font-spec)))
-             (color (aif (part-color self)
-                      (system-color->symbol it)
-                      'black)))
+             (color (system-color->symbol (aif (part-color self :text)
+                                           it
+                                           *black-color*))))
         (multiple-value-bind (ascent descent) (font-info font-spec)
           (setf start-y (point-v (view-position self)))
           (dolist (item textlines)
@@ -399,8 +370,7 @@
           (set-chunk-slot-value-fct x 'color color)
           (setf (chunk-visual-object x) self))))))
 
-
-(defmethod xstart ((self easygui:static-text-view))
+(defmethod xstart ((self static-text-dialog-item))
    (let ((left-x (point-h (view-position self)))
          (text-width (string-width (dialog-item-text self)
                                      (view-font self)))
@@ -660,7 +630,7 @@
                                 :view-position (make-point (point-h end-pt) (point-v start-pt))
                                 :view-size vs))))))
 
-
+|#
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; Utilities
@@ -700,14 +670,11 @@
 ;;;; RPM device methods.
 ;;;; ---------------------------------------------------------------------- ;;;;
 
-|#
-
-
 ;;; DEVICE-HANDLE-KEYPRESS      [Method]
 ;;; Description : Just call VIEW-KEY-EVENT-HANDLER and make sure that the 
 ;;;             : event gets dealt with.
 
-(defmethod device-handle-keypress ((device easygui:window) key)
+(defmethod device-handle-keypress ((device window) key)
   (view-key-event-handler device key)
   (event-dispatch))
 
@@ -736,7 +703,6 @@
 (defmethod device-handle-click ((device window))
   (view-click-event-handler device (view-mouse-position device))
   (event-dispatch))
-
 
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
 ;;; Date        : 97.02.18 [revised 98.10.29]
@@ -778,7 +744,6 @@
     (while (not (vpt= xyloc (p2vpt (view-mouse-position device))))
       (event-dispatch))))
 
-
 (unless (fboundp 'speech-available-p)
   (defun speech-available-p () nil))
 
@@ -793,6 +758,7 @@
     (speak-string string)
     ))
 
+|#
 
 ;;; GET-MOUSE-COORDINATES      [Method]
 ;;; Description : Return the current mouse loc in #(x y) format.
@@ -800,7 +766,7 @@
 (defmethod get-mouse-coordinates ((device window))
   (p2vpt (view-mouse-position device)))
 
-
+#|
 ;;; DEVICE-UPDATE      [Method]
 ;;; Date        : 03.03.11
 ;;; Description : Rather than calling EVENT-DISPATCH on every cycle, call it
@@ -1081,9 +1047,6 @@
   (destructuring-bind (red green blue) (color-symbol->rgb symb)
     (easygui:make-rgb :red red :green green :blue blue)))
 
-
-
-#|
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; handling mouse movement under MCL 5.0 and OS X.
 
@@ -1122,9 +1085,6 @@
                         :single-float (coerce (point-v xyloc) 'short-float)
                         :unsigned-fullword))
     ))
-
-
-|#
 
 (let ((rgb-list
         (list
