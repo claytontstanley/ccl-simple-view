@@ -4,6 +4,10 @@
 (shadowing-import 'easygui:window)
 (shadowing-import 'easygui:view)
 
+(setf (symbol-function 'make-point) #'easygui:point)
+(setf (symbol-function 'point-v) #'easygui:point-y)
+(setf (symbol-function 'point-h) #'easygui:point-x)
+
 (defmethod add-subviews ((view easygui:view) &rest subviews)
   (when subviews
     (apply #'easygui:add-subviews view subviews)))
@@ -46,6 +50,10 @@
 (defun event-dispatch ()
   ())
 
+(defmethod window-title ((view easygui:view))
+  ;TODO: Maybe use easygui:view-text method here?
+  (easygui::window-title view))
+
 (defparameter *black-color* 'black)
 
 #|
@@ -72,16 +80,6 @@
 (defconstant os::TEJUSTLEFT 0)
 (print os::TEJUSTLEFT)
 |#
-
-ccl::*shared-libraries*
-
-(defmethod window-title ((view easygui:view))
-  ;TODO: Maybe use easygui:view-text method here?
-  (easygui::window-title view))
-
-(setf (symbol-function 'make-point) #'easygui:point)
-(setf (symbol-function 'point-v) #'easygui:point-y)
-(setf (symbol-function 'point-h) #'easygui:point-x)
 
 (defclass view-text-via-title-mixin (easygui::view-text-via-title-mixin)
   ((easygui::text :initarg :window-title)))
@@ -113,6 +111,10 @@ ccl::*shared-libraries*
          :text text
          :action action
          attributes))
+
+(defmethod part-color ((view easygui:static-text-view) part)
+  (declare (ignore part))
+  (easygui:get-fore-color view))
 
 (defmethod set-part-color ((view easygui:view) part new-color)
   (declare (ignore part))
@@ -149,7 +151,4 @@ ccl::*shared-libraries*
 (defmethod view-font ((view easygui:static-text-view))
   (easygui:view-font view))
 
-(defmethod part-color ((view easygui:static-text-view) part)
-  (declare (ignore part))
-  (easygui:get-fore-color view))
 
