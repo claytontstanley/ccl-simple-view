@@ -1002,7 +1002,7 @@
 ;;; make the fous ring
 
 (eval-when (load eval)
-  (setf *attn-tracker* (make-instance 'focus-ring )))
+  (setf *attn-tracker* (make-instance 'focus-ring)))
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; color text stuff
