@@ -108,6 +108,7 @@
                (list 200 200)
                'blue))
 
+
 (add-visual-items-to-rpm-window *win* *view*)
 (sleep .5)
 

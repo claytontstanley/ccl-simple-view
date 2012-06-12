@@ -1,5 +1,35 @@
 (print (list-all-packages))
 
+
+#|
+(load-os-constant 'e)
+(print #$TEJUSTLEFT)
+(ccl::%LOAD-VAR 'X86-DARWIN64::TEJUSTLEFT NIL)
+(maphash #'print-hash-entry (ccl::fvs))
+(gethash "NSKernAttributeName" *t*)
+(gethash "tejustleft" *t*)
+(print #$NSLinkAttributeName)
+(ccl::extract-db-type 0 ccl::*target-ftd*)
+(print (svref ccl::*signed-integer-types* 64))
+(ccl::%cons-foreign-variable "tejustleft" 'integer)
+(setf *fv* *)
+(print ccl::*foreign-type-classes*)
+(maphash #'print-hash-entry ccl::*foreign-type-classes*)
+;(ccl::%cons-foreign-variable "tejustleft" (gethash 'INTEGER ccl::*foreign-type-classes*)))
+(setf (gethash "tejustleft" (ccl::fvs))
+      (ccl::%cons-foreign-variable "tejustleft" (svref ccl::*signed-integer-types* 64) ))
+(ccl::resolve-foreign-variable "tejustleft")
+(defun print-hash-entry (key value)
+  (format t "The value associated with the key ~S is ~S~%" key value))
+(alexandria:maphash-keyskccl::fvs)
+(defconstant os::TEJUSTLEFT 0)
+(print os::TEJUSTLEFT)
+|#
+
+
+
+
+
 (open-shared-library "/Users/claytonstanley/src/mcl-migration/actr6/devices/ccl/libtypetest.dylib")
 (inspect ccl::*shared-libraries*)
 (#_void_void_test :void)

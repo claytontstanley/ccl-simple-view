@@ -453,6 +453,7 @@
 (defmethod height ((self simple-view))
   (point-v (view-size self)))
 
+|#
 
 ;;;; ---------------------------------------------------------------------- ;;;;;;;
 ;;;; The view based line drawing classes and methods
@@ -496,7 +497,7 @@
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : Draw a top-down line on it's container window.
 
-(defmethod view-draw-contents ((lnr td-liner))
+#|(defmethod view-draw-contents ((lnr td-liner))
   "Draws the line on the view-container window using the color specified
    and restoring the previous draw color and pen position"
   (let* ((parent (view-container lnr))
@@ -526,7 +527,8 @@
                                 (point-v (view-position lnr))))
     (set-fore-color parent old-color)
     (move-to parent old-point)))
-
+|#
+#|
 
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : A td-liner is just a line-feature located "at" it's mid-point.
