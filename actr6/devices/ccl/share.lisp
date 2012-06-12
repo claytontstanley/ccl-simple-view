@@ -4,9 +4,20 @@
 (shadowing-import 'easygui:window)
 (shadowing-import 'easygui:view)
 
-(setf (symbol-function 'make-point) #'easygui:point)
 (setf (symbol-function 'point-v) #'easygui:point-y)
 (setf (symbol-function 'point-h) #'easygui:point-x)
+(import 'easygui:point-x)
+(import 'easygui:point-y)
+
+(defun make-point (x y)
+  (make-instance 'easygui::eg-point :x x :y y))
+
+(defmethod add-points ((p1 easygui::eg-point) (p2 easygui::eg-point))
+  (make-point
+    (+ (point-x p1) (point-x p2))
+    (+ (point-y p1) (point-y p2))))
+
+
 
 (defmethod add-subviews ((view easygui:view) &rest subviews)
   (when subviews
@@ -43,7 +54,7 @@
   (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
                                                  (point-v xyloc))))
 
-(defun view-draw-contents (win)
+(defmethod view-draw-contents ((win easygui:view))
   (declare (ignore win))
   ())
 
@@ -55,6 +66,8 @@
   (easygui::window-title view))
 
 (defparameter *black-color* 'black)
+(defparameter *red-color* 'red)
+(defparameter *light-gray-pattern* 'gray)
 
 #|
 (load-os-constant 'e)
@@ -103,6 +116,9 @@
 
 (defclass static-text-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:static-text-view) ())
 
+(defclass simple-view (view-mixin easygui:drawing-view) ())
+
+;(defclass simple-view (td-liner) ())
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   (apply #'make-instance 
@@ -146,10 +162,61 @@
 (defmethod view-position ((view easygui:view))
   (easygui:view-position view))
 
+(defmethod set-view-position ((view easygui:view) x &optional (y nil))
+  (let ((pos (if y
+               (make-point x y)
+               x)))
+    (setf (easygui:view-position view) pos)))
+
+(defmethod view-size ((view easygui:view))
+  (easygui:view-size view))
+
+
+(defmethod view-window ((view easygui:window))
+  view)
+
+(defmethod view-window ((view easygui:view))
+  (awhen (easygui:view-container view)
+    (view-window it)))
+
+(defmethod pen-mode ((view easygui:view)) ())
+
+(defmethod pen-pattern ((view easygui:view)) ())
+
+(defmethod pen-size ((view easygui:view))
+  (make-point 4 4))
+
+(defmethod set-pen-mode ((view easygui:view) newmode)
+  (declare (ignore newmode))
+  ())
+
+(defmethod set-pen-pattern ((view easygui:view) newpattern)
+  (declare (ignore newpattern))
+  ())
+
+(defmethod set-pen-size ((view easygui:view) h &optional v)
+  (declare (ignore h v))
+  ())
+
+(defmethod frame-oval ((view easygui:view) left &optional top right bottom)
+  (assert left)
+  (assert top)
+  (assert (not right))
+  (assert (not bottom)))
+
+(defmacro with-fore-color (color &body body)
+  `(progn
+     ,@body))
+
+(defmacro with-focused-view (view &body body)
+  `(progn
+     ,@body))
+
 (defmethod dialog-item-text ((view easygui:static-text-view))
   (easygui:view-text view))
 
 (defmethod view-font ((view easygui:static-text-view))
   (easygui:view-font view))
 
-
+(defmethod draw-view-rectangle ((view focus-ring))
+  (frame-oval view (make-point 0 0) (view-size view)))
