@@ -80,7 +80,7 @@
    (easygui::foreground :initarg :color)))
 
 (defclass simple-view (view-mixin easygui:drawing-view)
-  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 10 0))))
+  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))))
 
 (defclass color-dialog (view-text-via-title-mixin view-mixin easygui:window) ())
 
@@ -95,7 +95,6 @@
 
 (defclass static-text-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:static-text-view) ())
 
-#|
 (defmethod move-to ((view simple-view) position)
   (setf (pen-position view) position))
 
@@ -104,36 +103,28 @@
                                             (point-y (pen-position view)))
     (destructuring-bind (endx endy) (list (point-x position)
                                           (point-y position))
-      (with-focused-view view
-        (#/set (slot-value view 'easygui::foreground))
-        (#/strokeLineFromPoint:toPoint:
-         ns:ns-bezier-path
-         (ns:make-ns-point startx starty) 
-         (ns:make-ns-point endx endy))))))
-|#
-
-(defmethod get-start ((view td-liner))
-  (list 0 (easygui:point-y (view-size view))))
-
-(defmethod get-start ((view bu-liner))
-  (list 0 0))
-
-(defmethod get-end ((view td-liner))
-  (list (easygui:point-x (view-size view)) 0))
-
-(defmethod get-end ((view bu-liner))
-  (list (easygui:point-x (view-size view))
-        (easygui:point-y (view-size view))))
-
-(defmethod view-draw-contents ((view liner))
-  ; TODO Use with-fore-color instead of set explicitly here
-  (#/set (get-fore-color view))
-  (destructuring-bind (startx starty) (get-start view)
-    (destructuring-bind (endx endy) (get-end view)
+      ; TODO Use with-fore-color instead of set explicitly here
+      (#/set (get-fore-color view))
       (#/strokeLineFromPoint:toPoint:
        ns:ns-bezier-path
        (ns:make-ns-point startx starty) 
        (ns:make-ns-point endx endy)))))
+
+(defmethod get-start ((view td-liner))
+  (make-point 0 (easygui:point-y (view-size view))))
+
+(defmethod get-start ((view bu-liner))
+  (make-point 0 0))
+
+(defmethod get-end ((view td-liner))
+  (make-point (easygui:point-x (view-size view)) 0))
+
+(defmethod get-end ((view bu-liner))
+  (view-size view))
+
+(defmethod view-draw-contents ((view liner))
+  (move-to view (get-start view))
+  (line-to view (get-end view)))
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   (apply #'make-instance 
