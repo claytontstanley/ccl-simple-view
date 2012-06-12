@@ -454,6 +454,7 @@
   (point-v (view-size self)))
 
 |#
+#|
 
 ;;;; ---------------------------------------------------------------------- ;;;;;;;
 ;;;; The view based line drawing classes and methods
@@ -497,7 +498,7 @@
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : Draw a top-down line on it's container window.
 
-#|(defmethod view-draw-contents ((lnr td-liner))
+(defmethod view-draw-contents ((lnr td-liner))
   "Draws the line on the view-container window using the color specified
    and restoring the previous draw color and pen position"
   (let* ((parent (view-container lnr))
@@ -527,8 +528,7 @@
                                 (point-v (view-position lnr))))
     (set-fore-color parent old-color)
     (move-to parent old-point)))
-|#
-#|
+
 
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : A td-liner is just a line-feature located "at" it's mid-point.
@@ -704,6 +704,7 @@
   (view-click-event-handler device (view-mouse-position device))
   (event-dispatch))
 
+
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
 ;;; Date        : 97.02.18 [revised 98.10.29]
 ;;; Description : Since moving the mouse is considered a Bad Thing by 
@@ -743,6 +744,7 @@
     (update-cursor)
     (while (not (vpt= xyloc (p2vpt (view-mouse-position device))))
       (event-dispatch))))
+
 
 (unless (fboundp 'speech-available-p)
   (defun speech-available-p () nil))
