@@ -126,10 +126,10 @@
         (easygui:point-y (view-size view))))
 
 (defmethod view-draw-contents ((view liner))
+  ; TODO Use with-fore-color instead of set explicitly here
   (#/set (get-fore-color view))
   (destructuring-bind (startx starty) (get-start view)
     (destructuring-bind (endx endy) (get-end view)
-      (print startx)
       (#/strokeLineFromPoint:toPoint:
        ns:ns-bezier-path
        (ns:make-ns-point startx starty) 
