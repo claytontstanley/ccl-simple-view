@@ -212,32 +212,19 @@
 ;;; Description : Build and return the appropriate liner object for the
 ;;;             : window based on the parameters supplied.
 
-(defmethod make-line-for-rpm-window ((wind rpm-real-window) start-pt end-pt 
-                                                            &optional (color 'black))
-  (let* ((gx (> (first end-pt) (first start-pt)))
-         (gy (> (second end-pt) (second start-pt)))
-         (vs (make-point (+ 1 (abs (- (first end-pt) (first start-pt))))
-                         (+ 1 (abs (- (second end-pt) (second start-pt)))))))
-    (cond ((and gx gy)
-           (make-instance 'td-liner
-                          :color (color-symbol->system-color color)
-                          :view-position (make-point (first start-pt) (second start-pt)) 
-                          :view-size vs))
-          ((and (not gx) (not gy))
-           (make-instance 'td-liner
-                          :color (color-symbol->system-color color)
-                          :view-position (make-point (first end-pt) (second end-pt)) 
-                          :view-size vs))
-          ((and gx (not gy))
-           (make-instance 'bu-liner
-                          :color (color-symbol->system-color color)
-                          :view-position (make-point (first start-pt) (second end-pt))
-                          :view-size vs))
-          (t
-           (make-instance 'bu-liner
-                          :color (color-symbol->system-color color)
-                          :view-position (make-point (first end-pt) (second start-pt))
-                          :view-size vs)))))
+(defmethod make-line-for-rpm-window ((wind rpm-real-window) start-pt end-pt &optional (color 'black))
+  (destructuring-bind (startx starty) start-pt
+    (destructuring-bind (endx endy) end-pt
+      (unless (> endx startx)
+        (rotatef startx endx)
+        (rotatef starty endy))
+      (let ((vs (make-point (+ 1 (abs (- endx startx)))
+                            (+ 1 (abs (- endy starty)))))
+            (vp (make-point startx (min starty endy))))
+        (make-instance (if (> endy starty) 'up-liner 'down-liner)
+                       :position vp
+                       :size vs
+                       :fore-color (color-symbol->system-color color))))))
 
 ;;; ALLOW-EVENT-MANAGER  [Method]
 ;;; Description : Call event-dispatch.  This is used while waiting for

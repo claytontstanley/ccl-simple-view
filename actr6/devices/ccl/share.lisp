@@ -42,7 +42,11 @@
   (easygui:perform-close win))
 
 (defmethod view-mouse-position ((view view))
-  (easygui:view-mouse-position view))
+  (let* ((w (easygui:cocoa-ref (easygui::easygui-window-of view)))
+         (mouselocation (easygui:dcc (#/mouseLocationOutsideOfEventStream w)))
+         (cview (if (typep view 'window) (easygui:content-view view) view))
+         (nspt (easygui:dcc (#/convertPoint:fromView: (easygui:cocoa-ref cview) mouselocation NIL))))
+    (make-point (ns:ns-point-x nspt) (ns:ns-point-y nspt))))
 
 (defmethod wptr ((view view))
   (#/isVisible (easygui::cocoa-ref view)))
@@ -86,9 +90,13 @@
 
 (defclass liner (simple-view) ())
 
-(defclass td-liner (liner) ())
+(defclass up-liner (liner) ())
 
-(defclass bu-liner (liner) ())
+(defclass down-liner (liner) ())
+
+(defclass td-liner (up-liner) ())
+
+(defclass bu-liner (down-liner) ())
 
 (defclass button-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:push-button-view)
    ((easygui::default-button-p :initarg :default-button)))
@@ -110,16 +118,16 @@
        (ns:make-ns-point startx starty) 
        (ns:make-ns-point endx endy)))))
 
-(defmethod get-start ((view td-liner))
-  (make-point 0 (easygui:point-y (view-size view))))
+(defmethod get-start ((view down-liner))
+  (make-point 0 (point-y (view-size view))))
 
-(defmethod get-start ((view bu-liner))
+(defmethod get-start ((view up-liner))
   (make-point 0 0))
 
-(defmethod get-end ((view td-liner))
-  (make-point (easygui:point-x (view-size view)) 0))
+(defmethod get-end ((view down-liner))
+  (make-point (point-x (view-size view)) 0))
 
-(defmethod get-end ((view bu-liner))
+(defmethod get-end ((view up-liner))
   (view-size view))
 
 (defmethod view-draw-contents ((view liner))
@@ -165,11 +173,7 @@
     (setf (easygui::content-view window) view)
     (easygui::window-show window)))
 
-(defun font-info (font-spec)
-  (values 0 0))
 
-(defun string-width (&rest args)
-  1)
 
 (defmethod view-position ((view easygui:view))
   (easygui:view-position view))
@@ -236,7 +240,21 @@
   (easygui:view-text view))
 
 (defmethod view-font ((view easygui:static-text-view))
-  (easygui:view-font view))
+  (#/font (easygui:cocoa-ref view)))
+
+(defun font-info (font-spec)
+  (values (#/ascender font-spec)
+          (abs (#/descender font-spec))))
+
+(defun string-width (str font)
+  (let* ((dict (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
+                font #$NSFontAttributeName 
+                ccl:+null-ptr+))
+         (attr (#/initWithString:attributes: (#/alloc ns:ns-attributed-string)
+                (ccl::%make-nsstring str)
+                dict))
+         (size (#/size attr)))
+    (ns:ns-size-width size)))
 
 (objc:defmethod (#/drawRect: :void) ((self easygui::cocoa-drawing-view)
                                      (rect :<NSR>ect))

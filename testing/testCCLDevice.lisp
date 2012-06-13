@@ -4,7 +4,6 @@
 ;(visible-virtuals-available?)
 ;(start-environment)
 ;(stop-environment)
-
 #-:act-r-6.0 (load "~/src/actr6/load-act-r-6.lisp")
 #+clozure (require :cocoa)
 #+clozure (require :easygui)
@@ -12,6 +11,8 @@
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/share.lisp")
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/device.lisp")
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/uwi.lisp")
+
+;(setf easygui:*screen-flipped* t)
 
 (defun flash-text (&optional (text "!!!!"))
   (setf *view* (make-static-text-for-rpm-window
@@ -80,7 +81,6 @@
 (add-visual-items-to-rpm-window *win* *view*)
 (sleep .5)
 
-
 (setf *view* (make-line-for-rpm-window
                *win*
                (list 100 200)
@@ -107,9 +107,8 @@
                (list 300 220)
                (list 200 200)
                'blue))
-
-
 (add-visual-items-to-rpm-window *win* *view*)
+
 (sleep .5)
 
 (setf *view* (make-line-for-rpm-window
@@ -123,8 +122,8 @@
 (sleep .5)
 
 
-(remove-all-items-from-rpm-window *win*)
+;(remove-all-items-from-rpm-window *win*)
 
-(close-rpm-window *win*)
+;(close-rpm-window *win*)
 
-(assert (null (open-rpm-window? *win*)))
+;(assert (null (open-rpm-window? *win*)))
