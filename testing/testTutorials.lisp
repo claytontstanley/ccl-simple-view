@@ -13,13 +13,19 @@
   #+:digitool ":"
   #+:clozure "/")
 
-;(dolist (tutorial (list "unit1" "unit2" "unit3"))
-;(dolist (tutorial (list "unit4"))
-(dolist (tutorial (list "unit5"))
+(defun do-tutorial (tutorial)
   (let ((path-to-loader
           (format nil "~a~a~a~a~a~a"
                   (directory-namestring *load-truename*) "tutorial" *path-separator* tutorial *path-separator* "loader.lisp")))
     (print path-to-loader)
     (load path-to-loader)))
 
-(print-visicon)
+;(print-visicon)
+
+; This suite takes about 4 mins to run on CCL:
+; (mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit4"))
+
+
+(mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit5"))
+
+
