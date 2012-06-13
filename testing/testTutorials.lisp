@@ -7,6 +7,13 @@
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/device.lisp")
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/uwi.lisp")
 
+(defun run-in-file (file fun)
+  (load (concatenate 'string
+                     (directory-namestring *load-truename*)
+                     file))
+  (funcall fun)
+  (close-rpm-window *library-experiment-window*))
+
 ;(setf easygui:*screen-flipped* nil)
 
 (defparameter *path-separator*
@@ -22,9 +29,8 @@
 
 ;(print-visicon)
 
-; This suite takes about 4 mins to run on CCL:
-; (mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit4"))
-
+; This suite takes about 4 mins to run on CCL b/c of unit4:
+;(mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit4"))
 
 (mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit5"))
 
