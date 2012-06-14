@@ -221,7 +221,7 @@
       (let ((vs (make-point (+ 1 (abs (- endx startx)))
                             (+ 1 (abs (- endy starty)))))
             (vp (make-point startx (min starty endy))))
-        (make-instance (if (> endy starty) 'up-liner 'down-liner)
+        (make-instance (if (> endy starty) 'td-liner 'bu-liner)
                        :position vp
                        :size vs
                        :fore-color (color-symbol->system-color color))))))

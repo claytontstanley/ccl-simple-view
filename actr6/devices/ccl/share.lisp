@@ -22,9 +22,26 @@
    (easygui::position :initarg :view-position)
    (easygui::foreground :initarg :color)))
 
+(defclass easygui::cocoa-drawing-overlay-view (easygui::cocoa-drawing-view)
+  ()
+  (:metaclass ns:+ns-object))
+
+(defclass easygui::drawing-overlay-view (easygui::drawing-view)
+  ())
+
+(objc:defmethod #/hitTest: ((self easygui::cocoa-drawing-overlay-view)
+                            (point :<NSP>oint))
+                ccl:+null-ptr+)
+
+(push (cons 'easygui::drawing-overlay-view 'easygui::cocoa-drawing-overlay-view) easygui::*view-class-to-ns-class-map*)
+
 (defclass simple-view (view-mixin easygui:drawing-view)
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0)))
   (:documentation "Top-level class for views"))
+
+(defclass simple-overlay-view (view-mixin easygui::drawing-overlay-view)
+  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0)))
+  (:documentation "Top-level class for views that do not monitor mouse clicks and mouse movement"))
 
 (defclass color-dialog (view-text-via-title-mixin view-mixin easygui:window)
   ()
@@ -32,16 +49,12 @@
 
 (defclass liner (simple-view) ())
 
-(defclass up-liner (liner) ())
+(defclass td-liner (liner) ())
 
-(defclass down-liner (liner) ())
+(defclass bu-liner (liner) ())
 
-(defclass td-liner (up-liner) ())
-
-(defclass bu-liner (down-liner) ())
-
-(defclass button-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:push-button-view)
-   ((easygui::default-button-p :initarg :default-button)))
+(defclass button-dialog-item (view-text-via-title-mixin view-mixin easygui::text-fonting-mixin easygui:push-button-view)
+  ((easygui::default-button-p :initarg :default-button)))
 
 (defclass static-text-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:static-text-view) ())
 
@@ -51,7 +64,7 @@
          :view-position position
          :view-size size
          :text text
-         :action action
+         :action (lambda () (funcall action 'obj))
          attributes))
 
 ; ----------------------------------------------------------------------
@@ -107,7 +120,7 @@
   ;TODO: Maybe use easygui:view-text method here?
   (easygui::window-title view))
 
-(defmethod dialog-item-text ((view easygui:static-text-view))
+(defmethod dialog-item-text ((view easygui::view-text-mixin))
   (easygui:view-text view))
 
 (defmethod view-position ((view easygui:view))
@@ -178,6 +191,9 @@
   (declare (ignore part))
   (get-fore-color view))
 
+(defmethod color ((view easygui:view))
+  (get-fore-color view))
+
 (defmethod set-fore-color ((view easygui:view) new-color)
   (easygui:set-fore-color view new-color))
 
@@ -205,6 +221,29 @@
          (cview (if (typep view 'window) (easygui:content-view view) view))
          (nspt (easygui:dcc (#/convertPoint:fromView: (easygui:cocoa-ref cview) mouselocation NIL))))
     (make-point (ns:ns-point-x nspt) (ns:ns-point-y nspt))))
+
+(defun create-mouse-event (event pos)
+  (#_CGEventCreateMouseEvent
+   ccl:+null-ptr+
+   event
+   pos
+   0))
+
+(defun left-mouse-up (pos)
+  (#_CGEventPost
+   0
+   (create-mouse-event #$NSLeftMouseUp pos)))
+
+(defun left-mouse-down (pos)
+  (#_CGEventPost
+   0
+   (create-mouse-event #$NSLeftMouseDown pos)))
+
+(defun left-mouse-click (pos)
+  (let ((pos (easygui::ns-point-from-point pos)))
+    (left-mouse-down pos)
+    (left-mouse-up pos)))
+
 
 ; Handling keyboard interaction
 
@@ -261,16 +300,16 @@
   (declare (ignore view))
   ())
 
-(defmethod get-start ((view down-liner))
+(defmethod get-start ((view bu-liner))
   (make-point 0 (point-y (view-size view))))
 
-(defmethod get-start ((view up-liner))
+(defmethod get-start ((view td-liner))
   (make-point 0 0))
 
-(defmethod get-end ((view down-liner))
+(defmethod get-end ((view bu-liner))
   (make-point (point-x (view-size view)) 0))
 
-(defmethod get-end ((view up-liner))
+(defmethod get-end ((view td-liner))
   (view-size view))
 
 (defmethod view-draw-contents ((view liner))
@@ -290,7 +329,7 @@
 
 ; Handling fonts and string width/height in pixels
 
-(defmethod view-font ((view easygui:static-text-view))
+(defmethod view-font ((view easygui::text-fonting-mixin))
   (#/font (easygui:cocoa-ref view)))
 
 (defun font-info (font-spec)

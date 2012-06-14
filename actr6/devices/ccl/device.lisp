@@ -97,10 +97,10 @@
 (defvar *attn-tracker* nil "Holds the view for the focus ring.")
 ;(defparameter *last-update* (get-internal-real-time))
 
-#|(defun loc-avg (x y)
+(defun loc-avg (x y)
   "Return the 'location' (integer) average of <x> and <y>."
   (declare (fixnum x) (fixnum y))
-  (floor (/ (+ x y) 2)))|#
+  (floor (/ (+ x y) 2)))
 
 ;;;; ---------------------------------------------------------------------- ;;;;;;;
 ;;;; MCL screen-to-icon interface
@@ -175,7 +175,7 @@
       (setf (chunk-visual-object x) self))
     feats))
 
-
+|#
 (defmethod build-vis-locs-for ((self button-dialog-item)
                                   (vis-mod vision-module))
   (let* ((btn-width (point-h (view-size self)))
@@ -227,6 +227,7 @@
     
     feats))
 
+#|
 |#
 
 
@@ -424,6 +425,7 @@
                        (local-to-global tw (view-mouse-position tw))))))
 
 
+|#
 
 (defmethod view-loc ((self view))
   (let ((pos (view-position self))
@@ -445,14 +447,13 @@
     (get-mouse-coordinates (current-device))
     (error "!! Can't find location of ~S" self)))
 
-
+#|
 (defmethod width ((self simple-view))
   (point-h (view-size self)))
 
 
 (defmethod height ((self simple-view))
   (point-v (view-size self)))
-
 |#
 #|
 
@@ -530,6 +531,8 @@
     (move-to parent old-point)))
 
 
+|#
+
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : A td-liner is just a line-feature located "at" it's mid-point.
 
@@ -550,7 +553,7 @@
     (setf (chunk-visual-object f) lnr)
     f))
 
-(defmethod vis-loc-to-obj ((lnr td-liner) loc)
+#|(defmethod vis-loc-to-obj ((lnr td-liner) loc)
   (let ((start-pt (view-position lnr))
         (end-pt (subtract-points (add-points (view-position lnr) (view-size lnr)) 
                                  (make-point 1 1)))
@@ -559,7 +562,7 @@
     (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
     (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
     (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-    v-o))
+    v-o))|#
 
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : A bu-liner is just a line-feature located "at" it's mid-point.
@@ -582,7 +585,7 @@
     (setf (chunk-visual-object f) lnr)
     f))
 
-(defmethod vis-loc-to-obj ((lnr bu-liner) loc)
+#|(defmethod vis-loc-to-obj ((lnr bu-liner) loc)
   (let ((start-pt (add-points (view-position lnr)
                                (make-point 0 (1- (point-v (view-size lnr))))))
         (end-pt (add-points (view-position lnr) 
@@ -592,8 +595,10 @@
     (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
     (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
     (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-    v-o))
+    v-o))|#
 
+
+#|
 
 ;;; RPM-VIEW-LINE [Function]
 ;;; Description : Add a view to the window that displays a line defined by
@@ -696,15 +701,15 @@
       (view-draw-contents view)))
   )
 
-
+|#
 ;;; DEVICE-HANDLE-CLICK      [Method]
 ;;; Description : Again, just call the base MCL method and dispatch.
 
 (defmethod device-handle-click ((device window))
-  (view-click-event-handler device (view-mouse-position device))
-  (event-dispatch))
+  (left-mouse-click
+    (local-to-global device (view-mouse-position device))))
 
-
+#|
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
 ;;; Date        : 97.02.18 [revised 98.10.29]
 ;;; Description : Since moving the mouse is considered a Bad Thing by 
@@ -934,7 +939,7 @@
 ;;;             : the view and the upper-left corner, as a QuickDraw point.
 ;;;             : For example, for the focus ring its #@(-10 -10).
 
-(defclass rpm-overlay (simple-view)
+(defclass rpm-overlay (simple-overlay-view)
   ((offset :accessor offset :initarg :offset :initform nil)))
 
 
