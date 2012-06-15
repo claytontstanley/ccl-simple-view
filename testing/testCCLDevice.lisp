@@ -68,7 +68,7 @@
                :x 10
                :y 100
                :text "bute"
-               :action (lambda () (sleep .5))))
+               :action (lambda (obj) (sleep .5))))
 (add-visual-items-to-rpm-window *win* *view*)
 (sleep .5)
 
