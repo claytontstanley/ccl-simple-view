@@ -15,8 +15,6 @@
   (when close-window-p
     (close-rpm-window *library-experiment-window*)))
 
-;(setf easygui:*screen-flipped* nil)
-
 (defparameter *path-separator*
   #+:digitool ":"
   #+:clozure "/")
@@ -32,11 +30,9 @@
 ; This suite takes about 4 mins to run on CCL b/c of unit4:
 ;(mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit4"))
 
-;(mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit5"))
+; This suite takes about 4 mins to run on CCL b/c of unit7:
+;(mapc #'do-tutorial (list "unit7"))
 
-;(inspect #'build-vis-locs-for)
+(mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit5" "unit6" "unit8"))
 
-(print-visicon)
-
-(mapc #'do-tutorial (list "unit6"))
 
