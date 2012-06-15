@@ -33,6 +33,6 @@
 ; This suite takes about 4 mins to run on CCL b/c of unit7:
 ;(mapc #'do-tutorial (list "unit7"))
 
-(mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit5" "unit6" "unit8"))
+(mapc #'do-tutorial (list  "unit2" "unit3" "unit5" "unit6" "unit8"))
 
 

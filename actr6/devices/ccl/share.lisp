@@ -22,19 +22,6 @@
    (easygui::position :initarg :view-position)
    (easygui::foreground :initarg :color)))
 
-(defclass easygui::cocoa-drawing-overlay-view (easygui::cocoa-drawing-view)
-  ()
-  (:metaclass ns:+ns-object))
-
-(defclass easygui::drawing-overlay-view (easygui::drawing-view)
-  ())
-
-(objc:defmethod #/hitTest: ((self easygui::cocoa-drawing-overlay-view)
-                            (point :<NSP>oint))
-                ccl:+null-ptr+)
-
-(push (cons 'easygui::drawing-overlay-view 'easygui::cocoa-drawing-overlay-view) easygui::*view-class-to-ns-class-map*)
-
 (defclass simple-view (view-mixin easygui:drawing-view)
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0)))
   (:documentation "Top-level class for views"))
@@ -86,9 +73,6 @@
 (setf (symbol-function 'point-h) #'easygui:point-x)
 (import 'easygui:point-x)
 (import 'easygui:point-y)
-(defparameter *black-color* 'black)
-(defparameter *red-color* 'red)
-(defparameter *light-gray-pattern* 'gray)
 
 (defun make-point (x y)
   (make-instance 'easygui::eg-point :x x :y y))
@@ -145,21 +129,37 @@
 (defmethod view-container ((view easygui:view))
   (easygui:view-container view))
 
-; ----------------------------------------------------------------------
 ; Other MCL drawing methods are not available in the easygui package.
 ; For these, move down a layer below easygui, and implement the functionality
 ; using CCL's Objective C bridge. Most bridge calls will have #/ or #_ reader
 ; macros in the expression
-; ----------------------------------------------------------------------
+
+; A few with-... macros to handle setup/teardown, and make programming a bit easier
+
+; This one uses Doug Hoyte's defmacro! and ,g!... syntax to easily handle unwanted variable capture. 
+(defmacro! with-graphics-context (&body body)
+  "Any changes to the graphics environment by body, will be valid only in body"
+  `(let ((,g!context (#/currentContext ns::ns-graphics-context)))
+     (unwind-protect (progn 
+                       (#/saveGraphicsState ,g!context)
+                       ,@body)
+       (#/restoreGraphicsState ,g!context))))
+
+(defmacro with-fore-color (color &body body)
+  `(with-graphics-context
+     (#/set ,color)
+     ,@body))
+
+(defmacro with-focused-view (view &body body)
+  "Any changes to the graphics environment by body will be directed to the view object"
+  `(easygui:with-focused-view (easygui:cocoa-ref ,view)
+     ,@body))
 
 (defmethod wptr ((view view))
   (#/isVisible (easygui::cocoa-ref view)))
 
 (defmethod local-to-global ((view view) local-pos)
-  (let ((view-pos (easygui:view-position view)))
-    (make-point
-      (+ (point-h view-pos) (point-h local-pos))
-      (+ (point-v view-pos) (point-v local-pos)))))
+    (add-points (easygui:view-position view) local-pos))
 
 (defmethod move-to ((view simple-view) position)
   (setf (pen-position view) position))
@@ -169,20 +169,13 @@
                                             (point-y (pen-position view)))
     (destructuring-bind (endx endy) (list (point-x position)
                                           (point-y position))
-      ; TODO Use with-fore-color instead of set explicitly here
-      (#/set (get-fore-color view))
-      (#/strokeLineFromPoint:toPoint:
-       ns:ns-bezier-path
-       (ns:make-ns-point startx starty) 
-       (ns:make-ns-point endx endy)))))
+      (with-fore-color (get-fore-color view)
+        (#/strokeLineFromPoint:toPoint:
+         ns:ns-bezier-path
+         (ns:make-ns-point startx starty) 
+         (ns:make-ns-point endx endy))))))
 
-(defmacro with-fore-color (color &body body)
-  `(progn
-     ,@body))
 
-(defmacro with-focused-view (view &body body)
-  `(easygui:with-focused-view (easygui:cocoa-ref ,view)
-     ,@body))
 
 (defmethod get-fore-color ((view easygui:view))
   (easygui:get-fore-color view))
@@ -350,3 +343,221 @@
 
 (defun event-dispatch ()
   ())
+
+; ----------------------------------------------------------------------
+; Defining color-symbol->system-color and system-color->symbol for CCL.
+;
+; These functions may have been in the base CCL distro, but I couldn't find them.
+; So I searched online for a table of color names -> rgb mappings, threw that
+; data into a bash shell, cleaned up the text, and then pasted it here. A few lisp
+; parenths were wrapped around that, which turned the data into a lexical closure.
+; ----------------------------------------------------------------------
+
+(let ((rgb-list
+        (list
+          'Grey (list 84 84 84)
+          'grey (list 190 190 190)
+          'gray (list 190 190 190)
+          'LightGray (list 211 211 211)
+          'LightSlateGrey (list 119 136 153)
+          'SlateGray (list 112 128 144)
+          'black (list 0 0 0)
+          'AliceBlue (list 240 248 255)
+          'BlueViolet (list 138 43 226)
+          'CadetBlue (list 95 158 160)
+          'CadetBlue (list 95 158 160)
+          'CornflowerBlue (list 100 149 237)
+          'DarkSlateBlue (list 72 61 139)
+          'DarkTurquoise (list 0 206 209)
+          'DeepSkyBlue (list 0 191 255)
+          'DodgerBlue (list 30 144 255)
+          'LightBlue (list 173 216 230)
+          'LightCyan (list 224 255 255)
+          'LightSkyBlue (list 135 206 250)
+          'LightSlateBlue (list 132 112 255)
+          'LightSteelBlue (list 176 196 222)
+          'Aquamarine (list 112 219 147)
+          'MediumBlue (list 0 0 205)
+          'MediumSlateBlue (list 123 104 238)
+          'MediumTurquoise (list 72 209 204)
+          'MidnightBlue (list 25 25 112)
+          'NavyBlue (list 0 0 128)
+          'PaleTurquoise (list 175 238 238)
+          'PowderBlue (list 176 224 230)
+          'RoyalBlue (list 65 105 225)
+          'SkyBlue (list 135 206 235)
+          'SlateBlue (list 106 90 205)
+          'SteelBlue (list 70 130 180)
+          'aquamarine (list 127 255 212)
+          'azure (list 240 255 255)
+          'blue (list 0 0 255)
+          'aqua (list 0 255 255)
+          'cyan (list 0 255 255)
+          'navy (list 0 0 128)
+          'teal (list 0 128 128)
+          'turquoise (list 64 224 208)
+          'DarkSlateGray (list 47 79 79)
+          'Iris (list 3 180 200)
+          'RosyBrown (list 188 143 143)
+          'SaddleBrown (list 139 69 19)
+          'SandyBrown (list 244 164 96)
+          'beige (list 245 245 220)
+          'brown (list 165 42 42)
+          'brown (list 166 42 42)
+          'burlywood (list 222 184 135)
+          'chocolate (list 210 105 30)
+          'peru (list 205 133 63)
+          'tan (list 210 180 140)
+          'Sienna (list 142 107 35)
+          'Tan (list 219 147 112)
+          'DarkGreen (list 0 100 0)
+          'DarkKhaki (list 189 183 107)
+          'DarkOliveGreen (list 85 107 47)
+          'olive (list 128 128 0)
+          'DarkSeaGreen (list 143 188 143)
+          'ForestGreen (list 34 139 34)
+          'GreenYellow (list 173 255 47)
+          'LawnGreen (list 124 252 0)
+          'LightSeaGreen (list 32 178 170)
+          'LimeGreen (list 50 205 50)
+          'MediumSeaGreen (list 60 179 113)
+          'MediumSpringGreen (list 0 250 154)
+          'MintCream (list 245 255 250)
+          'OliveDrab (list 107 142 35)
+          'PaleGreen (list 152 251 152)
+          'SpringGreen (list 0 255 127)
+          'YellowGreen (list 154 205 50)
+          'chartreuse (list 127 255 0)
+          'green (list 0 255 0)
+          'green (list 0 128 0)
+          'lime (list 0 255 0)
+          'khaki (list 240 230 140)
+          'DarkOrange (list 255 140 0)
+          'DarkSalmon (list 233 150 122)
+          'LightCoral (list 240 128 128)
+          'LightSalmon (list 255 160 122)
+          'PeachPuff (list 255 218 185)
+          'bisque (list 255 228 196)
+          'coral (list 255 127 0)
+          'coral (list 255 127 80)
+          'honeydew (list 240 255 240)
+          'orange (list 255 165 0)
+          'salmon (list 250 128 114)
+          'sienna (list 160 82 45)
+          'Orange (list 255 127 0)
+          'DeepPink (list 255 20 147)
+          'HotPink (list 255 105 180)
+          'IndianRed (list 205 92 92)
+          'LightPink (list 255 182 193)
+          'MediumVioletRed (list 199 21 133)
+          'MistyRose (list 255 228 225)
+          'OrangeRed (list 255 69 0)
+          'PaleVioletRed (list 219 112 147)
+          'VioletRed (list 208 32 144)
+          'firebrick (list 178 34 34)
+          'pink (list 255 192 203)
+          'Flesh (list 245 204 176)
+          'Feldspar (list 209 146 117)
+          'red (list 255 0 0)
+          'tomato (list 255 99 71)
+          'Firebrick (list 142 35 35)
+          'Pink (list 188 143 143)
+          'Salmon (list 111 66 66)
+          'Scarlet (list 140 23 23)
+          'DarkOrchid (list 153 50 204)
+          'DarkViolet (list 148 0 211)
+          'LavenderBlush (list 255 240 245)
+          'MediumOrchid (list 186 85 211)
+          'MediumPurple (list 147 112 219)
+          'lavender (list 230 230 250)
+          'magenta (list 255 0 255)
+          'fuchsia (list 255 0 255)
+          'maroon (list 176 48 96)
+          'orchid (list 218 112 214)
+          'Orchid (list 219 112 219)
+          'plum (list 221 160 221)
+          'purple (list 160 32 240)
+          'purple (list 128 0 128)
+          'thistle (list 216 191 216)
+          'violet (list 238 130 238)
+          'Maroon (list 128 0 0)
+          'Plum (list 234 173 234)
+          'Thistle (list 216 191 216)
+          'Turquoise (list 173 234 234)
+          'Violet (list 79 47 79)
+          'AntiqueWhite (list 250 235 215)
+          'FloralWhite (list 255 250 240)
+          'GhostWhite (list 248 248 255)
+          'NavajoWhite (list 255 222 173)
+          'OldLace (list 253 245 230)
+          'WhiteSmoke (list 245 245 245)
+          'gainsboro (list 220 220 220)
+          'ivory (list 255 255 240)
+          'linen (list 250 240 230)
+          'seashell (list 255 245 238)
+          'snow (list 255 250 250)
+          'wheat (list 245 222 179)
+          'white (list 255 255 255)
+          'Quartz (list 217 217 243)
+          'Wheat (list 216 216 191)
+          'BlanchedAlmond (list 255 235 205)
+          'DarkGoldenrod (list 184 134 11)
+          'LemonChiffon (list 255 250 205)
+          'LightGoldenrod (list 238 221 130)
+          'LightGoldenrodYellow (list 250 250 210)
+          'LightYellow (list 255 255 224)
+          'PaleGoldenrod (list 238 232 170)
+          'PapayaWhip (list 255 239 213)
+          'cornsilk (list 255 248 220)
+          'goldenrod (list 218 165 32)
+          'moccasin (list 255 228 181)
+          'yellow (list 255 255 0)
+          'gold (list 255 215 0)
+          'Goldenrod (list 219 219 112)
+          'copper (list 184 115 51)
+          'brass (list 181 166 66)
+          'bronze (list 140 120 83)
+          'CSS (list 204 153 0)
+          'gold (list 205 127 50)
+          'silver (list 230 232 250))))
+  (defun color-symbol->rgb (symb)
+    (getf rgb-list symb))
+  (defun rgb->color-symbol (rgb)
+    (loop for item on rgb-list by #'cddr
+          do (destructuring-bind (cur-symb cur-rgb) (list (first item) (second item))
+               (when (equal cur-rgb rgb)
+                 (return-from rgb->color-symbol cur-symb))))))
+
+(defun color-symbol->system-color (symb)
+    (destructuring-bind (red green blue) (color-symbol->rgb symb)
+          (easygui:make-rgb :red red :green green :blue blue)))
+
+(defun system-color->symbol (color)
+    (let ((red (easygui:rgb-red color))
+                  (green (easygui:rgb-green color))
+                          (blue (easygui:rgb-blue color)))
+          (rgb->color-symbol (list red green blue))))
+
+(defparameter *black-color* (color-symbol->system-color 'black))
+(defparameter *red-color* (color-symbol->system-color 'red))
+(defparameter *light-gray-pattern* (color-symbol->system-color 'gray))
+
+; ----------------------------------------------------------------------
+; Manipulate the read table so that MCL's #@(a b) make-point shorthand works. 
+;
+; CCL does not support this by default, and the objective-c bridge has its own use for the
+; #@ macro character, so note that no easygui/objective-c code should be loaded/read
+; after this read-table mod is made. If this needs to be done, restore the readtable first
+; ----------------------------------------------------------------------
+
+(defparameter *nonhacked-readtable* (copy-readtable))
+; Code grabbed from RMCL, since MCL is now open-sourced (yay!)
+;for reading #@(h v) as points.
+(set-dispatch-macro-character 
+  #\# #\@
+  (defun |#@-reader| (stream char arg)
+    (declare (ignore arg char))
+    (let ((list (read stream t nil t)))
+      (unless *read-suppress*
+        (let ((point (apply #'make-point list)))
+          point)))))
