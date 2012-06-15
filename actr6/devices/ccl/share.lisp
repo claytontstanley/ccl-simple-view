@@ -22,15 +22,15 @@
    (easygui::position :initarg :view-position)
    (easygui::foreground :initarg :color)))
 
-(defclass simple-view (view-mixin easygui:drawing-view)
+(defclass simple-view (easygui:drawing-view view-mixin)
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0)))
   (:documentation "Top-level class for views"))
 
-(defclass simple-overlay-view (view-mixin easygui::drawing-overlay-view)
-  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0)))
+(defclass simple-overlay-view (simple-view easygui::drawing-overlay-view) 
+  ()
   (:documentation "Top-level class for views that do not monitor mouse clicks and mouse movement"))
 
-(defclass color-dialog (view-text-via-title-mixin view-mixin easygui:window)
+(defclass color-dialog (easygui:window view-text-via-title-mixin view-mixin)
   ()
   (:documentation "Top-level class for windows"))
 
@@ -40,10 +40,10 @@
 
 (defclass bu-liner (liner) ())
 
-(defclass button-dialog-item (view-text-via-title-mixin view-mixin easygui::text-fonting-mixin easygui:push-button-view)
+(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin view-mixin easygui::text-fonting-mixin)
   ((easygui::default-button-p :initarg :default-button)))
 
-(defclass static-text-dialog-item (view-text-via-stringvalue-mixin view-mixin easygui:static-text-view) ())
+(defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin view-mixin) ())
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   (apply #'make-instance 
