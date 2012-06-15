@@ -121,6 +121,25 @@
 (remove-visual-items-from-rpm-window *win* *view*)
 (sleep .5)
 
+(break)
+
+
+#|(setf *cocoa-win* (easygui:cocoa-ref *win*))
+(defun create-left-mouse-click (window)
+  "Returns an NSEvent object that describes a left mouse click at the current mouse location"
+  (#/mouseEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:clickCount:pressure: ns:ns-event
+   #$NSLeftMouseDown
+   (#/mouseLocationOutsideOfEventStream window) ;Mouse location
+   0 ;No flags
+   (coerce 0 'double-float) ;Occured at time 0.0; is this OK?
+   (#/windowNumber window) 
+   (#/graphicsContext window)
+   0 ;eventNumber 0; is this OK?
+   1 ;clickCount
+   (float 1)))
+(setf *the-event* (create-left-mouse-click *cocoa-win*))
+(#/sendEvent: (#/sharedApplication ns:ns-application)
+ *the-event*)|#
 
 ;(remove-all-items-from-rpm-window *win*)
 
