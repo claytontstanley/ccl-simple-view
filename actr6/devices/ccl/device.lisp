@@ -102,6 +102,7 @@
   (declare (fixnum x) (fixnum y))
   (floor (/ (+ x y) 2)))
 
+
 ;;;; ---------------------------------------------------------------------- ;;;;;;;
 ;;;; MCL screen-to-icon interface
 ;;;; ---------------------------------------------------------------------- ;;;;;;;
@@ -368,6 +369,7 @@
         (dolist (x accum accum)
           (set-chunk-slot-value-fct x 'color color)
           (setf (chunk-visual-object x) self))))))
+  
 
 (defmethod xstart ((self static-text-dialog-item))
    (let ((left-x (point-h (view-position self)))
@@ -978,8 +980,9 @@
 (defclass focus-ring (rpm-overlay)
   ((color :accessor color :initarg :color :initform *red-color*))
   (:default-initargs 
-    :view-size (make-point 19 19)
-    :offset (make-point -10 -10)))
+    :view-size #@(19 19)
+    :offset #@(-10 -10)))
+
 
 (defmethod view-draw-contents ((self focus-ring))
   (let ((oldmode (pen-mode self))
@@ -990,7 +993,7 @@
     (set-pen-size self 4 4)
     (with-focused-view self
       (with-fore-color (color self)
-        (frame-oval self (make-point 0 0) (view-size self))))
+        (frame-oval self #@(0 0) (view-size self))))
     (set-pen-mode self oldmode)
     (set-pen-pattern self oldpat)
     (set-pen-size self (point-h oldsize) (point-v oldsize))

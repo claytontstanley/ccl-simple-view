@@ -107,27 +107,27 @@
 (defmethod dialog-item-text ((view easygui::view-text-mixin))
   (easygui:view-text view))
 
-(defmethod view-position ((view easygui:view))
+(defmethod view-position ((view view))
   (easygui:view-position view))
 
-(defmethod set-view-position ((view easygui:view) x &optional (y nil))
+(defmethod set-view-position ((view view) x &optional (y nil))
   (let ((pos (if y
                (make-point x y)
                x)))
     (setf (easygui:view-position view) pos)))
 
-(defmethod view-size ((view easygui:view))
+(defmethod view-size ((view view))
   (easygui:view-size view))
 
-(defmethod view-window ((view easygui:window))
+(defmethod view-window ((view window))
   view)
 
-(defmethod view-window ((view easygui:view))
-  (awhen (easygui:view-container view)
-    (view-window it)))
-
-(defmethod view-container ((view easygui:view))
+(defmethod view-container ((view view))
   (easygui:view-container view))
+
+(defmethod view-window ((view view))
+  (awhen (view-container view)
+    (view-window it)))
 
 ; Other MCL drawing methods are not available in the easygui package.
 ; For these, move down a layer below easygui, and implement the functionality
@@ -175,22 +175,20 @@
          (ns:make-ns-point startx starty) 
          (ns:make-ns-point endx endy))))))
 
-
-
-(defmethod get-fore-color ((view easygui:view))
+(defmethod get-fore-color ((view view))
   (easygui:get-fore-color view))
 
 (defmethod part-color ((view easygui:static-text-view) part)
   (declare (ignore part))
   (get-fore-color view))
 
-(defmethod color ((view easygui:view))
+(defmethod color ((view view))
   (get-fore-color view))
 
-(defmethod set-fore-color ((view easygui:view) new-color)
+(defmethod set-fore-color ((view view) new-color)
   (easygui:set-fore-color view new-color))
 
-(defmethod set-part-color ((view easygui:view) part new-color)
+(defmethod set-part-color ((view view) part new-color)
   (declare (ignore part))
   (set-fore-color view new-color))
 
@@ -199,8 +197,8 @@
 (defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
 
-(defmethod view-click-event-handler ((device easygui:view) position)
-  (awhen (easygui:view-container device) 
+(defmethod view-click-event-handler ((device view) position)
+  (awhen (view-container device) 
     (view-click-event-handler it position)))
 
 (defmethod device-move-cursor-to ((device window) (xyloc vector))
@@ -237,7 +235,6 @@
     (left-mouse-down pos)
     (left-mouse-up pos)))
 
-
 ; Handling keyboard interaction
 
 (defmethod easygui::view-key-event-handler ((device color-dialog) key)
@@ -249,25 +246,24 @@
     (setf (easygui::content-view window) view)
     (easygui::window-show window)))
 
-
 ; MCL's Pen
 
-(defmethod pen-mode ((view easygui:view)) ())
+(defmethod pen-mode ((view view)) ())
 
-(defmethod pen-pattern ((view easygui:view)) ())
+(defmethod pen-pattern ((view view)) ())
 
-(defmethod pen-size ((view easygui:view))
+(defmethod pen-size ((view view))
   (make-point 4 4))
 
-(defmethod set-pen-mode ((view easygui:view) newmode)
+(defmethod set-pen-mode ((view view) newmode)
   (declare (ignore newmode))
   ())
 
-(defmethod set-pen-pattern ((view easygui:view) newpattern)
+(defmethod set-pen-pattern ((view view) newpattern)
   (declare (ignore newpattern))
   ())
 
-(defmethod set-pen-size ((view easygui:view) h &optional v)
+(defmethod set-pen-size ((view view) h &optional v)
   (declare (ignore h v))
   ())
 
@@ -309,7 +305,7 @@
   (move-to view (get-start view))
   (line-to view (get-end view)))
 
-(defmethod frame-oval ((view easygui:view) left &optional top right bottom)
+(defmethod frame-oval ((view simple-view) left &optional top right bottom)
   (assert (not right))
   (assert (not bottom))
   (assert left)
@@ -550,9 +546,9 @@
 ; after this read-table mod is made. If this needs to be done, restore the readtable first
 ; ----------------------------------------------------------------------
 
-(defparameter *nonhacked-readtable* (copy-readtable))
+(defvar *nonhacked-readtable* (copy-readtable))
 ; Code grabbed from RMCL, since MCL is now open-sourced (yay!)
-;for reading #@(h v) as points.
+; For reading #@(h v) as points.
 (set-dispatch-macro-character 
   #\# #\@
   (defun |#@-reader| (stream char arg)
