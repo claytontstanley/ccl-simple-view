@@ -22,7 +22,11 @@
    (easygui::position :initarg :view-position)
    (easygui::foreground :initarg :color)))
 
-(defclass simple-view (easygui:drawing-view view-mixin)
+(defclass view (view-mixin) ())
+
+(defclass window (easygui:window view-text-via-title-mixin view) ())
+
+(defclass simple-view (easygui:drawing-view view)
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0)))
   (:documentation "Top-level class for views"))
 
@@ -30,7 +34,7 @@
   ()
   (:documentation "Top-level class for views that do not monitor mouse clicks and mouse movement"))
 
-(defclass color-dialog (easygui:window view-text-via-title-mixin view-mixin)
+(defclass color-dialog (window)
   ()
   (:documentation "Top-level class for windows"))
 
@@ -40,10 +44,39 @@
 
 (defclass bu-liner (liner) ())
 
-(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin view-mixin easygui::text-fonting-mixin)
+(defun convert-font (font)
+  (if (listp font)
+    (#/fontWithName:size: ns:ns-font
+     (objc:make-nsstring (first font))
+     (second font))))
+
+;(#/initWithString: ns:ns-string "hello")
+
+;(#/stringWithUTF8String: ns:ns-string "hello")
+
+
+(convert-font '("Geneva" 16 :SRCOR :PLAIN
+                    (:COLOR-INDEX 0)))
+
+
+(objc::make-nsstring "hello")
+
+(defmethod easygui::initialize-view :after ((view easygui::text-fonting-mixin))
+  (setf (slot-value view 'easygui::font (convert-font (slot-value view 'easygui::font))))
+  (when (slot-value view 'easygui::font)
+    (easygui:dcc (#/setFont: (easygui:cocoa-ref view) (slot-value view 'easygui::font)))))
+
+
+(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin easygui::text-fonting-mixin view)
   ((easygui::default-button-p :initarg :default-button)))
 
-(defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin view-mixin) ())
+(defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin view) ())
+
+(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin view) ())
+
+(class-precedence-list (find-class 'static-text-dialog-item))
+(class-precedence-list (find-class 'button-dialog-item))
+(class-precedence-list (find-class 'check-box-dialog-item))
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   (apply #'make-instance 
@@ -67,8 +100,8 @@
 ; they are an already-defined ccl method)
 ; ----------------------------------------------------------------------
 
-(shadowing-import 'easygui:window)
-(shadowing-import 'easygui:view)
+;(shadowing-import 'easygui:window)
+;(shadowing-import 'easygui:view)
 (setf (symbol-function 'point-v) #'easygui:point-y)
 (setf (symbol-function 'point-h) #'easygui:point-x)
 (import 'easygui:point-x)
@@ -340,6 +373,15 @@
 (defun event-dispatch ()
   ())
 
+(defun choose-file-dialog (&key directory mac-file-type button-string prompt file)
+  (gui::cocoa-choose-file-dialog :directory directory
+                                 :file-types mac-file-type
+                                 :file file
+                                 :button-string button-string))
+
+(defun open-resource-file (arg-0 &key if-does-not-exist errorp direction perm data-fork-p)
+  (print arg-0))
+  
 ; ----------------------------------------------------------------------
 ; Defining color-symbol->system-color and system-color->symbol for CCL.
 ;

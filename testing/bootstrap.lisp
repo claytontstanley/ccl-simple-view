@@ -25,3 +25,5 @@
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/share.lisp")
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/device.lisp")
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/uwi.lisp")
+
+#+digitool (load-as-lst "bootstrap-mcl.lisp")

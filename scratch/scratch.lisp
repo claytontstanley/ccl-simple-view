@@ -1,5 +1,5 @@
 (print (list-all-packages))
-
+(load #P"NebulaSL:Users:claytonstanley:src:mcl-migration:testing:testVotebox.lisp")
 
 ;(setf ccl:*compile-code-coverage* nil)
 ;(print *features*)
