@@ -1,18 +1,5 @@
-
-
-
-;(visible-virtuals-available?)
-;(start-environment)
-;(stop-environment)
-#-:act-r-6.0 (load "~/src/actr6/load-act-r-6.lisp")
-#+clozure (require :cocoa)
-#+clozure (require :easygui)
-#+clozure (load "~/src/mcl-migration/easygui/extensions.lisp")
-#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/share.lisp")
-#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/device.lisp")
-#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/uwi.lisp")
-
-;(setf easygui:*screen-flipped* t)
+; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
+(load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
 (defun flash-text (&optional (text "!!!!"))
   (setf *view* (make-static-text-for-rpm-window
@@ -36,9 +23,6 @@
   (declare (ignorable device key))
   (flash-text (format nil "key ~a pressed" key))
   (call-next-method))
-
-;(setf ccl:*compile-code-coverage* nil)
-;(print *features*)
 
 (defparameter *win* nil)
 (defparameter *view* nil)
@@ -120,8 +104,6 @@
 (sleep .1)
 (remove-visual-items-from-rpm-window *win* *view*)
 (sleep .5)
-
-(break)
 
 
 #|(setf *cocoa-win* (easygui:cocoa-ref *win*))

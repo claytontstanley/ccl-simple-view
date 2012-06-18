@@ -1,6 +1,14 @@
 (print (list-all-packages))
 
 
+;(setf ccl:*compile-code-coverage* nil)
+;(print *features*)
+
+;(visible-virtuals-available?)
+;(start-environment)
+;(stop-environment)
+;(setf easygui:*screen-flipped* t)
+
 #|
 (load-os-constant 'e)
 (print #$TEJUSTLEFT)
