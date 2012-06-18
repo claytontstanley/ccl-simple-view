@@ -11,8 +11,12 @@
 
 (defun do-tutorial (tutorial)
   (let ((path-to-loader
-          (format nil "~a~a~a~a~a~a"
-                  (directory-namestring *load-truename*) "tutorial" *path-separator* tutorial *path-separator* "loader.lisp")))
+          (format nil "~{~a~}"
+                  (list (directory-namestring *load-truename*) 
+                        "actr6" *path-separator*
+                        "tutorial" *path-separator* 
+                        tutorial *path-separator* 
+                        "loader.lisp"))))
     (print path-to-loader)
     (load path-to-loader)))
 
