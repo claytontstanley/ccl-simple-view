@@ -1,3 +1,6 @@
 [submodule "submodules/actr6"]
 	path = submodules/actr6
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/actr6
+[submodule "submodules/ccl"]
+	path = submodules/ccl
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/ccl
