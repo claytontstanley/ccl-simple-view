@@ -7,9 +7,3 @@
 (load-as-lst "votebox" "RMCL" "bincarbon" "pict-svm.lisp")
 
 (load-as-lst "votebox" "Emulator Files" "VBEmulator.lisp")
-
-
-
-;ls "votebox/RMCL/bincarbon"
-
-

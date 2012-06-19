@@ -123,7 +123,7 @@
 (#/sendEvent: (#/sharedApplication ns:ns-application)
  *the-event*)|#
 
-;(remove-all-items-from-rpm-window *win*)
+(remove-all-items-from-rpm-window *win*)
 
 ;(close-rpm-window *win*)
 
