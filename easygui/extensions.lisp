@@ -57,6 +57,10 @@
 ; Note that the *view-class-to-ns-class-map*, as implemented in easygui, is sort of an already-sorted class-precedence-list. So in order to keep from 
 ; all make-instance calls from creating the most general cocoa-simple-view objects, this class is placed at the end of *view-class-to-ns-class-map*. 
 
-(common-lisp-user::push-to-end  
-  (cons 'easygui::simple-view 'easygui::cocoa-simple-view)
-  easygui::*view-class-to-ns-class-map*)
+(defvar *do-only-once* 
+  (progn
+    (common-lisp-user::push-to-end  
+      (cons 'easygui::simple-view 'easygui::cocoa-simple-view)
+      easygui::*view-class-to-ns-class-map*)
+    'evaled))
+
