@@ -1,6 +1,15 @@
 (print (list-all-packages))
 (load #P"NebulaSL:Users:claytonstanley:src:mcl-migration:testing:testVotebox.lisp")
 
+
+
+(print $tejustleft)
+(print #$tejustleft)
+(defconstant tejustleft :left)
+(require "PARSE-FFI")
+(ccl::parse-standard-ffi-files "tmp")
+(ccl::load-os-constant 'tejustleft)
+
 ;(setf ccl:*compile-code-coverage* nil)
 ;(print *features*)
 
