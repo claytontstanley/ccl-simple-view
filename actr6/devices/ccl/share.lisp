@@ -27,10 +27,11 @@
 ; So, simple-view is top; then view (allows subviews); then types that inherit from view,
 ; like, window, dialog stuff, etc.
 
-(defclass simple-view (easygui::simple-view view-mixin) ())
+(defclass simple-view (easygui::simple-view view-mixin)
+  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))))
 
 (defclass view (simple-view)
-  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0)))
+  ()
   (:documentation "Top-level class for views"))
 
 (defclass window (easygui:window view-text-via-title-mixin view) ())
@@ -43,7 +44,7 @@
   ()
   (:documentation "Top-level class for windows"))
 
-(defclass liner (easygui:drawing-view view) ())
+(defclass liner (simple-view) ())
 
 (defclass td-liner (liner) ())
 
@@ -233,7 +234,7 @@
 (defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
 
-(defmethod view-click-event-handler ((device simple-view) position)
+(defmethod view-click-event-handler ((device easygui:view) position)
   (awhen (view-container device) 
     (view-click-event-handler it position)))
 
@@ -276,13 +277,6 @@
 (defmethod easygui::view-key-event-handler ((device color-dialog) key)
   (view-key-event-handler device key))
 
-  ;(let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
-(defmethod easygui::initialize-view :after ((window color-dialog))
-  (let ((view (make-instance 'simple-view)))
-    (setf (slot-value view 'easygui::parent) window)
-    (setf (easygui::content-view window) view)
-    (easygui::window-show window)))
-
 ; MCL's Pen
 
 (defmethod pen-mode ((view simple-view)) ())
@@ -322,11 +316,7 @@
 
 ; Drawing methods
 
-(defmethod view-draw-contents ((view simple-view))
-  (declare (ignore view))
-  ())
-
-(defmethod view-draw-contents ((view easygui:drawing-view))
+(defmethod view-draw-contents ((view easygui:view))
   (declare (ignore view))
   ())
 
@@ -356,6 +346,17 @@
       (let* ((rect (ns:make-ns-rect startx starty width height))
              (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
         (#/stroke path)))))
+
+(defmethod frame-rect ((view simple-view) left &optional top right bottom)
+  (assert (not right))
+  (assert (not bottom))
+  (assert left)
+  (assert top)
+  (destructuring-bind (startx starty) (list (point-x left) (point-y left))
+    (destructuring-bind (width height) (list (point-x top) (point-y top))
+      (let ((rect (ns:make-ns-rect startx starty width height)))
+        (#/strokeRect: ns:ns-bezier-path
+         rect)))))
 
 ; Handling fonts and string width/height in pixels
 
