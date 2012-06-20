@@ -74,3 +74,5 @@
           (zerop (#_LSOpenCFURLRef cfurl (%null-ptr)))
           (#_cfrelease cfurl))))))
 |#
+
+(provide :launch-url)
