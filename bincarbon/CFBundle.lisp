@@ -104,3 +104,5 @@
                   :signed-fullword))
         (%get-cstring buf)))))
 |#
+
+(provide :cfbundle)
