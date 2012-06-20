@@ -18,6 +18,10 @@
         (t (cons (car lst) 
                  (cons item (sandwich item (cdr lst)))))))
 
+(defun load-in-bincarbon (&rest files)
+  (dolist (file files)
+    (load-as-lst "bincarbon" file)))
+
 #-:act-r-6.0 (load-as-lst "actr6" "load-act-r-6.lisp")
 #+clozure (require :cocoa)
 #+clozure (require :easygui)
