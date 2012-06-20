@@ -33,9 +33,9 @@
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0)))
   (:documentation "Top-level class for views"))
 
-(defclass window (view easygui:window view-text-via-title-mixin) ())
+(defclass window (easygui:window view-text-via-title-mixin view) ())
 
-(defclass simple-overlay-view (view easygui::drawing-overlay-view) 
+(defclass simple-overlay-view (easygui::drawing-overlay-view view) 
   ()
   (:documentation "Top-level class for views that do not monitor mouse clicks and mouse movement"))
 
@@ -43,20 +43,20 @@
   ()
   (:documentation "Top-level class for windows"))
 
-(defclass liner (view easygui:drawing-view) ())
+(defclass liner (easygui:drawing-view view) ())
 
 (defclass td-liner (liner) ())
 
 (defclass bu-liner (liner) ())
 
-(defclass button-dialog-item (easygui:push-button-view view view-text-via-title-mixin easygui::text-fonting-mixin)
+(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin easygui::text-fonting-mixin view)
   ((easygui::default-button-p :initarg :default-button)))
 
-(defclass static-text-dialog-item (easygui:static-text-view view view-text-via-stringvalue-mixin)
+(defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin view)
   ((text-justification :accessor text-justification :initarg :text-justification)
    (part-color-list :accessor part-color-list :initarg :part-color-list)))
 
-(defclass check-box-dialog-item (easygui:check-box-view view view-text-via-title-mixin) ())
+(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin view) ())
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   ; easygui's action slot takes a lambda with zero arguments; mcl's action slots take a lambda 
@@ -276,8 +276,9 @@
 (defmethod easygui::view-key-event-handler ((device color-dialog) key)
   (view-key-event-handler device key))
 
+  ;(let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
 (defmethod easygui::initialize-view :after ((window color-dialog))
-  (let ((view (make-instance 'easygui::drawing-view :accept-key-events-p t)))
+  (let ((view (make-instance 'simple-view)))
     (setf (slot-value view 'easygui::parent) window)
     (setf (easygui::content-view window) view)
     (easygui::window-show window)))
