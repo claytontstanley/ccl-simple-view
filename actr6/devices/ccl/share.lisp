@@ -17,6 +17,9 @@
 (defclass view-text-via-stringvalue-mixin (easygui::view-text-via-stringvalue-mixin)
   ((easygui::text :initarg :text)))
 
+(defclass view-text-mixin (easygui::view-text-mixin)
+  ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
+
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position)
@@ -50,14 +53,15 @@
 
 (defclass bu-liner (liner) ())
 
-(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin easygui::text-fonting-mixin view)
+; FIXME: Too many mixins; maybe define a dialog-item class, and have these 3 inherit from that?
+
+(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin view-text-mixin easygui::text-fonting-mixin view)
   ((easygui::default-button-p :initarg :default-button)))
 
-(defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin view)
-  ((text-justification :accessor text-justification :initarg :text-justification)
-   (part-color-list :accessor part-color-list :initarg :part-color-list)))
+(defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin view-text-mixin view)
+  ((part-color-list :accessor part-color-list :initarg :part-color-list)))
 
-(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin view) ())
+(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin view-text-mixin view) ())
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   ; easygui's action slot takes a lambda with zero arguments; mcl's action slots take a lambda 
@@ -135,6 +139,22 @@
 (defmethod dialog-item-text ((view easygui::view-text-mixin))
   (easygui:view-text view))
 
+(defmethod text-just ((view view-text-mixin))
+  (text-justification view))
+
+(defun convert-justification (justification)
+  (let ((mapping (list (cons $tejustleft #$NSLeftTextAlignment)
+                       (cons $tejustcenter #$NSCenterTextAlignment)
+                       (cons $tejustright #$NSRightTextAlignment))))
+    (cdr (assoc justification mapping))))
+
+(defmethod set-text-justification ((view view-text-mixin) justification)
+  (#/setAlignment: (easygui:cocoa-ref view) (convert-justification justification))
+  (setf (text-justification view) justification))
+
+(defmethod initialize-instance :after ((view view-text-mixin) &key)
+  (set-text-justification view (text-justification view)))
+  
 (defmethod set-dialog-item-text ((view easygui::view-text-mixin) text)
   (setf (easygui:view-text view) text))
 
@@ -143,6 +163,12 @@
 
 (defmethod dialog-item-disable ((view easygui::action-view-mixin))
   (easygui:set-dialog-item-enabled-p view nil))
+
+(defmethod check-box-check ((item check-box-dialog-item))
+  (easygui:check-box-check item nil))
+
+(defmethod check-box-uncheck ((item check-box-dialog-item))
+  (easygui:check-box-uncheck item nil))
 
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
@@ -232,6 +258,9 @@
 ; Handling mouse movement/interaction
 
 (defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
+  (view-click-event-handler view location))
+
+(defmethod easygui::mouse-down ((view simple-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
 
 (defmethod view-click-event-handler ((device easygui:view) position)
