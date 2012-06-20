@@ -709,7 +709,7 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
      (%put-word (%int-to-ptr #$CrsrNew) -1))))
 
 
-#+ccl-4.3.1
+#+(and ccl-4.3.1 (not :ccl-5.2))
 (if (osx-p)
   (progn
     (defparameter *warp* (lookup-function-in-framework 
@@ -728,6 +728,23 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
        (#_LMSetMouseTemp tp)
        (#_LMSetRawMouseLocation tp)
        (#_LMSetCursorNew -1)))))
+
+;;; under MCL 5.2, can't use CFBundle, but there are alternate ways to 
+;;; deal with framework calls, so use that.
+#+ccl-5.2
+(when (osx-p)
+  (progn
+    (defparameter *warp* (ccl::lookup-function-in-bundle
+                          "CGWarpMouseCursorPosition"
+                          (ccl::load-framework-bundle "ApplicationServices.framework")))
+
+    (defun move-cursor-to (x y) 
+      (ccl::ppc-ff-call *warp*
+                        :single-float (coerce x 'short-float)
+                        :single-float (coerce y 'short-float)
+                        :unsigned-fullword))
+    ))
+
 
 
 ;;;; ---------------------------------------------------------------------- ;;;;
