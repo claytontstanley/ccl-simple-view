@@ -143,7 +143,8 @@
 ;;;; ms-level (roughly) keyboard timing
 
 (defmethod initialize-instance :after ((tmr ms-timer) &key)
-  (setf (map-ptr tmr) (rref (keymap tmr) keymap.array)))
+  ;(setf (map-ptr tmr) (rref (keymap tmr) keymap.array)))
+  (setf (map-ptr tmr) (rref (keymap tmr) keymap.contents)))
 
 
 (defmethod dispose-timer ((tmr ms-timer))
