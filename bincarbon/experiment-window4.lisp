@@ -698,7 +698,7 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
       (setf num (read-from-string (get-string-from-user "Subject number:"))))
     num))
 
-
+#|
 #-ccl-4.3.1
 (defun move-cursor-to (x y)
   "Moves the cursor to absolute coordinates X Y."
@@ -707,7 +707,7 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
      (ccl::%put-point (%int-to-ptr #$MTemp) tp)
      (ccl::%put-point (%int-to-ptr #$RawMouse) tp)
      (%put-word (%int-to-ptr #$CrsrNew) -1))))
-
+|#
 
 #+(and ccl-4.3.1 (not :ccl-5.2))
 (if (osx-p)
