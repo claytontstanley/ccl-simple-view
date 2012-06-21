@@ -1,3 +1,7 @@
+(defmacro with-continue (&body body)
+  `(handler-bind ((error #'continue))
+     ,@body))
+
 (defparameter *path-separator*
   #+:digitool ":"
   #+:clozure "/")

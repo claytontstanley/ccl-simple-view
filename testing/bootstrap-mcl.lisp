@@ -1,7 +1,3 @@
-(defmacro with-continue (&body body)
-  `(handler-bind ((error #'continue))
-     ,@body))
-
 (with-continue
   (defconstant #$tejustleft :left)
   (defconstant $tejustleft :left)

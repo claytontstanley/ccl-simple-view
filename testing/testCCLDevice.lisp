@@ -1,6 +1,8 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
+(defparameter *key* nil)
+
 (defun flash-text (&optional (text "!!!!"))
   (setf *view* (make-static-text-for-rpm-window
                  *win*
@@ -21,6 +23,7 @@
 
 (defmethod rpm-window-key-event-handler ((device rpm-real-window) key)
   (declare (ignorable device key))
+  (setf *key* key)
   (flash-text (format nil "key ~a pressed" key))
   (call-next-method))
 

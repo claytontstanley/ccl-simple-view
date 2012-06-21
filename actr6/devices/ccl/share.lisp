@@ -37,7 +37,11 @@
   ()
   (:documentation "Top-level class for views"))
 
-(defclass window (easygui:window view-text-via-title-mixin view) ())
+(defclass window (easygui:window view-text-via-title-mixin view)
+  ((grow-icon-p :initform nil :initarg :grow-icon-p :reader grow-icon-p)
+   (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)))
+
+(defclass windoid (window) ())
 
 (defclass simple-overlay-view (easygui::drawing-overlay-view view) 
   ()
@@ -53,15 +57,35 @@
 
 (defclass bu-liner (liner) ())
 
-; FIXME: Too many mixins; maybe define a dialog-item class, and have these 3 inherit from that?
+(defclass dialog-item (view view-text-mixin)  ())
 
-(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin view-text-mixin easygui::text-fonting-mixin view)
+(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin easygui::text-fonting-mixin dialog-item)
   ((easygui::default-button-p :initarg :default-button)))
 
-(defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin view-text-mixin view)
+(defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
   ((part-color-list :accessor part-color-list :initarg :part-color-list)))
 
-(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin view-text-mixin view) ())
+(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin dialog-item) ())
+
+; FIXME: what's this view-text hack?
+
+(defclass icon-dialog-item (easygui::image-view easygui::action-view-mixin dialog-item)
+  ((icon :reader icon :initarg :icon)
+   (easygui::view-text :accessor easygui::view-text :initarg :view-text)))
+
+(defun convert-icon (icon)
+  (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
+   (#_NSFileTypeForHFSTypeCode icon)))
+
+(defmethod initialize-instance :after ((view icon-dialog-item) &key)
+  (#/setImage: (easygui:cocoa-ref view) (convert-icon (icon view))))
+
+(provide :icon-dialog-item)
+
+(defclass thermometer (simple-view)
+  ())
+
+(provide :thermometer)
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   ; easygui's action slot takes a lambda with zero arguments; mcl's action slots take a lambda 
@@ -102,6 +126,10 @@
 (defconstant $tejustleft :left)
 (defconstant $tejustcenter :center)
 (defconstant $tejustright :right)
+(ccl::register-character-name "UpArrow" #\U+F700)
+(ccl::register-character-name "DownArrow" #\U+F701)
+(ccl::register-character-name "BackArrow" #\U+F702)
+(ccl::register-character-name "ForwardArrow" #\U+F703)
 
 (defun make-point (x y)
   (make-instance 'easygui::eg-point :x x :y y))
@@ -683,3 +711,41 @@
       (unless *read-suppress*
         (let ((point (apply #'make-point list)))
           point)))))
+
+
+(defvar *load-external-function-orig* #'ccl::load-external-function)
+
+(with-continue 
+  (defun ccl::load-external-function (sym query)
+    (let* ((fun-names (list "showmenubar" "hidemenubar" "getcursor" "showcursor" "ShowCursor" "HideCursor"))
+           (the-package (find-package :X86-Darwin64))
+           (fun-syms (mapcar (lambda (name)
+                               (intern name the-package))
+                             fun-names)))
+      (if (member sym fun-syms)
+        (return-from ccl::load-external-function sym)
+        (funcall *load-external-function-orig* sym query)))))
+
+(defun X86-Darwin64::|getcursor| (num)
+  num)
+
+(defun X86-Darwin64::|showcursor| ()
+  t)
+
+(defun X86-Darwin64::|hidecursor| ()
+  t)
+
+(defun X86-Darwin64::|hidemenubar| ()
+  t)
+
+(defun X86-Darwin64::|showmenubar| ()
+  t)
+
+(defun convert-color (color)
+  (color-symbol->system-color 'green))
+
+(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
+  (if back-color
+    (apply #'call-next-method view :back-color (convert-color back-color) args)
+    (call-next-method)))
+
