@@ -33,6 +33,14 @@
 (defclass simple-view (easygui::simple-view view-mixin)
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))))
 
+(defun convert-color (color)
+  (color-symbol->system-color 'green))
+
+(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
+  (if back-color
+    (apply #'call-next-method view :back-color (convert-color back-color) args)
+    (call-next-method)))
+
 (defclass view (simple-view)
   ()
   (:documentation "Top-level class for views"))
@@ -417,14 +425,6 @@
 
 ; Handling fonts and string width/height in pixels
 
-; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
-; same slot name and expects the font slot to be initialized with a font spec as a list.
-; So in order to hack it so that the font slot is correct for easygui, overwrite the initialize-view
-; :after on the text-fonting-mixin class, and canonicalize the font slot at that point.
-; I would have liked to have writtin an initialize-instance :after on a class named here, but because
-; the slot name for the MCL spec and easygui are the same, I saw no way to do this other than to just write
-; over easygui's method. Kinda' hacky, but it seems to work.
-
 (defun convert-font (font)
   (etypecase font
     (ns:ns-font font)
@@ -434,10 +434,14 @@
          (objc:make-nsstring name)
          pt)))))
 
-(defmethod easygui::initialize-view :after ((view easygui::text-fonting-mixin))
-  (when (slot-value view 'easygui::font)
-    (setf (slot-value view 'easygui::font) (convert-font (slot-value view 'easygui::font)))
-    (easygui:dcc (#/setFont: (easygui:cocoa-ref view) (slot-value view 'easygui::font)))))
+; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
+; same slot name and expects the font slot to be initialized with a font spec as a list.
+; So in order to make it so that the font slot is correct for easygui, shadow the :view-font
+; initarg if it is provided by the equivalent ns-font value
+(defmethod initialize-instance :around ((view easygui::text-fonting-mixin) &rest args &key view-font)
+  (if view-font
+    (apply #'call-next-method view :view-font (convert-font view-font) args)
+    (call-next-method)))
 
 (defmethod view-font ((view easygui::text-fonting-mixin))
   (#/font (easygui:cocoa-ref view)))
@@ -712,6 +716,18 @@
         (let ((point (apply #'make-point list)))
           point)))))
 
+; ----------------------------------------------------------------------
+; Manipulate reader functionality so that references to foreign functions that no longer exist can
+; be defined as native functions, while keeping the same access syntax
+;
+; I did not want to have to modify the source code in the Phaser task where all of these carbon foreign 
+; functions were used. CCL does not support the carbon framework, as far as I can tell. So in order to 
+; trick CCL into thinking that these foreign functions are defined, add a bit of a 'before' section of 
+; code to the load-external-function call. If the symbol name of the external function being loaded is
+; in the list of function names that are being defined natively, then just return the symbol that maps
+; to that function in the funcion symbol table. Otherwise, call the usual load-external-funcion funcion,
+; and have CCL do the standard thing to try to find the foreign function
+; ----------------------------------------------------------------------
 
 (defvar *load-external-function-orig* #'ccl::load-external-function)
 
@@ -725,6 +741,8 @@
       (if (member sym fun-syms)
         (return-from ccl::load-external-function sym)
         (funcall *load-external-function-orig* sym query)))))
+
+; All of the functions being natively defined are here
 
 (defun X86-Darwin64::|getcursor| (num)
   num)
@@ -740,12 +758,4 @@
 
 (defun X86-Darwin64::|showmenubar| ()
   t)
-
-(defun convert-color (color)
-  (color-symbol->system-color 'green))
-
-(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
-  (if back-color
-    (apply #'call-next-method view :back-color (convert-color back-color) args)
-    (call-next-method)))
 
