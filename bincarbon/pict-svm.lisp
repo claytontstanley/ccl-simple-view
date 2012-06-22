@@ -49,6 +49,7 @@
     (#_ReleaseResource (rest pa)))
   (setf *pict-h-alist* nil))
 
+#+:digitool
 (defun pid-to-h (pictid)
   "Given a PICT id [either a number or a string], return a handle."
   (let ((ph (rest (assoc pictid *pict-h-alist* :test #'equal))))
@@ -70,6 +71,7 @@
    )
   )
 
+#+:digitool
 (defmethod draw-pict ((sv pict-svm))
   (when (pict-id sv)
     (with-focused-view (view-window sv)
@@ -103,6 +105,7 @@
        ,@body)
      (require-trap #_SetResLoad t)))
 
+#+:digitool
 (defun get-resource-id (rsrc-type rsrc-name &key (errorp t))
   (with-returned-pstrs ((name_p rsrc-name))
     (rlet ((id_p :integer)
