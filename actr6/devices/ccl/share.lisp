@@ -73,6 +73,13 @@
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
   ((part-color-list :accessor part-color-list :initarg :part-color-list)))
 
+(defclass editable-text-dialog-item (easygui:text-input-view view-text-via-stringvalue-mixin easygui::action-view-mixin dialog-item)
+  ((allow-returns :initarg :allow-returns)
+   (draw-outline :initarg :draw-outline)))
+
+(defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-title-mixin dialog-item)
+  ((easygui::cluster :initarg :radio-button-cluster)))
+
 (defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin dialog-item) ())
 
 ; FIXME: what's this view-text hack?
@@ -109,7 +116,9 @@
                     :view-position position
                     :view-size size
                     :text text
-                    :action (lambda () (funcall action obj))
+                    :action (if action 
+                              (lambda () (funcall action obj))
+                              nil)
                     attributes))
     obj))
 
@@ -138,6 +147,8 @@
 (ccl::register-character-name "DownArrow" #\U+F701)
 (ccl::register-character-name "BackArrow" #\U+F702)
 (ccl::register-character-name "ForwardArrow" #\U+F703)
+(defparameter *arrow-cursor* 'fixme)
+(defparameter *black-pattern* 'fixme)
 
 (defun make-point (x y)
   (make-instance 'easygui::eg-point :x x :y y))
@@ -205,6 +216,12 @@
 
 (defmethod check-box-uncheck ((item check-box-dialog-item))
   (easygui:check-box-uncheck item nil))
+
+(defmethod radio-button-unpush ((item radio-button-dialog-item))
+  (easygui:radio-button-deselect item))
+
+(defmethod radio-button-push ((item radio-button-dialog-item))
+  (easygui:radio-button-select item))
 
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
@@ -422,6 +439,10 @@
       (let ((rect (ns:make-ns-rect startx starty width height)))
         (#/strokeRect: ns:ns-bezier-path
          rect)))))
+
+(defmethod fill-rect ((view simple-view) pattern left &optional top right bottom)
+  (let ((rect (ns:make-ns-rect left top right bottom)))
+    (#/fillRect: ns:ns-bezier-path rect)))
 
 ; Handling fonts and string width/height in pixels
 
@@ -715,6 +736,9 @@
       (unless *read-suppress*
         (let ((point (apply #'make-point list)))
           point)))))
+
+(defun set-cursor (cursor)
+  cursor)
 
 ; ----------------------------------------------------------------------
 ; Manipulate reader functionality so that references to foreign functions that no longer exist can

@@ -127,6 +127,10 @@
         (t (tick->ms tmr (#_tickcount)))))
 
 
+#+:clozure
+(defmethod current-time ((tmr event-timer))
+  0)
+
 (defgeneric stop-timing (tmr)
   (:documentation "Stops an event timer at the current event and returns the time in ms."))
 

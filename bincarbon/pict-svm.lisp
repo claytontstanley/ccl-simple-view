@@ -81,6 +81,10 @@
           )))
     ))
 
+#+:clozure
+(defmethod draw-pict ((sv pict-svm))
+  nil)
+
 (defmethod view-draw-contents ((sv pict-svm))
   (draw-pict sv)
   (call-next-method))
