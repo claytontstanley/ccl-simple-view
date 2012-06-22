@@ -44,6 +44,15 @@
   (cons 'easygui::drawing-overlay-view 'easygui::cocoa-drawing-overlay-view)
   easygui::*view-class-to-ns-class-map*)
 
+(defclass cocoa-image-view (cocoa-extension-mixin ns:ns-image-view)
+  ()
+  (:metaclass ns:+ns-object))
+
+(defclass image-view (easygui::view)
+  ())
+
+(push (cons 'easygui::image-view 'easygui::cocoa-image-view) *view-class-to-ns-class-map*)
+
 ; In order to implement MCL's top-level simple-view class, I needed a cocoa view class that was capable of drawing to the display
 ; (since simple-view can do this in MCL). Cocoa-drawing-view in easygui seemed like the appropriate class for this. However, the 
 ; default lisp class (drawing-view) for this class did a bit more than a top-level simple-view class should do. It tracks mouse movement, 
