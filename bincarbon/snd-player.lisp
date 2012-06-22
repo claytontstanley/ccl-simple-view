@@ -110,6 +110,7 @@
 ;;;             : resource handle.  Theses conses are built into a list
 ;;;             : for later lookup with assoc.
 
+#+:digitool
 (defmethod initialize-instance :after ((self snd-player) &key)
   (declare (ignore a))
   (setf (the-channel self) (make-record :sndchannel :qLength 16))
@@ -123,7 +124,6 @@
                          (#_GetNamedResource "snd " pname)))
             (snd-alis self)))))
 
-
 ;;; RELEASE-PLAYER      [Method]
 ;;; Date        : 97.01.21
 ;;; Description : When finished with the sound player, it must be disposed
@@ -132,6 +132,7 @@
 ;;;             : the resource file.  A terrific argument for destructors
 ;;;             : in CLOS.
 
+#+:digitool
 (defmethod release-player ((player snd-player))
   "Does the REQUIRED clean-up after finishing with a sound player."
   (#_SndDisposeChannel (the-channel player) nil)
@@ -142,7 +143,6 @@
   (when (res-file player)
     (close-resource-file (res-file player))))
 
-
 ;;; PLAY-SND      [Method]
 ;;; Date        : 97.01.21
 ;;; Description : Plays a sound.  If we're a preloaded sound name, then it
@@ -150,6 +150,7 @@
 ;;;             : then it gets the sound handle via a call to GetResource.
 ;;;             : ASSOC ought to be much faster.
 
+#+:digitool
 (defmethod play-snd ((player snd-player) snd-name &optional async)
   "Tells the given sound player to play the named sound with the supplied mode"
   (if (member snd-name (preload player))
