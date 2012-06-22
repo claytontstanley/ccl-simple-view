@@ -40,9 +40,10 @@
 
 ;;;; PICT handle cache
 
+#+:digitool
 (defparameter *pict-h-alist* nil "Stores the PICT handles.")
 
-
+#+:digitool
 (defun release-picts ()
   "Releases all the PICT handles in *pict-h-alist*."
   (dolist (pa *pict-h-alist*)
@@ -66,10 +67,14 @@
 ;;; PICT-SVM      [Class]
 ;;; Description : The main class.  Build your subclasses based on this.
 
+#+:digitool
 (defclass pict-svm ()
   ((pict-id :accessor pict-id :initarg :pict-id :initform nil)
    )
   )
+
+#+:clozure
+(defclass pict-svm (image-view-mixin) ())
 
 #+:digitool
 (defmethod draw-pict ((sv pict-svm))
@@ -82,26 +87,29 @@
     ))
 
 #+:clozure
-(defmethod draw-pict ((sv pict-svm))
-  nil)
+(defmethod draw-pict ((sv pict-svm)) ())
 
+#+:digitool
 (defmethod view-draw-contents ((sv pict-svm))
   (draw-pict sv)
   (call-next-method))
 
-
 (defgeneric set-view-pict (sv id)
   (:documentation "Sets the ID used for that view, also causes the view to be drawn."))
 
+#+:digitool
 (defmethod set-view-pict ((sv pict-svm) id)
   (setf (pict-id sv) id)
   (draw-pict sv)
   )
 
-
+#+:clozure
+(defmethod set-view-pict ((sv pict-svm) id)
+  (setf (pict-id sv) id))
 
 ;;;; utilites for managing resources. 
 
+#+digitool
 (defmacro without-res-load (&body body)
   `(unwind-protect
      (progn
@@ -122,8 +130,6 @@
          (when (and errorp (not (zerop (#_ResError))))
            (error "resource ~s of type ~s not found." rsrc-name rsrc-type))))
       (%get-signed-word id_p))))
-
-
 
 #|
 

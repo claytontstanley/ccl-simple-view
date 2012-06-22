@@ -1,5 +1,6 @@
 (require :cocoa)
 (require :easygui)
+(require :resources) 
 
 ; ----------------------------------------------------------------------
 ; Building class definitions to match MCL's GUI class heirarchy
@@ -88,12 +89,28 @@
   ((icon :reader icon :initarg :icon)
    (easygui::view-text :accessor easygui::view-text :initarg :view-text)))
 
+(defclass image-view (view-mixin easygui::image-view) ())
+
 (defun convert-icon (icon)
   (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
    (#_NSFileTypeForHFSTypeCode icon)))
 
-(defmethod initialize-instance :after ((view icon-dialog-item) &key)
-  (#/setImage: (easygui:cocoa-ref view) (convert-icon (icon view))))
+(defclass image-view-mixin ()
+  ((pict-id :reader pict-id :initarg :pict-id)
+   (image-view :accessor image-view)))
+
+(defmethod (setf pict-id) (pict-id (view image-view-mixin))
+  (unwind-protect (setf (slot-value view 'pict-id) pict-id)
+    (#/setImage: (easygui:cocoa-ref (image-view view)) (get-resource pict-id))))
+
+(defmethod initialize-instance :after ((view image-view-mixin) &key)
+  (let ((image-view (make-instance 'image-view
+                                   :view-size (view-size view)
+                                   :view-position (view-position view))))
+    (setf (image-view view) image-view)
+    (add-subviews view image-view)
+    (when (slot-boundp view 'pict-id)
+      (#/setImage: (easygui:cocoa-ref image-view) (get-resource (pict-id view))))))
 
 (provide :icon-dialog-item)
 
@@ -516,9 +533,9 @@
 (defun choose-new-file-dialog (&key directory prompt button-string)
   (gui::cocoa-choose-new-file-dialog :directory directory))
 
-(defun open-resource-file (arg-0 &key if-does-not-exist errorp direction perm data-fork-p)
-  (print arg-0))
-  
+(defun choose-directory-dialog (&key directory)
+  (easygui:choose-directory-dialog :directory directory))
+
 ; ----------------------------------------------------------------------
 ; Defining color-symbol->system-color and system-color->symbol for CCL.
 ;
