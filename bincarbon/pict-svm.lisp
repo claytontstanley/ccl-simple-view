@@ -49,7 +49,6 @@
     (#_ReleaseResource (rest pa)))
   (setf *pict-h-alist* nil))
 
-#|
 (defun pid-to-h (pictid)
   "Given a PICT id [either a number or a string], return a handle."
   (let ((ph (rest (assoc pictid *pict-h-alist* :test #'equal))))
@@ -62,7 +61,6 @@
       (progn
         (push (cons pictid ph) *pict-h-alist*)
         ph))))
-|#
 
 ;;; PICT-SVM      [Class]
 ;;; Description : The main class.  Build your subclasses based on this.
@@ -72,7 +70,6 @@
    )
   )
 
-#|
 (defmethod draw-pict ((sv pict-svm))
   (when (pict-id sv)
     (with-focused-view (view-window sv)
@@ -81,7 +78,6 @@
           (#_DrawPicture (pid-to-h (pict-id sv)) r)
           )))
     ))
-|#
 
 (defmethod view-draw-contents ((sv pict-svm))
   (draw-pict sv)
@@ -107,7 +103,6 @@
        ,@body)
      (require-trap #_SetResLoad t)))
 
-#|
 (defun get-resource-id (rsrc-type rsrc-name &key (errorp t))
   (with-returned-pstrs ((name_p rsrc-name))
     (rlet ((id_p :integer)
@@ -120,7 +115,6 @@
          (when (and errorp (not (zerop (#_ResError))))
            (error "resource ~s of type ~s not found." rsrc-name rsrc-type))))
       (%get-signed-word id_p))))
-|#
 
 
 
