@@ -68,7 +68,7 @@
    (start-time :accessor start-time :initarg :start-time :initform nil)
    ))
 
-
+#+:digitool
 (defclass ms-timer (timer)
   ((keymap :accessor keymap :initarg :keymap :initform (make-record keymap))
    (map-ptr :accessor map-ptr :initarg :map-ptr :initform nil)
@@ -119,6 +119,7 @@
 (defgeneric current-time (tmr)
   (:documentation "Returns the current time in milliseconds."))
 
+#+:digitool
 (defmethod current-time ((tmr event-timer))
   (cond (*actr-enabled-p* (pm-get-time))
         ((boundp '*current-event*)
@@ -142,11 +143,13 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; ms-level (roughly) keyboard timing
 
+#+:digitool
 (defmethod initialize-instance :after ((tmr ms-timer) &key)
   ;(setf (map-ptr tmr) (rref (keymap tmr) keymap.array)))
   (setf (map-ptr tmr) (rref (keymap tmr) keymap.contents)))
 
 
+#+:digitool
 (defmethod dispose-timer ((tmr ms-timer))
   (dispose-record (keymap tmr)))
 
@@ -154,6 +157,7 @@
   (:documentation "Wait for FCT [a test on the state of keys] to be true, returning the time and optionally which key was pressed."))
 
 
+#+:digitool
 (defmethod wait-for-keys ((tmr ms-timer) (fct function))
   (without-interrupts
    (let ((start (get-internal-real-time)))
@@ -208,6 +212,7 @@
 (defgeneric wait-for-no-keys (tmr)
   (:documentation "Wait until no key is down, returning latency."))
 
+#+:digitool
 (defmethod wait-for-no-keys ((tmr ms-timer))
   (without-interrupts
    (let ((start (get-internal-real-time)))
@@ -216,6 +221,7 @@
        (#_getkeys (keymap tmr)))
      (- (get-internal-real-time) start))))
 
+#+:digitool
 (defmethod test-for-no-key-down ((tmr ms-timer))
   (dotimes (i 16)
     (when (not (= 0 (%get-unsigned-byte (map-ptr tmr) i)))
@@ -226,6 +232,7 @@
 (defgeneric wait-for-any-key (tmr)
   (:documentation "Spins the system until a key is pressed, returns the latency in ms."))
 
+#+:digitool
 (defmethod wait-for-any-key ((tmr ms-timer))
   (without-interrupts
    (let ((start (get-internal-real-time)))
