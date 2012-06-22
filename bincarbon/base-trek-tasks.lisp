@@ -12,7 +12,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 
 ;;; Filename    : base-trek-tasks.lisp
-;;; Version     : r2
+;;; Version     : r4
 ;;; 
 ;;; Description : Base classes for Conn (or ship's course), phaser, and 
 ;;;             : transporter tasks.
@@ -22,6 +22,18 @@
 ;;; Todo        : 
 ;;; 
 ;;; ----- History -----
+;;; 2007.07.09 fpt [r5]
+;;;		: added torpedo-window subclass of the phaser-window and
+;;;		jammer-window subclass of the transporter-window to avoid
+;;;		having to duplicate so much code
+;;; 2007.07.09 fpt [r4]
+;;;		: altered transporter-window to get the scan dots' positions
+;;;		from the transporter window
+;;; 2006.11.21 fpt & mdb [r3]
+;;;             : altered class definition for transporter-window, method 
+;;;             : definition for move-target, and method definition for 
+;;;             : begin-tracking to get target coords from the implemented 
+;;;             : instance of a transporter-window
 ;;; 2006.01.30 mdb 
 ;;;             : Slightly increased hit probability for transporter.
 ;;; 2005.11.10 mdb [r2]
@@ -780,6 +792,14 @@
                 :initform #@(755 176))
    (key-state :accessor key-state :initarg :key-state 
               :initform :accept-frequency)
+   (x1-bound :accessor x1-bound :initarg :x1-bound :initform 117)
+   (x2-bound :accessor x2-bound :initarg :x2-bound :initform 412)
+   (y1-bound :accessor y1-bound :initarg :y1-bound :initform 352)
+   (y2-bound :accessor y2-bound :initarg :y2-bound :initform 648)
+   (scan1-pos :accessor scan1-pos :initarg :scan1-pos :initform #@(680 101))
+   (scan2-pos :accessor scan2-pos :initarg :scan2-pos :initform #@(824 101))
+   (scan3-pos :accessor scan3-pos :initarg :scan3-pos :initform #@(680 245))
+   (scan4-pos :accessor scan4-pos :initarg :scan4-pos :initform #@(824 245))
    )
   (:default-initargs
     :pict-name "transporter"
@@ -915,27 +935,27 @@
   (mapc #'view-draw-contents (subviews wind))
   )
 
-
+;; Niftier version that gets scan dots' positions from the transporter-window
 (defmethod add-markers ((wind transporter-window))
   (add-subviews wind
     (make-instance 'target-sv
       :view-size #@(5 5)
-      :view-position #@(680 101)
+      :view-position (scan1-pos wind) ;; #@(680 101)
       :view-nick-name :scan1
       )
     (make-instance 'target-sv
       :view-size #@(5 5)
-      :view-position #@(824 101)
+      :view-position (scan2-pos wind) ;; #@(824 101)
       :view-nick-name :scan2
       )
     (make-instance 'target-sv
       :view-size #@(5 5)
-      :view-position #@(680 245)
+      :view-position (scan3-pos wind) ;; #@(680 245)
       :view-nick-name :scan3
       )
     (make-instance 'target-sv
       :view-size #@(5 5)
-      :view-position #@(824 245)
+      :view-position (scan4-pos wind) ;; #@(824 245)
       :view-nick-name :scan4
       )))
 
@@ -1004,6 +1024,10 @@
           (move-dist (random max-dist))
           (move-dir (last-dir wind))
           (move-change (random 7))
+          (x1-bound (x1-bound wind))
+          (x2-bound (x2-bound wind))
+          (y1-bound (y1-bound wind))
+          (y2-bound (y2-bound wind))
           )
       (when (= 1 move-change) (incf move-dir))
       (when (= 2 move-change) (decf move-dir))
@@ -1017,9 +1041,9 @@
         (decf y move-dist))
       (when (or (= move-dir 5) (= move-dir 4) (= move-dir 3))
         (incf y move-dist))
-      (setf x (bounds x 117 412))
-      (setf y (bounds y 352 648))
-      (when (or (= x 117) (= x 412) (= y 352) (= y 648))
+      (setf x (bounds x x1-bound x2-bound))
+      (setf y (bounds y y1-bound y2-bound))
+      (when (or (= x x1-bound) (= x x2-bound) (= y y1-bound) (= y y2-bound))
         (incf move-dir 4)
         (when (> move-dir 7) (setf move-dir (- move-dir 8)))) 
       (setf (last-dir wind) move-dir) 
@@ -1066,7 +1090,9 @@
 (defmethod begin-tracking ((wind transporter-window))
   (setf (track-p wind) t)
   (set-cursor (#_getcursor 501))
-  (set-view-position (trgt-v wind) (+ 117 (random 295)) (+ 352 (random 296)))
+  (set-view-position (trgt-v wind) 
+                     (+ (x1-bound wind) (random 295)) 
+                     (+ (y1-bound wind) (random 296)))
   (add-subviews wind (trgt-v wind)))
 
 
@@ -1133,6 +1159,622 @@
 
 (defmethod scan-marker ((wind transporter-window) (num fixnum))
   (view-named (read-from-string (mkstr ":SCAN" num)) wind))
+
+
+
+
+
+;;;; ---------------------------------------------------------------------- ;;;;
+;;;; torpedo-window subclass of the phaser-window
+
+
+
+(defclass torpedo-window (phaser-window)
+  
+()
+
+  (:default-initargs
+    :task-id 300
+    :pict-name "phaser-extrabtn"
+    :window-title "Torpedo Subgoal Shuffling"
+    :state-vec #(:DISPERSION :DISPERSION-SLIDER :DISPERSION-SET 
+                 :BAY-ACTIVATED :LOAD :STOP-LOADING :BAY-ACTIVATED 
+                                  :FIRING :LOCKING :SHOOT :LOCKING 
+                                  :MAIN-CONTROL)
+    :gui-vec #((radio-button-push . :DISPERSION) nil (check-box-check . :DISPERSION-SET)
+               (check-box-check . :BAY-ACTIVATED)
+               nil nil (check-box-uncheck . :BAY-ACTIVATED) 
+               (radio-button-push . :FIRING) nil nil nil nil)
+    :trgt-cntr #@(281 253)
+    :view-subviews
+    (list 
+     ;; tracking cluster
+     (MAKE-DIALOG-ITEM
+      'button-checker
+      #@(150 410)
+      #@(110 30)
+      "Tracking"
+      nil
+      :VIEW-NICK-NAME :TRACKING
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0))
+      :DEFAULT-BUTTON NIL)
+     (MAKE-DIALOG-ITEM
+      'button-checker
+      #@(300 410)
+      #@(110 30)
+      "Locking"
+      nil
+      :VIEW-NICK-NAME :LOCKING
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0))
+      :DEFAULT-BUTTON NIL)
+     
+     ;; power cluster
+     (make-dialog-item
+      'button-checker
+      #@(538 139)
+      #@(120 34)
+      "Charge"
+      nil
+      :VIEW-NICK-NAME :CHARGE
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0))
+      :DEFAULT-BUTTON NIL)
+     (MAKE-DIALOG-ITEM
+      'button-checker
+      #@(538 274)
+      #@(120 34)
+      "Stop Charging"
+      nil
+      :VIEW-NICK-NAME :STOP-CHARGING
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0))
+      :DEFAULT-BUTTON NIL)
+     (make-instance 'thermometer 
+       :view-position #@(736 133)
+       :view-size #@(25 174)
+       :view-nick-name :THERMO
+       :pattern *light-gray-pattern*)
+     (make-dialog-item
+      'button-checker
+      #@(538 184)
+      #@(120 34)
+      "Load"
+      nil
+      :VIEW-NICK-NAME :LOAD
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0))
+      :DEFAULT-BUTTON NIL)
+     (make-dialog-item
+      'button-checker
+      #@(538 229)
+      #@(120 34)
+      "Stop Loading"
+      nil
+      :VIEW-NICK-NAME :STOP-LOADING
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0))
+      :DEFAULT-BUTTON NIL)
+     
+     ;; central button cluster
+     (MAKE-DIALOG-ITEM
+      'radio-checker
+      #@(513 354)
+      #@(70 15)
+      "Battery"
+      nil
+      :VIEW-NICK-NAME :BATTERY
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     (MAKE-DIALOG-ITEM
+      'radio-checker
+      #@(513 374)
+      #@(70 16)
+      "Firing"
+      nil
+      :VIEW-NICK-NAME :FIRING
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     (MAKE-DIALOG-ITEM
+      'radio-checker
+      #@(513 414)
+      #@(70 16)
+      "Settings"
+      nil
+      :VIEW-NICK-NAME :SETTINGS
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     (MAKE-DIALOG-ITEM
+      'check-box-checker
+      #@(643 414)
+      #@(136 16)
+      "Focus Set"
+      nil
+      :VIEW-NICK-NAME :FOCUS-SET
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     (MAKE-DIALOG-ITEM
+      'check-box-checker
+      #@(643 354)
+      #@(136 16)
+      "Power Connected"
+      nil
+      :VIEW-NICK-NAME :POWER-CONNECTED
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     (MAKE-DIALOG-ITEM
+      'check-box-checker
+      #@(643 394)
+      #@(136 16)
+      "Bay Activated"
+      nil
+      :VIEW-NICK-NAME :BAY-ACTIVATED
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     (MAKE-DIALOG-ITEM
+      'radio-checker
+      #@(513 434)
+      #@(130 16)
+      "Dispersion"
+      nil
+      :VIEW-NICK-NAME :DISPERSION
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     (MAKE-DIALOG-ITEM
+      'check-box-checker
+      #@(643 374)
+      #@(136 16)
+      "Dispersion Set"
+      nil
+      :VIEW-NICK-NAME :DISPERSION-SET
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     (MAKE-DIALOG-ITEM
+      'radio-checker
+      #@(513 394)
+      #@(70 16)
+      "Scope"
+      nil
+      :VIEW-NICK-NAME :SCOPE
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0)))
+     
+     ;; main control
+     (MAKE-DIALOG-ITEM
+      'button-checker
+      #@(442 616)
+      #@(108 34)
+      "Main Control"
+      nil
+      :VIEW-NICK-NAME :MAIN-CONTROL
+      :VIEW-FONT '("Avant Garde" 12 :SRCCOPY :PLAIN (:COLOR-INDEX 0))
+      :DEFAULT-BUTTON NIL)
+     
+     ;; focus
+     (make-instance 'click-indicator :view-position #@(164 562)
+                    :view-size #@(240 44) :v-offset 24
+                    :view-nick-name :DISPERSION-SLIDER)
+     
+     ;; elapsed time
+     (MAKE-DIALOG-ITEM
+      'STATIC-TEXT-DIALOG-ITEM
+      #@(743 638)
+      #@(54 14)
+      "0"
+      'NIL
+      :VIEW-NICK-NAME :TIME
+      :VIEW-FONT
+      '("Avant Garde" 14 :SRCOR :PLAIN (:COLOR-INDEX 0)))
+     
+     ;; status
+     (MAKE-DIALOG-ITEM
+      'STATIC-TEXT-DIALOG-ITEM
+      #@(135 645)
+      #@(273 38)
+      ""
+      'NIL
+      :VIEW-NICK-NAME :STATUS
+      :VIEW-FONT '("Avant Garde" 14 :SRCOR :PLAIN (:COLOR-INDEX 0)))
+     )
+    ))
+
+(defmethod reset-display ((wind torpedo-window))
+  (set-indicator (view-named :DISPERSION-SLIDER wind) nil)
+  (check-box-uncheck (view-named :DISPERSION-SET wind))
+  (check-box-uncheck (view-named :BAY-ACTIVATED wind))
+  (setf (thermometer-value (view-named :THERMO wind)) 0)
+  (radio-button-push (view-named :BATTERY wind))
+  (status wind ""))
+
+(defmethod check-state-update ((wind torpedo-window) state)
+  (case state
+    (:BAY-ACTIVATED (status wind "") (view-draw-contents wind))
+    (:LOAD (setf (charge-p wind) t))
+    (:STOP-LOADING (setf (charge-p wind) nil))
+    (:LOCKING (if (= (state-num wind) 8)
+                 (tracking-on wind)
+                 (tracking-off wind)))
+    (:MAIN-CONTROL (finish-task wind))
+    ))
+
+(defmethod shot-feedback ((wind torpedo-window))
+  (cond ((= (num-hits wind) -1)
+         (status wind "Romulan vessel destroyed.")
+         (play-snd *sp* "explosion")
+         (play-snd *sp* "explosion" t)
+         )
+        ((last-hit-p wind)
+         (play-snd *sp* "explosion" t)
+         (status wind "Romulan vessel hit but not destroyed.")
+         (setf (track-p wind) nil)
+         (setf (state-num wind) 0)
+         (setf (advance-p wind) nil))
+        (t
+         (play-snd *sp* "Whip")
+         (setf (track-p wind) nil)
+         (status wind "Torpedo missed Romulan vessel.")
+         (setf (state-num wind) 0)
+         (setf (advance-p wind) nil)
+         )))
+
+(defmethod fire-phaser ((wind torpedo-window))
+  (play-snd *sp* "torpedo" t)
+  (state-check wind :SHOOT)
+  (setf (track-p wind) nil)
+  (remove-subviews wind (trgt-v wind))
+  (if
+    (check-hit wind (subtract-points (view-position (trgt-v wind))
+                                     (trgt-cntr wind)))
+    (hit-target wind)
+    (setf (last-hit-p wind) nil))
+  (reset-display wind)
+  (when (postcomp-p wind)
+    (shot-feedback wind)))
+
+
+(defmethod focus-val ((wind torpedo-window))
+  (let ((sld (view-named :DISPERSION-SLIDER wind)))
+    (float (* 2 (/ (indicator sld) (point-h (view-size sld)))))))
+
+
+
+;;;; ---------------------------------------------------------------------- ;;;;
+;;;; jammer-window subclass of the transporter-window
+
+
+
+
+(defclass jammer-window (transporter-window)
+  ()
+  (:default-initargs
+    :window-title "Jammer"
+    :state-vec #(:enter-calibration 
+                 :type :accept-calibration
+                 :scanner-on :active-scan :lock-signal :scanner-off
+                 :transporter-power :desynchronize
+                 :shoot :desynchronize :main-control)
+    :gui-vec #(nil nil (check-box-check . :accept-calibration)
+                   (radio-button-push . :scanner-on) 
+                   (radio-button-push . :active-scan)
+                   (radio-button-push . :lock-signal)
+                   (radio-button-push . :scanner-off)                    
+                   (check-box-check . :transporter-power) nil nil nil nil)
+    :pict-name "transporter-extra-buttons"
+    :key-state :accept-calibration
+    :dots-center #@(752 173)
+    ;; x & y bounds for the target
+    :x1-bound 120
+    :x2-bound 412
+    :y1-bound 352
+    :y2-bound 645
+    :scan1-pos #@(-10 -10)
+    :scan2-pos #@(-10 -10)
+    :scan3-pos #@(-10 -10)
+    :scan4-pos #@(-10 -10)
+    :task-id 400
+    :view-subviews
+    (list
+     ;; left button grouping
+     (make-dialog-item
+      'button-checker
+      #@(185 107)
+      #@(150 28)
+      "Desynchronize"
+      'nil
+      :view-nick-name :DESYNCHRONIZE
+      :view-font '("Avant Garde" 14 :srccopy :plain (:color-index 0))
+      :default-button nil)
+     (make-dialog-item
+      'button-checker
+      #@(185 145)
+      #@(150 28)
+      "Synchronous Mode"
+      'nil
+      :view-nick-name :SYNCHRONOUS-MODE
+      :view-font '("Avant Garde" 14 :srccopy :plain (:color-index 0))
+      :default-button nil)
+     (make-dialog-item
+      'check-box-checker
+      #@(189 223)
+      #@(151 16)
+      "Transporter Power"
+      'nil
+      :view-nick-name :TRANSPORTER-POWER
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))      
+     (make-dialog-item
+      'check-box-checker
+      #@(189 244)
+      #@(151 16)
+      "Diagnostic Z"
+      'nil
+      :view-nick-name :DIAGNOSTIC-Z
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))      
+     (make-dialog-item
+      'check-box-checker
+      #@(189 265)
+      #@(151 16)
+      "Auxiliary Power"
+      'nil
+      :view-nick-name :AUXILIARY-POWER
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))      
+     
+     ;; Middle button group
+     (make-dialog-item
+      'button-checker
+      #@(440 107)
+      #@(150 28)
+      "Calibration"
+      'nil
+      :view-nick-name :ENTER-CALIBRATION
+      :view-font '("Avant Garde" 14 :srccopy :plain (:color-index 0))
+      :default-button nil)
+     (make-dialog-item
+      'button-checker
+      #@(440 145)
+      #@(150 28)
+      "Enter Frequency"
+      'nil
+      :view-nick-name :ENTER-FREQUENCY
+      :view-font '("Avant Garde" 14 :srccopy :plain (:color-index 0))
+      :default-button nil)
+     (make-dialog-item
+      'editable-text-dialog-item
+      #@(525 188)
+      #@(35 15)
+      "0"
+      'nil
+      :view-nick-name :CALIBRATION
+      :view-font '("Avant Garde" 14 :srccopy :plain (:color-index 0))
+      :allow-returns nil
+      :draw-outline t :enabled-p nil)
+     (make-dialog-item
+      'editable-text-dialog-item
+      #@(463 188)
+      #@(35 15)
+      "0"
+      'nil
+      :view-nick-name :FREQUENCY
+      :view-font '("Avant Garde" 14 :srccopy :plain (:color-index 0))
+      :allow-returns nil
+      :draw-outline t :enabled-p nil)
+     (make-dialog-item
+      'check-box-checker
+      #@(439 224)
+      #@(151 16)
+      "Accept Frequency"
+      'nil
+      :view-nick-name :ACCEPT-FREQUENCY
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     (make-dialog-item
+      'check-box-checker
+      #@(439 245)
+      #@(151 16)
+      "Accept Calibration"
+      'nil
+      :view-nick-name :ACCEPT-CALIBRATION
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     (make-dialog-item
+      'check-box-checker
+      #@(439 266)
+      #@(151 16)
+      "Frequency Sample"
+      'nil
+      :view-nick-name :FREQ-SAMPLE
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     
+     
+     ;; main control group
+     (make-dialog-item 'button-checker
+                       #@(505 577) #@(108 34)
+                       "Main Control" nil :view-nick-name :MAIN-CONTROL
+                       :view-font '("Charcoal" 12 :srccopy :plain (:color-index 0))
+                       :default-button NIL)
+     (make-dialog-item 'button-checker
+                       #@(625 577)
+                       #@(108 34)
+                       "Diagnostic" nil :view-nick-name :DIAGNOSTIC
+                       :view-font '("Charcoal" 12 :srccopy :plain (:color-index 0))
+                       :default-button NIL)
+     (make-dialog-item 'button-checker
+                       #@(505 617)
+                       #@(108 34)
+                       "Alpha Mask" nil :view-nick-name :ALPHA-MASK
+                       :view-font '("Charcoal" 12 :srccopy :plain (:color-index 0))
+                       :default-button NIL)
+     (make-dialog-item 'button-checker
+                       #@(625 617)
+                       #@(108 34)
+                       "System Lock" nil :view-nick-name :SYSTEM-LOCK
+                       :view-font '("Charcoal" 12 :srccopy :plain (:color-index 0))
+                       :default-button NIL)
+     
+     ;; right button group -- out of order to get defaults correct
+     (make-dialog-item
+      'radio-checker
+      #@(703 281)
+      #@(117 16)
+      "Scanner Off"
+      'nil
+      :view-nick-name :SCANNER-OFF
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     (make-dialog-item
+      'radio-checker
+      #@(703 260)
+      #@(117 16)
+      "Scanner On"
+      'nil
+      :view-nick-name :SCANNER-ON
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     (make-dialog-item
+      'radio-checker
+      #@(703 323)
+      #@(117 16)
+      "Lock Signal"
+      'nil
+      :view-nick-name :LOCK-SIGNAL
+      :radio-button-cluster 1
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     (make-dialog-item
+      'radio-checker
+      #@(703 302)
+      #@(117 16)
+      "Active Scan"
+      'nil
+      :view-nick-name :ACTIVE-SCAN
+      :radio-button-cluster 1
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     
+     (make-dialog-item
+      'radio-checker
+      #@(703 365)
+      #@(117 16)
+      "Tracker Off"
+      'nil
+      :view-nick-name :TRACKER-OFF
+      :radio-button-cluster 2
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     (make-dialog-item
+      'radio-checker
+      #@(703 344)
+      #@(117 16)
+      "Tracker On"
+      'nil
+      :view-nick-name :TRACKER-ON
+      :radio-button-cluster 2
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     
+     (make-dialog-item
+      'radio-checker
+      #@(703 407)
+      #@(117 16)
+      "Fix Frequency"
+      'nil
+      :view-nick-name :FIX-FREQUENCY
+      :radio-button-cluster 3
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     (make-dialog-item
+      'radio-checker
+      #@(703 386)
+      #@(117 16)
+      "Modulator"
+      'nil
+      :view-nick-name :MODULATOR
+      :radio-button-cluster 3
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     
+     
+     (make-dialog-item
+      'static-text-dialog-item
+      #@(529 492)
+      #@(274 37)
+      ""
+      'nil
+      :view-nick-name :STATUS
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     (make-dialog-item
+      'static-text-dialog-item
+      #@(834 635)
+      #@(32 15)
+      "0"
+      'nil
+      :view-nick-name :TIME
+      :view-font '("Avant Garde" 14 :srcor :plain (:color-index 0)))
+     )))
+
+
+
+(defmethod initialize-instance :after ((wind jammer-window) &key)
+  (dialog-item-disable (view-named :calibration wind))
+  )
+
+
+
+(defmethod check-state-update ((wind jammer-window) state)
+  ;(print state)
+  (case state
+    (:enter-calibration (progn  (status wind "") 
+                                (activate-freq-2 wind)))        ; mdb change
+    (:active-scan (setf (scan-p wind) t))
+    (:lock-signal (setf (scan-p wind) nil))
+    (:desynchronize (if (eq (state-num wind) 8)
+                      (begin-tracking wind)
+                      (unless (postcomp-p wind) (give-feedback wind))))
+    (:accept-calibration (check-freq wind))
+    (:shoot (cease-tracking wind))
+    (:main-control (finish-task wind))
+    ))
+
+
+(defmethod activate-freq-2 ((wind jammer-window))
+  (let ((ted (view-named :calibration wind)))
+    (dialog-item-enable ted)
+    (set-selection-range ted 0 1)))
+
+
+(defmethod check-freq ((wind jammer-window))
+  (let ((freq (freq-val wind)))
+    (if (or (not (numberp freq))
+            (> freq 100)
+            (< freq 1))
+      (progn
+        (play-snd *sp* "Warning" t)
+        (check-box-uncheck (view-named :accept-calibration wind))
+        (decf (state-num wind)))
+      (dialog-item-disable (view-named :calibration wind)))))
+
+
+(defmethod freq-val-2 ((wind jammer-window))
+  (read-from-string (dialog-item-text (view-named :calibration wind))))
+
+
+(defmethod freq-val ((wind jammer-window))
+  (read-from-string (dialog-item-text (view-named :calibration wind))))
+
+
+(defmethod give-feedback ((wind jammer-window))
+  (cond ((last-hit-p wind)
+         (play-snd *sp* "yes" t)
+         (status wind "Jamming successful--return to main control.")
+         )
+        (t
+         (play-snd *sp* "damn" t)
+         (status wind (if (flip)
+                        "Jamming failed--hostile signal too strong."
+                        "Jamming failed--beam too weak."))
+         (setf (state-num wind) 0)
+         (setf (advance-p wind) nil)))
+  (unless (postcomp-p wind)
+    (reset-display wind)))
+
+(defmethod cease-tracking ((wind jammer-window))
+  (remove-subviews wind (trgt-v wind))
+  (setf (track-p wind) nil)
+  (play-snd *sp* "Jammer" t)
+  (set-cursor *arrow-cursor*)
+  (determine-hit wind)
+  (when (postcomp-p wind) 
+    (give-feedback wind)
+    (reset-display wind))
+  )
+
+
+(defmethod reset-display ((wind jammer-window))
+  (check-box-uncheck (view-named :accept-calibration wind))
+  (check-box-uncheck (view-named :transporter-power wind))
+  (radio-button-push (view-named :scanner-off wind))
+  (set-dialog-item-text (view-named :calibration wind) "0")
+  (dotimes (i 4)
+    (awhen (scan-marker wind (1+ i))
+      (remove-subviews wind it)))
+  (add-markers wind)
+  (setf (scan-count wind) 4)
+  )
 
 
 
