@@ -37,7 +37,7 @@
 
 (defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
   (if back-color
-    (apply #'call-next-method view :back-color (convert-color back-color) args)
+    (apply #'call-next-method view :back-color (mcl-color->system-color back-color) args)
     (call-next-method)))
 
 #|
@@ -89,7 +89,7 @@
 (defmethod initialize-instance :after ((view static-text-dialog-item) &key)
   (when (slot-boundp view 'part-color-list)
     (loop for (part color) in (group (part-color-list view) 2)
-          do (set-part-color view part (convert-color color)))))
+          do (set-part-color view part (mcl-color->system-color color)))))
 
 (defclass editable-text-dialog-item (easygui:text-input-view view-text-via-stringvalue-mixin easygui::action-view-mixin dialog-item)
   ((allow-returns :initarg :allow-returns)
@@ -803,7 +803,7 @@
     (ceiling (* (/ (float (color-green color)) (float 65535)) 255))
     (ceiling (* (/ (float (color-blue color)) (float 65535)) 255))))
 
-(defun convert-color (color)
+(defun mcl-color->system-color (color)
   "Converts an MCL color to a CCL system color"
   (multiple-value-bind (r g b) (color-values color)
     (rgb->system-color r g b)))
