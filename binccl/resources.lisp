@@ -72,17 +72,20 @@
       (objc:make-nsstring predicate)))))
 
 (defun remove-if-not-image (lst)
-  (remove-if-not-predicate lst "self ENDSWITH '.jpg'"))
+  (remove-if-not-predicate lst "self ENDSWITH '.tiff'"))
 
 (defun remove-if-not-sound (lst)
   (remove-if-not-predicate lst "self ENDSWITH '.m4a'"))
 
 (defun open-resource-folder (dir)
-  (dolist (image-name (remove-if-not-image (contents-of-directory dir)))
-    (let* ((image-name-lisp-str (objc:lisp-string-from-nsstring image-name))
-           (image-name-no-ext (#/stringByDeletingPathExtension image-name))
-           (res (create-resource 'image (format nil "~a~a" dir image-name-lisp-str))))
-      (add-resource res (objc:lisp-string-from-nsstring image-name-no-ext)))))
+  (let ((dir (if (pathnamep dir) 
+               (directory-namestring dir)
+               dir)))
+    (dolist (image-name (remove-if-not-image (contents-of-directory dir)))
+      (let* ((image-name-lisp-str (objc:lisp-string-from-nsstring image-name))
+             (image-name-no-ext (#/stringByDeletingPathExtension image-name))
+             (res (create-resource 'image (format nil "~a~a" dir image-name-lisp-str))))
+        (add-resource res (objc:lisp-string-from-nsstring image-name-no-ext))))))
 
 ; This is a wrapper function to maintain backwards compatibility with lab code that was loading a resource file.
 ; The idea is that we take all images and sounds in the resource file, and place them into a single folder. Then

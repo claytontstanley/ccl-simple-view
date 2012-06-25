@@ -34,13 +34,23 @@
 (defclass simple-view (easygui::simple-view view-mixin)
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))))
 
-(defun convert-color (color)
-  (color-symbol->system-color 'green))
 
 (defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
   (if back-color
     (apply #'call-next-method view :back-color (convert-color back-color) args)
     (call-next-method)))
+
+#|
+(defmethod initialize-instance :after ((view simple-view) &key)
+  (let ((rect (easygui::view-content-rect view)))
+    (destructuring-bind (x y width height) (list (ns:ns-rect-x rect)
+                                                 (ns:ns-rect-y rect)
+                                                 (ns:ns-rect-width rect)
+                                                 (ns:ns-rect-height rect))
+      (unless (slot-boundp view 'easygui::position)
+        (set-view-position view x y))
+      (unless (slot-boundp view 'easygui::size)
+        (set-view-size view width height)))))|#
 
 (defclass view (simple-view)
   ()
@@ -72,7 +82,14 @@
   ((easygui::default-button-p :initarg :default-button)))
 
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
-  ((part-color-list :accessor part-color-list :initarg :part-color-list)))
+  ((part-color-list :reader part-color-list :initarg :part-color-list)))
+
+; FIXME: part-color-list and foreground/background slots should all remain in sync; how does MCL achieve this cleanly?
+
+(defmethod initialize-instance :after ((view static-text-dialog-item) &key)
+  (when (slot-boundp view 'part-color-list)
+    (loop for (part color) in (group (part-color-list view) 2)
+          do (set-part-color view part (convert-color color)))))
 
 (defclass editable-text-dialog-item (easygui:text-input-view view-text-via-stringvalue-mixin easygui::action-view-mixin dialog-item)
   ((allow-returns :initarg :allow-returns)
@@ -106,11 +123,20 @@
 (defmethod initialize-instance :after ((view image-view-mixin) &key)
   (let ((image-view (make-instance 'image-view
                                    :view-size (view-size view)
-                                   :view-position (view-position view))))
+                                   :view-position (make-point 0 0))))
     (setf (image-view view) image-view)
     (add-subviews view image-view)
     (when (slot-boundp view 'pict-id)
       (#/setImage: (easygui:cocoa-ref image-view) (get-resource (pict-id view))))))
+
+(defmethod easygui::add-1-subview ((view image-view) (super-view easygui::view))
+  (setf (slot-value view 'easygui::parent) super-view)
+  (push view (slot-value super-view 'easygui::subviews))
+  (#/addSubview:positioned:relativeTo: 
+   (easygui:cocoa-ref super-view) 
+   (easygui:cocoa-ref view)
+   #$NSWindowBelow
+   nil))
 
 (provide :icon-dialog-item)
 
@@ -249,6 +275,12 @@
                x)))
     (setf (easygui:view-position view) pos)))
 
+(defmethod set-view-size ((view simple-view) x &optional (y nil))
+  (let ((size (if y
+                (make-point x y)
+                x)))
+    (setf (easygui:view-size view) size)))
+
 (defmethod view-size ((view simple-view))
   (easygui:view-size view))
 
@@ -321,8 +353,17 @@
 (defmethod set-fore-color ((view simple-view) new-color)
   (easygui:set-fore-color view new-color))
 
+(defmethod set-back-color ((view simple-view) new-color)
+  (easygui:set-back-color view new-color))
+
 (defmethod set-part-color ((view simple-view) part new-color)
   (declare (ignore part))
+  (set-fore-color view new-color))
+
+(defmethod set-part-color ((view static-text-dialog-item) (part (eql :body)) new-color)
+  (set-back-color view new-color))
+
+(defmethod set-part-color ((view static-text-dialog-item) (part (eql :text)) new-color)
   (set-fore-color view new-color))
 
 ; Handling mouse movement/interaction
@@ -724,6 +765,9 @@
     (destructuring-bind (red green blue) (color-symbol->rgb symb)
           (easygui:make-rgb :red red :green green :blue blue)))
 
+(defun rgb->system-color (red green blue)
+  (easygui:make-rgb :red red :green green :blue blue))
+
 (defun system-color->symbol (color)
     (let ((red (easygui:rgb-red color))
                   (green (easygui:rgb-green color))
@@ -733,6 +777,38 @@
 (defparameter *black-color* (color-symbol->system-color 'black))
 (defparameter *red-color* (color-symbol->system-color 'red))
 (defparameter *light-gray-pattern* (color-symbol->system-color 'gray))
+
+; Converting MCL colors (specified as a huge (technical term) integer) to 'system' colors
+
+; FIXME: Stole this code from CCL's src; couldn't figure out how to load it with a require;
+; fix this. This code was initially stolen from MCL, so this is the actual MCL code to do the conversion
+
+(defun color-red (color &optional (component (logand (the fixnum (lsh color -16)) #xff)))
+  "Returns the red portion of the color"
+  (declare (fixnum component))
+  (the fixnum (+ (the fixnum (ash component 8)) component)))
+
+(defun color-green (color &optional (component (logand (the fixnum (lsh color -8)) #xff)))
+  "Returns the green portion of the color"
+  (declare (fixnum component))
+  (the fixnum (+ (the fixnum (ash component 8)) component)))
+
+(defun color-blue (color &optional (component (logand color #xff)))
+  "Returns the blue portion of the color"
+  (declare (fixnum component))
+  (the fixnum (+ (the fixnum (ash component 8)) component)))
+
+(defun color-values (color)
+  "Given an encoded color, returns the red, green, and blue components"
+  (values
+    (ceiling (* (/ (float (color-red color)) (float 65535)) 255))
+    (ceiling (* (/ (float (color-green color)) (float 65535)) 255))
+    (ceiling (* (/ (float (color-blue color)) (float 65535)) 255))))
+
+(defun convert-color (color)
+  "Converts an MCL color to a CCL system color"
+  (multiple-value-bind (r g b) (color-values color)
+    (rgb->system-color r g b)))
 
 ; ----------------------------------------------------------------------
 ; Manipulate the read table so that MCL's #@(a b) make-point shorthand works. 
