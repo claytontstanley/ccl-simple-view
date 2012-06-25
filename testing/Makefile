@@ -7,5 +7,7 @@ testString = ${testFiles:%=-l % }
 
 cclQuit = -e '(quit)'
 
+ccl = ./ccl
+
 unit:
-	ccl ${testString} ${cclQuit}
+	${ccl} ${testString} ${cclQuit}
