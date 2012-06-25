@@ -344,8 +344,7 @@
   (easygui:get-fore-color view))
 
 (defmethod part-color ((view easygui:static-text-view) part)
-  (declare (ignore part))
-  (get-fore-color view))
+  (error "write this"))
 
 (defmethod color ((view simple-view))
   (get-fore-color view))
@@ -357,8 +356,7 @@
   (easygui:set-back-color view new-color))
 
 (defmethod set-part-color ((view simple-view) part new-color)
-  (declare (ignore part))
-  (set-fore-color view new-color))
+  (error "write this"))
 
 (defmethod set-part-color ((view static-text-dialog-item) (part (eql :body)) new-color)
   (set-back-color view new-color))
@@ -761,18 +759,18 @@
                (when (equal cur-rgb rgb)
                  (return-from rgb->color-symbol cur-symb))))))
 
-(defun color-symbol->system-color (symb)
-    (destructuring-bind (red green blue) (color-symbol->rgb symb)
-          (easygui:make-rgb :red red :green green :blue blue)))
-
 (defun rgb->system-color (red green blue)
   (easygui:make-rgb :red red :green green :blue blue))
 
+(defun color-symbol->system-color (symb)
+    (destructuring-bind (red green blue) (color-symbol->rgb symb)
+      (rgb->system-color red green blue)))
+
 (defun system-color->symbol (color)
-    (let ((red (easygui:rgb-red color))
-                  (green (easygui:rgb-green color))
-                          (blue (easygui:rgb-blue color)))
-          (rgb->color-symbol (list red green blue))))
+  (let ((red (easygui:rgb-red color))
+        (green (easygui:rgb-green color))
+        (blue (easygui:rgb-blue color)))
+    (rgb->color-symbol (list red green blue))))
 
 (defparameter *black-color* (color-symbol->system-color 'black))
 (defparameter *red-color* (color-symbol->system-color 'red))
