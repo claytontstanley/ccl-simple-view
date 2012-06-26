@@ -348,20 +348,9 @@
          (ns:make-ns-point startx starty) 
          (ns:make-ns-point endx endy))))))
 
-(defmethod get-fore-color ((view simple-view))
-  (easygui:get-fore-color view))
-
-(defmethod part-color ((view easygui:static-text-view) part)
-  (error "write this"))
-
-(defmethod color ((view simple-view))
+(defmethod part-color ((view easygui:static-text-view) (part (eql :text)))
+  (declare (ignore part))
   (get-fore-color view))
-
-(defmethod set-fore-color ((view simple-view) new-color)
-  (easygui:set-fore-color view new-color))
-
-(defmethod set-back-color ((view simple-view) new-color)
-  (easygui:set-back-color view new-color))
 
 (defmethod set-part-color ((view simple-view) part new-color)
   (error "write this"))
@@ -371,6 +360,18 @@
 
 (defmethod set-part-color ((view static-text-dialog-item) (part (eql :text)) new-color)
   (set-fore-color view new-color))
+
+(defmethod color ((view simple-view))
+  (get-fore-color view))
+
+(defmethod get-fore-color ((view simple-view))
+  (easygui:get-fore-color view))
+
+(defmethod set-fore-color ((view simple-view) new-color)
+  (easygui:set-fore-color view new-color))
+
+(defmethod set-back-color ((view simple-view) new-color)
+  (easygui:set-back-color view new-color))
 
 ; Handling mouse movement/interaction
 
