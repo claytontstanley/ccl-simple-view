@@ -8,5 +8,4 @@
 
 (load-as-lst "votebox" "Emulator Files" "VBEmulator.lisp")
 
-(inspect wind)
 

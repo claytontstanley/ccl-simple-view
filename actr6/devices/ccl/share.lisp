@@ -98,7 +98,8 @@
 (defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-title-mixin dialog-item)
   ((easygui::cluster :initarg :radio-button-cluster)))
 
-(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin dialog-item) ())
+(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin dialog-item)
+  ((easygui::text :initform "")))
 
 ; FIXME: what's this view-text hack?
 
