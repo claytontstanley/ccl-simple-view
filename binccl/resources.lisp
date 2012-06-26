@@ -39,17 +39,16 @@
 ; Done this way, where the containers (arrays/lists) are converted, but not the containees, the container
 ; conversion functions do not have to do any type conversion or type checking.
 
-; TODO: Finish this off and write the &optional return in the first arglist, to mimick dolist
-(defmacro! doarray ((varsym array) &body body)
+(defmacro! do-array ((varsym array &optional ret) &body body)
   `(loop for ,g!i below (#/count ,array)
          for ,varsym = (#/objectAtIndex: ,array ,g!i)
-         do (progn ,@body)))
+         do (progn ,@body)
+         ,@(if ret `(finally (return ,ret)))))
 
 (defun ns-array->list (ns-array)
   (let ((out))
-    (doarray (item ns-array)
-      (push-to-end item out))
-    out))
+    (do-array (item ns-array out)
+      (push-to-end item out))))
 
 (defun list->ns-array (lst)
   (let ((out (#/array ns:ns-mutable-array)))
@@ -103,6 +102,6 @@
   (setf *pool* (init-pool))
   (open-resource-file (directory-namestring dir))
   (print-pool)
-  (get-resource "image2"))
+  (get-resource "voteboxbg"))
 |#
 

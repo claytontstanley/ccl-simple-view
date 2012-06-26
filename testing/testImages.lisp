@@ -29,9 +29,5 @@
 
 (setf (pict-id *view*) "image")
 
-(defmacro doarray ((varsym array) &body body)
-  `(loop for i below (#/count ,array)
-         for ,varsym = (#/objectAtIndex: ,array i)
-         do (progn ,@body)))
 
 
