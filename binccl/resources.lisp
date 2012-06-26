@@ -1,3 +1,5 @@
+(require :cocoa)
+
 (defun init-pool ()
   (make-hash-table :test #'equal))
 
