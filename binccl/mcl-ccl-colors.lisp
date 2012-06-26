@@ -230,3 +230,5 @@
   "Converts an MCL color to a CCL system color"
   (multiple-value-bind (r g b) (color-values color)
     (rgb->system-color r g b)))
+
+(provide :mcl-ccl-colors.lisp)
