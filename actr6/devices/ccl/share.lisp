@@ -73,7 +73,8 @@
   ()
   (:documentation "Top-level class for windows"))
 
-(defclass liner (simple-view) ())
+(defclass liner (simple-view)
+  ((easygui::foreground :reader color)))
 
 (defclass td-liner (liner) ())
 
@@ -352,17 +353,11 @@
   (declare (ignore part))
   (get-fore-color view))
 
-(defmethod set-part-color ((view simple-view) part new-color)
-  (error "write this"))
-
 (defmethod set-part-color ((view static-text-dialog-item) (part (eql :body)) new-color)
   (set-back-color view new-color))
 
 (defmethod set-part-color ((view static-text-dialog-item) (part (eql :text)) new-color)
   (set-fore-color view new-color))
-
-(defmethod color ((view simple-view))
-  (get-fore-color view))
 
 (defmethod get-fore-color ((view simple-view))
   (easygui:get-fore-color view))
