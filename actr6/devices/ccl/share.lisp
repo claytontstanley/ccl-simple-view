@@ -1,6 +1,7 @@
 (require :cocoa)
 (require :easygui)
-(require :resources) 
+(require :resources)
+(require :mcl-ccl-colors)
 
 ; ----------------------------------------------------------------------
 ; Building class definitions to match MCL's GUI class heirarchy
