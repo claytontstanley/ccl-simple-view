@@ -44,6 +44,20 @@
   (cons 'easygui::drawing-overlay-view 'easygui::cocoa-drawing-overlay-view)
   easygui::*view-class-to-ns-class-map*)
 
+(defclass cocoa-drawing-consuming-view (cocoa-drawing-view)
+  ()
+  (:metaclass ns:+ns-object))
+
+(defclass drawing-consuming-view (easygui::drawing-view) ())
+
+(objc:defmethod #/hitTest: ((self cocoa-drawing-consuming-view) (point :<NSP>oint))
+  (let ((ret (call-next-method point)))
+    (if (not (equal ccl:+null-ptr+ ret))
+      self
+      ccl:+null-ptr+)))
+
+(pushnew (cons 'drawing-consuming-view 'cocoa-drawing-consuming-view) *view-class-to-ns-class-map*)
+
 (defclass cocoa-image-view (cocoa-extension-mixin ns:ns-image-view)
   ()
   (:metaclass ns:+ns-object))
@@ -51,7 +65,7 @@
 (defclass image-view (easygui::view)
   ())
 
-(push (cons 'easygui::image-view 'easygui::cocoa-image-view) *view-class-to-ns-class-map*)
+(pushnew (cons 'easygui::image-view 'easygui::cocoa-image-view) *view-class-to-ns-class-map*)
 
 ; In order to implement MCL's top-level simple-view class, I needed a cocoa view class that was capable of drawing to the display
 ; (since simple-view can do this in MCL). Cocoa-drawing-view in easygui seemed like the appropriate class for this. However, the 

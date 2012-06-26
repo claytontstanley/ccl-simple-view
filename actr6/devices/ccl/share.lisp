@@ -66,6 +66,9 @@
   ()
   (:documentation "Top-level class for views that do not monitor mouse clicks and mouse movement"))
 
+(defclass consuming-view (easygui::drawing-consuming-view view)
+  ())
+
 (defclass color-dialog (window)
   ()
   (:documentation "Top-level class for windows"))

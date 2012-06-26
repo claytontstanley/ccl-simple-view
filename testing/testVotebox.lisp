@@ -9,3 +9,17 @@
 (load-as-lst "votebox" "Emulator Files" "VBEmulator.lisp")
 
 
+#|
+(inspect *view*)
+
+(remove-subviews wind *view*)
+
+(inspect wind)
+
+(first (subviews wind))
+
+(setf *view* *)
+
+(add-subviews wind *view*)
+
+|#
