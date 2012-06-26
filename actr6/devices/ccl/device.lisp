@@ -378,13 +378,10 @@
          (text-justification (text-just self))
          )
      (ecase text-justification
-       ;(#.#$tejustleft (1+ left-x))
-       ; Hardcoding to left justification for now
-       ; TODO: Fix this
-       (:left (1+ left-x)))))
-       ;(#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))
-       ;(#.#$tejustright (+ 1 left-x (- (width self) text-width))))))
-
+       (#.#$tejustleft (1+ left-x))
+       (#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))
+       (#.#$tejustright (+ 1 left-x (- (width self) text-width))))))
+ 
 #|(defmethod text-just ((self static-text-dialog-item))
    (if (null (slot-value self 'ccl::text-justification))
      #.#$tejustleft

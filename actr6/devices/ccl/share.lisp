@@ -192,9 +192,6 @@
 (import 'easygui:point-x)
 (import 'easygui:point-y)
 
-(defconstant $tejustleft :left)
-(defconstant $tejustcenter :center)
-(defconstant $tejustright :right)
 (ccl::register-character-name "UpArrow" #\U+F700)
 (ccl::register-character-name "DownArrow" #\U+F701)
 (ccl::register-character-name "BackArrow" #\U+F702)
@@ -628,6 +625,21 @@
         (return-from ccl::load-external-function sym)
         (funcall *load-external-function-orig* sym query)))))
 
+; Use the same approach to define foreign constants that MCL uses that no longer exist for CCL
+
+(defvar *load-os-constant-orig* #'ccl::load-os-constant)
+
+(with-continue
+  (defun ccl::load-os-constant (sym &optional query)
+    (let* ((con-names (list "tejustleft" "tejustcenter" "tejustright"))
+           (the-package (find-package :X86-Darwin64))
+           (con-syms (mapcar (lambda (name)
+                               (intern name the-package))
+                             con-names)))
+      (if (member sym con-syms)
+        (return-from ccl::load-os-constant sym)
+        (funcall *load-os-constant-orig* sym query)))))
+
 ; All of the functions being natively defined are here
 
 (defun X86-Darwin64::|getcursor| (num)
@@ -644,4 +656,14 @@
 
 (defun X86-Darwin64::|showmenubar| ()
   t)
+
+; And the constants are here
+
+(defconstant $tejustleft :left)
+(defconstant $tejustcenter :center)
+(defconstant $tejustright :right)
+
+(defconstant X86-Darwin64::|tejustleft| $tejustleft)
+(defconstant X86-Darwin64::|tejustcenter| $tejustcenter)
+(defconstant X86-Darwin64::|tejustright| $tejustright)
 
