@@ -44,11 +44,25 @@
   (cons 'easygui::drawing-overlay-view 'easygui::cocoa-drawing-overlay-view)
   easygui::*view-class-to-ns-class-map*)
 
+; Use a consuming-view class to say that all subviews within an instance
+; of that class will not respond to mouse clicks. This is to work around the differences
+; in first responders between MCL and CCL. MCL looks down the view hierarchy for the first responder
+; (breadth first), CCL looks down the hierarchy for the deepest responder (depth first). In order
+; to simulate breadth first by stopping at a particular view in the tree (and not inspecting that view's
+; subviews), create an instance of the consuming-view class. 
+
 (defclass cocoa-drawing-consuming-view (cocoa-drawing-view)
   ()
   (:metaclass ns:+ns-object))
 
 (defclass drawing-consuming-view (easygui::drawing-view) ())
+
+; Override hitTest; if a view (or one of its subviews) returns a non-nil value
+; for the default hitTest call, then return self; this suppresses subviews of 
+; self from responding to mouse clicks
+; 
+; Ref. this url for call-next-method syntax in objc:defmethod macro: 
+; http://clozure.com/pipermail/openmcl-devel/2008-November/008645.html
 
 (objc:defmethod #/hitTest: ((self cocoa-drawing-consuming-view) (point :<NSP>oint))
   (let ((ret (call-next-method point)))
@@ -57,6 +71,8 @@
       ccl:+null-ptr+)))
 
 (pushnew (cons 'drawing-consuming-view 'cocoa-drawing-consuming-view) *view-class-to-ns-class-map*)
+
+; Providing a view container to hold and display images.
 
 (defclass cocoa-image-view (cocoa-extension-mixin ns:ns-image-view)
   ()
