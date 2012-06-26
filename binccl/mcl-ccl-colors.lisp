@@ -189,8 +189,8 @@
   (easygui:make-rgb :red red :green green :blue blue))
 
 (defun color-symbol->system-color (symb)
-    (destructuring-bind (red green blue) (color-symbol->rgb symb)
-      (rgb->system-color red green blue)))
+  (destructuring-bind (red green blue) (color-symbol->rgb symb)
+    (rgb->system-color red green blue)))
 
 (defun system-color->symbol (color)
   (let ((red (easygui:rgb-red color))

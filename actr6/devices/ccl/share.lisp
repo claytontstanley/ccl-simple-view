@@ -165,14 +165,14 @@
   ; This technique is actually wrapped up in a macro called alet in Hoyte's book, but I'm not using the macro here.
   (let ((obj))
     (setf obj (apply #'make-instance 
-                    class
-                    :view-position position
-                    :view-size size
-                    :text text
-                    :action (if action 
-                              (lambda () (funcall action obj))
-                              nil)
-                    attributes))
+                     class
+                     :view-position position
+                     :view-size size
+                     :text text
+                     :action (if action 
+                               (lambda () (funcall action obj))
+                               nil)
+                     attributes))
     obj))
 
 ; ----------------------------------------------------------------------
@@ -251,7 +251,7 @@
 
 (defmethod initialize-instance :after ((view view-text-mixin) &key)
   (set-text-justification view (text-justification view)))
-  
+
 (defmethod set-dialog-item-text ((view easygui::view-text-mixin) text)
   (setf (easygui:view-text view) text))
 
@@ -331,7 +331,7 @@
   (#/isVisible (easygui::cocoa-ref view)))
 
 (defmethod local-to-global ((view simple-view) local-pos)
-    (add-points (easygui:view-position view) local-pos))
+  (add-points (easygui:view-position view) local-pos))
 
 (defmethod move-to ((view simple-view) position)
   (setf (pen-position view) position))
