@@ -1,7 +1,24 @@
 Directory Structure:
 .
+├── README
 ├── actr6
 │   └── devices
+├── bincarbon
+│   ├── CFBundle.lisp
+│   ├── base-trek-tasks.lisp
+│   ├── blinker.lisp
+│   ├── experiment-window4.lisp
+│   ├── launch-url.lisp
+│   ├── menubar-hide.lisp
+│   ├── misc-lib.lisp
+│   ├── pict-svm.lisp
+│   ├── procedure-window2.lisp
+│   ├── seq-math.lisp
+│   ├── snd-player.lisp
+│   └── timer.lisp
+├── binccl
+│   ├── mcl-ccl-colors.lisp
+│   └── resources.lisp
 ├── docs
 │   ├── Getting\ Started\ with\ MCL.pdf
 │   ├── InterfaceBuilderWithCCLTutorial.pdf
@@ -9,22 +26,39 @@ Directory Structure:
 ├── easygui
 │   └── extensions.lisp
 ├── scratch
+│   ├── dialog-item.lisp
+│   ├── ffi.lisp
+│   ├── image.lisp
 │   ├── it-example1.lisp
 │   └── scratch.lisp
 ├── submodules
 │   ├── actr6
 │   └── ccl
 └── testing
+    ├── Makefile
     ├── actr6 -> ../submodules/actr6
+    ├── bincarbon -> ../bincarbon
+    ├── bootstrap-mcl.lisp
     ├── bootstrap.lisp
-    ├── testCCLDevice.dx64fsl
+    ├── ccl -> ../submodules/ccl/dx86cl64
+    ├── data
+    ├── phaser -> /Volumes/RedGiant/X\ Support/X83\ Frank\ Trek\ 11/Experiment
     ├── testCCLDevice.lisp
-    ├── testTutorials.dx64fsl
+    ├── testImages.lisp
+    ├── testPhaser.lisp
     ├── testTutorials.lisp
     ├── testVotebox.lisp
+    └── votebox -> /Volumes/RedGiant/Projects/ACCURATE/ACT-R\ VoteBox\ Models
+
 
 actr6:		All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. 
 		-Note the share.lisp file lives here for now, which contains the MCL GUI interface for CCL
+
+bincarbon:	All original MCL bincarbon code. Just a few files have minor tweaks to work with CCL. Timer is broken on CCL currently though.
+		Other files, like CFBundle.lisp don't work at all on CCL, but aren't necessary on CCL. The main goal for this folder is to document
+		all changes to bincarbon files when migrating to CCL, while maintaining backwards compatibility with MCL.
+
+binccl:		CCL-specific utility files. Contains a CCL implementation of an interface for managing resource files (e.g., sounds, images)
 
 docs:		Archived documentation and reference manuals found online.
 		-No docs for this specific stuff yet
@@ -38,11 +72,14 @@ scratch:	Stray lisp code, experimental, etc.
 submodules:	Source code for actr and ccl
 		-actr is newest version (as of Jun 2012). All code is same except that loader files (loader.lisp) are inside each of the tutorial folders
 		-ccl is newest version (as of Jun 2012). Image is modified. I added a few helper functions/packages that I like to use for a testing environment.
-		 This means that you'll have to load this ccl image if you want to run the tests
+		 This means that you'll have to load this ccl image if you want to run the tests (for now)
 
 testing:	Source code for testing the ccl code
 		-testCCLDevice.lisp: Used to test basic functionality of building a Cocoa display by writing lisp code that meets the uwi.lisp interface spec
 		-testTutorials.lisp: Runs ACT-R through all tutorials; checks that ACT-R can 'see' CCL's Cocoa device
+		-testImages.lisp: Tests that the CCL resources.lisp file correctly manages images
+		-testVotebox.lisp: Tests to run Votebox on CCL
+		-testPhaser.lisp: Tests to run Phaser on CCL
 	
 
 Main files:	
