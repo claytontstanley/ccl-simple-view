@@ -6,17 +6,19 @@
 
 (defparameter *win* 
   (make-instance 'window
-                 :view-size (make-point 500 500)
+                 :view-size (make-point 1024 768)
                  :view-position (make-point 100 100)))
 
 (defparameter *view*
   (make-instance 'test-image
-                 :view-size (make-point 200 200)
+                 :view-size (make-point 1024 768)
                  :view-position (make-point 0 0)))
 
+(defparameter *image-path*
+  (format nil "~a~a/~a" (directory-namestring *load-truename*) "data" "voteboxbg.tiff"))
 
 (current-directory)
-(defparameter *image* (create-resource 'image "tmp/image.jpg"))
+(defparameter *image* (create-resource 'image *image-path*))
 
 (add-resource *image* "image")
 (get-resource "image")
