@@ -46,12 +46,14 @@
 (objc:defmethod #/hitTest: ((self easygui::cocoa-drawing-overlay-view) (point :<NSP>oint))
   ccl:+null-ptr+)
 
-; Use a consuming-view class to say that all subviews within an instance
-; of that class will not respond to mouse clicks. This is to work around the differences
-; in first responders between MCL and CCL. MCL looks down the view hierarchy for the first responder
+; ----------------------------------------------------------------------
+; Use a consuming-view class to say that all subviews within an instance of that class will not respond to mouse clicks. 
+;
+; This is to work around the differences in first responders between MCL and CCL. MCL looks down the view hierarchy for the first responder
 ; (breadth first), CCL looks down the hierarchy for the deepest responder (depth first). In order
 ; to simulate breadth first by stopping at a particular view in the tree (and not inspecting that view's
 ; subviews), create an instance of the consuming-view class. 
+; ----------------------------------------------------------------------
 
 (defclass cocoa-drawing-consuming-view (cocoa-drawing-view)
   ()
@@ -74,7 +76,9 @@
       self
       ccl:+null-ptr+)))
 
+; ----------------------------------------------------------------------
 ; Providing a view container to hold and display images.
+; ----------------------------------------------------------------------
 
 (defclass cocoa-image-view (cocoa-extension-mixin ns:ns-image-view)
   ()
@@ -84,6 +88,9 @@
   ()
   (:default-initargs :specifically 'easygui::cocoa-image-view))
 
+; ----------------------------------------------------------------------
+; Creating MCL's top-level simple-view class
+;
 ; In order to implement MCL's top-level simple-view class, I needed a cocoa view class that was capable of drawing to the display
 ; (since simple-view can do this in MCL). Cocoa-drawing-view in easygui seemed like the appropriate class for this. However, the 
 ; default lisp class (drawing-view) for this class did a bit more than a top-level simple-view class should do. It tracks mouse movement, 
@@ -93,6 +100,7 @@
 ; create a simple-view object, and instantiate a cocoa-drawing-view object for that view. This allows window to be a subclass of simple-view,
 ; simple-view objects to draw to the display, and little code modification/extension to easygui since we're leveraging the objective c methods
 ; on cocoa-drawing-view.
+; ----------------------------------------------------------------------
 
 (defclass easygui::simple-view (easygui::view)
   ((flipped :initform *screen-flipped* :initarg :flipped :reader flipped-p))
