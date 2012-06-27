@@ -461,13 +461,9 @@
   (:metaclass ns:+ns-object))
 
 #+:clozure
-(defclass easygui::button-checker () ())
-
-#+:clozure
-(defclass checker (easygui::button-checker) ())
-
-#+:clozure
-(pushnew (cons 'easygui::button-checker 'easygui::cocoa-button-checker) easygui::*view-class-to-ns-class-map*)
+(defclass checker (easygui::view)
+  ()
+  (:default-initargs :specifically 'easygui::cocoa-button-checker))
 
 #+:clozure
 (objc:defmethod (#/mouseDown: :void) ((cocoa-self easygui::cocoa-button-checker) the-event)
