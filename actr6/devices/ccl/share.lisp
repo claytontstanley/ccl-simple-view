@@ -208,6 +208,14 @@
     (+ (point-x p1) (point-x p2))
     (+ (point-y p1) (point-y p2))))
 
+(defmethod subtract-points ((p1 easygui::eg-point) (p2 easygui::eg-point))
+  (make-point
+    (- (point-x p1) (point-x p2))
+    (- (point-y p1) (point-y p2))))
+
+(defmethod point-string ((point easygui::eg-point))
+  (format nil "#@(~a ~a)" (point-x point) (point-y point)))
+
 (defmethod add-subviews ((view view) &rest subviews)
   (when subviews
     (apply #'easygui:add-subviews view subviews)))
@@ -222,6 +230,9 @@
 
 (defmethod view-named (name (view view))
   (easygui:view-named name view))
+
+(defmethod view-nick-name ((view view))
+  (easygui:view-nick-name view))
 
 (defmethod window-select ((win window))
   (easygui:window-show win))

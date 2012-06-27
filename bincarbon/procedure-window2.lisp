@@ -453,9 +453,40 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; subclasses for use with procedure windows
 
+; FIXME: Simplify this clozure stuff.
+
+#+:clozure
+(defclass easygui::cocoa-button-checker (easygui::cocoa-button)
+  ()
+  (:metaclass ns:+ns-object))
+
+#+:clozure
+(defclass easygui::button-checker () ())
+
+#+:clozure
+(defclass checker (easygui::button-checker) ())
+
+#+:clozure
+(pushnew (cons 'easygui::button-checker 'easygui::cocoa-button-checker) easygui::*view-class-to-ns-class-map*)
+
+#+:clozure
+(objc:defmethod (#/mouseDown: :void) ((cocoa-self easygui::cocoa-button-checker) the-event)
+  (let* ((self (easygui::easygui-view-of cocoa-self))
+         (ns-point (#/locationInWindow the-event))
+         (ns-converted-point (#/convertPoint:fromView: (#/superview cocoa-self)
+                              ns-point
+                              nil))
+         (where (easygui::eg-point-from-ns-point ns-converted-point)))
+    (when (eq (view-nick-name self) (curr-state (view-window self)))
+      (call-next-method the-event))
+    (handle-click self (point-string (subtract-points where
+                                                      (view-position self))))))
+
+#+:digitool
 (defclass checker ()
   ())
 
+#+:digitool
 (defmethod view-click-event-handler :around ((self checker) where)
   (when (eq (view-nick-name self) (curr-state (view-window self)))
     (call-next-method))

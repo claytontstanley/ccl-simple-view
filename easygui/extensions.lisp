@@ -1,5 +1,10 @@
 (in-package :easygui)
 
+(defun eg-point-from-ns-point (point)
+  (easygui::point 
+    (ns:ns-point-x point)
+    (ns:ns-point-y point)))
+
 ; I think I found a bug in these two methods in the easygui package, so redefining them here with correct setNeedsDisplay: call
 (defmethod (setf view-position) (point (self view))
   (running-on-main-thread ()
