@@ -453,8 +453,6 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; subclasses for use with procedure windows
 
-; FIXME: Simplify this clozure stuff.
-
 #+:clozure
 (defclass easygui::cocoa-button-checker (easygui::cocoa-button)
   ()
@@ -464,6 +462,10 @@
 (defclass checker (easygui::view)
   ()
   (:default-initargs :specifically 'easygui::cocoa-button-checker))
+
+; FIXME: I don't like that I have to manage converting the point (so that when the screen is 
+; flipped for MCL, the coordinates are correct). I'm betting there's a more appropriate funciton to
+; use instead of #/locationInWindow, that handles this appropriately
 
 #+:clozure
 (objc:defmethod (#/mouseDown: :void) ((cocoa-self easygui::cocoa-button-checker) the-event)

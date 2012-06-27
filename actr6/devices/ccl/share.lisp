@@ -83,11 +83,22 @@
 
 (defclass dialog-item (view view-text-mixin)  ())
 
+; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
+; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.
+; Most of the easygui package uses a global easygui::*view-class-to-ns-class-map* variable that contains mappings of lisp
+; classes to cocoa view classes, but I found using this flat mapping to be problematic with clos hierarchies. 
+; Easygui also provides a :specifically method to overrule the easygui::*view-class-to-ns-class-map* variable, and I like this better, 
+; so I'm using it. The benefits of the :specifically method are: 
+; [1] cocoa view class mappings are explicitly written, and contained within each clos class definition. 
+; [2] As the clos classes are extended, the :specifically values are inherited/over-ridden in the usual way.
+
 (defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin easygui::text-fonting-mixin dialog-item)
-  ((easygui::default-button-p :initarg :default-button)))
+  ((easygui::default-button-p :initarg :default-button))
+  (:default-initargs :specifically 'easygui::cocoa-button))
 
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
-  ((part-color-list :reader part-color-list :initarg :part-color-list)))
+  ((part-color-list :reader part-color-list :initarg :part-color-list))
+  (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
 
 ; FIXME: part-color-list and foreground/background slots should all remain in sync; how does MCL achieve this cleanly?
 
@@ -98,13 +109,16 @@
 
 (defclass editable-text-dialog-item (easygui:text-input-view view-text-via-stringvalue-mixin easygui::action-view-mixin dialog-item)
   ((allow-returns :initarg :allow-returns)
-   (draw-outline :initarg :draw-outline)))
+   (draw-outline :initarg :draw-outline))
+  (:default-initargs :specifically 'easygui::cocoa-text-field))
 
 (defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-title-mixin dialog-item)
-  ((easygui::cluster :initarg :radio-button-cluster)))
+  ((easygui::cluster :initarg :radio-button-cluster))
+  (:default-initargs :specifically 'easygui::cocoa-button))
 
 (defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin dialog-item)
-  ((easygui::text :initform "")))
+  ((easygui::text :initform ""))
+  (:default-initargs :specifically 'easygui::cocoa-button))
 
 ; FIXME: what's this view-text hack?
 

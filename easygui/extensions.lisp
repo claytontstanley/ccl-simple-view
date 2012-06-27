@@ -36,18 +36,15 @@
   (:metaclass ns:+ns-object))
 
 ; And create the lisp equivalent class
+; And register the objective c extension and lisp class to the easygui package, so that it instantiates a 
+; cocoa-drawing-overlay-view object in the cocoa-ref slot when a drawing-overlay-view lisp object is instantiated
 (defclass easygui::drawing-overlay-view (easygui::drawing-view)
-  ())
+  ()
+  (:default-initargs :specifically 'easygui::cocoa-drawing-overlay-view))
 
 ; Add the hook method in objective c that will cause the new class to not respond to mouse activity
 (objc:defmethod #/hitTest: ((self easygui::cocoa-drawing-overlay-view) (point :<NSP>oint))
   ccl:+null-ptr+)
-
-; and register the objective c extension and lisp class to the easygui package, so that it instantiates a 
-; cocoa-drawing-overlay-view object in the cocoa-ref slot when a drawing-overlay-view lisp object is instantiated
-(push 
-  (cons 'easygui::drawing-overlay-view 'easygui::cocoa-drawing-overlay-view)
-  easygui::*view-class-to-ns-class-map*)
 
 ; Use a consuming-view class to say that all subviews within an instance
 ; of that class will not respond to mouse clicks. This is to work around the differences
@@ -60,7 +57,9 @@
   ()
   (:metaclass ns:+ns-object))
 
-(defclass drawing-consuming-view (easygui::drawing-view) ())
+(defclass drawing-consuming-view (easygui::drawing-view)
+  ()
+  (:default-initargs :specifically 'easygui::cocoa-drawing-consuming-view))
 
 ; Override hitTest; if a view (or one of its subviews) returns a non-nil value
 ; for the default hitTest call, then return self; this suppresses subviews of 
@@ -75,8 +74,6 @@
       self
       ccl:+null-ptr+)))
 
-(pushnew (cons 'drawing-consuming-view 'cocoa-drawing-consuming-view) *view-class-to-ns-class-map*)
-
 ; Providing a view container to hold and display images.
 
 (defclass cocoa-image-view (cocoa-extension-mixin ns:ns-image-view)
@@ -84,9 +81,8 @@
   (:metaclass ns:+ns-object))
 
 (defclass image-view (easygui::view)
-  ())
-
-(pushnew (cons 'easygui::image-view 'easygui::cocoa-image-view) *view-class-to-ns-class-map*)
+  ()
+  (:default-initargs :specifically 'easygui::cocoa-image-view))
 
 ; In order to implement MCL's top-level simple-view class, I needed a cocoa view class that was capable of drawing to the display
 ; (since simple-view can do this in MCL). Cocoa-drawing-view in easygui seemed like the appropriate class for this. However, the 
@@ -99,17 +95,8 @@
 ; on cocoa-drawing-view.
 
 (defclass easygui::simple-view (easygui::view)
-  ((flipped :initform *screen-flipped* :initarg :flipped :reader flipped-p)))
-
-; Note that the *view-class-to-ns-class-map*, as implemented in easygui, is sort of an already-sorted class-precedence-list. So in order to keep from 
-; all make-instance calls from creating the most general cocoa-drawing-view objects, this class is placed at the end of *view-class-to-ns-class-map*. 
-
-(defvar *do-only-once* 
-  (progn
-    (common-lisp-user::push-to-end  
-      (cons 'easygui::simple-view 'easygui::cocoa-drawing-view)
-      easygui::*view-class-to-ns-class-map*)
-    'evaled))
+  ((flipped :initform *screen-flipped* :initarg :flipped :reader flipped-p))
+  (:default-initargs :specifically 'easygui::cocoa-drawing-view))
 
 ; This section is the additional code required to have a simple-view object behave mostly like a drawing-view type object, 
 ; but without inheriting from drawing-view. Sort of a workaround to avoid the drawing-view mouse-tracking methods, since those aren't mixins (yet).
