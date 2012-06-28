@@ -1,3 +1,4 @@
+binccl/utilities.lisp
 easygui/extensions.lisp
 binccl/resources.lisp
 binccl/mcl-ccl-colors.lisp

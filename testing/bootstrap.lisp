@@ -1,7 +1,3 @@
-(defmacro with-continue (&body body)
-  `(handler-bind ((error #'continue))
-     ,@body))
-
 (defparameter *path-separator*
   #+:digitool ":"
   #+:clozure "/")
@@ -47,8 +43,6 @@
 
 #-:act-r-6.0 (load-as-lst "actr6" "load-act-r-6.lisp")
 
-#+clozure (require :cocoa)
-#+clozure (require :easygui)
 #+clozure (dolist (file (file-lines "~/src/mcl-migration/build/file-list.txt"))
             (load (format nil "~a/~a" "~/src/mcl-migration" file)))
 

@@ -1,3 +1,6 @@
+(require :cocoa)
+(require :easygui)
+
 (in-package :easygui)
 
 (defun eg-point-from-ns-point (point)
