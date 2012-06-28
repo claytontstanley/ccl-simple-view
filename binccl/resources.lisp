@@ -1,3 +1,18 @@
+; ----------------------------------------------------------------------
+; Some functions to create and manage resource data for CCL
+;
+; If images or sounds are needed for your application, these functions can 
+; be used to manage those resources. Usual getters/setters/creators are available:
+;
+; #'create-resource: Creates an image or sound resource, given a path to that file
+; #'add-resource: Adds a created resource to the pool
+; #'get-resource-val: Retrieves a resource's value from the pool
+;
+; Note that a form of lazy evaluation is used to alloc the resources only when needed
+; That is, each resource is allocd the first time it's retrieved, 'not' when it's created, or
+; added to the pool. If you want to alloc all resources currently in the pool (for pre-caching), 
+; call #'alloc-resources
+
 (require :cocoa)
 
 (defun init-pool ()
@@ -10,11 +25,45 @@
              (format t "~a->~a~%" key val))
            pool))
 
+(defclass resource ()
+  ((val :accessor val :initarg :val)
+   (alloc-fn :accessor alloc-fn :initarg :alloc-fn)))
+
+(defmacro when-bound ((name instance))
+  `(if (slot-boundp  ,instance ',name)
+     (,name ,instance)
+     'slot-unbound))
+
+(defmethod print-object ((obj resource) stream)
+  (print-unreadable-object (obj stream :identity t :type t)
+    (format stream "val->~a,alloc-fn->~a~%"
+            (when-bound (val obj))
+            (when-bound (alloc-fn obj)))))
+
+(defmethod alloc-resource ((obj resource))
+  (unless (slot-boundp obj 'val)
+    (setf (val obj) (funcall (alloc-fn obj))))
+  obj)
+
+(defun alloc-resources (&optional (pool *pool*))
+  (maphash 
+    (lambda (key val)
+      (declare (ignore key))
+      (alloc-resource val))
+    pool))
+
+(defmethod get-val ((obj resource))
+  (alloc-resource obj)
+  (val obj))
+
 (defun get-resource (id &optional (pool *pool*))
-  (multiple-value-bind (val present-p) (gethash id pool)
+  (multiple-value-bind (resource present-p) (gethash id pool)
     (unless present-p
       (error "resource with id ~a not present in pool ~a~%" id pool))
-    val))
+    resource))
+
+(defun get-resource-val (id &optional (pool *pool*))
+  (get-val (get-resource id pool)))
 
 (defun get-id (resource &optional (pool *pool*))
   (error "write this when needed"))
@@ -26,9 +75,13 @@
   (error "write this when needed"))
 
 (defmethod create-resource ((type (eql 'image)) path)
-  (#/initWithContentsOfFile: 
-   (#/alloc ns:ns-image) 
-   (objc:make-nsstring path)))
+  (make-instance 
+    'resource
+    :alloc-fn
+    (lambda ()
+      (#/initWithContentsOfFile: 
+       (#/alloc ns:ns-image) 
+       (objc:make-nsstring path)))))
 
 ; TODO: Write the create-resource for 'sound
 
@@ -93,8 +146,9 @@
 ; on the old code, load the folder instead of the resource file, but the old code doesn't have to be changed, since
 ; it just calls the function below, which calls the proper open-resource-folder function
 
+#|
 (defun open-resource-file (dir &key if-does-not-exist errorp direction perm data-fork-p)
-  (open-resource-folder dir))
+  (open-resource-folder dir))|#
 
 (provide :resources)
 
@@ -104,6 +158,6 @@
   (setf *pool* (init-pool))
   (open-resource-file (directory-namestring dir))
   (print-pool)
-  (get-resource "voteboxbg"))
+  (get-resource-val "voteboxbg"))
 |#
 

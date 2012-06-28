@@ -138,7 +138,7 @@
 
 (defmethod (setf pict-id) (pict-id (view image-view-mixin))
   (unwind-protect (setf (slot-value view 'pict-id) pict-id)
-    (#/setImage: (easygui:cocoa-ref (image-view view)) (get-resource pict-id))))
+    (#/setImage: (easygui:cocoa-ref (image-view view)) (get-resource-val pict-id))))
 
 (defmethod initialize-instance :after ((view image-view-mixin) &key)
   (let ((image-view (make-instance 'image-view
@@ -147,7 +147,7 @@
     (setf (image-view view) image-view)
     (add-subviews view image-view)
     (when (slot-boundp view 'pict-id)
-      (#/setImage: (easygui:cocoa-ref image-view) (get-resource (pict-id view))))))
+      (#/setImage: (easygui:cocoa-ref image-view) (get-resource-val (pict-id view))))))
 
 ; Place all images in the background (behind all other views). Do this by
 ; specializing on the add-1-subview method in the easygui package. And call
