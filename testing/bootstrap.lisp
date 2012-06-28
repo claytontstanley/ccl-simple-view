@@ -26,16 +26,30 @@
   (dolist (file files)
     (load-as-lst "bincarbon" file)))
 
+(defun file-string (path)
+  "Sucks up an entire file from PATH into a freshly-allocated string,
+   returning two values: the string and the number of bytes read."
+  (with-open-file (s path)
+    (let* ((len (file-length s))
+           (data (make-string len)))
+      (values data (read-sequence data s)))))
+
+(defun file-lines (path)
+  "Sucks up an entire file from PATH into a list of freshly-allocated
+   strings, returning two values: the list of strings and the number of
+   lines read."
+  (with-open-file (s path)
+    (loop for line = (read-line s nil nil)
+          while line
+          collect line into lines
+          counting t into line-count
+          finally (return (values lines line-count)))))
+
 #-:act-r-6.0 (load-as-lst "actr6" "load-act-r-6.lisp")
+
 #+clozure (require :cocoa)
 #+clozure (require :easygui)
-#+clozure (load "~/src/mcl-migration/easygui/extensions.lisp")
-#+clozure (load "~/src/mcl-migration/binccl/resources.lisp")
-#+clozure (load "~/src/mcl-migration/binccl/mcl-ccl-colors.lisp")
-#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/share.lisp")
-#+clozure (load "~/src/mcl-migration/rmcl/lib/ccl-menus.lisp")
-#+clozure (load "~/src/mcl-migration/rmcl/lib/dialogs.lisp")
-#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/device.lisp")
-#+clozure (load "~/src/mcl-migration/actr6/devices/ccl/uwi.lisp")
+#+clozure (dolist (file (file-lines "~/src/mcl-migration/build/file-list.txt"))
+            (load (format nil "~a/~a" "~/src/mcl-migration" file)))
 
 #+digitool (load-as-lst "bootstrap-mcl.lisp")
