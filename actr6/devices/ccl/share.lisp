@@ -331,8 +331,6 @@
 (defmethod radio-button-push ((item radio-button-dialog-item))
   (easygui:radio-button-select item))
 
-(defmethod update-default-button ((obj string-dialog)) ())
-
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
 

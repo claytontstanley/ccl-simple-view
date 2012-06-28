@@ -3,6 +3,8 @@
 
 (defclass get-string-dialog (string-dialog)())
 
+(defmethod update-default-button ((obj string-dialog)) ())
+
 (defmethod set-view-size ((dialog get-string-dialog) h &optional v)
   (declare (ignore h v))
   (let* ((old-size (view-size dialog)))
