@@ -13,3 +13,4 @@
 
 (load-as-lst "phaser" "X83.lisp")
 
+(get-string-from-user "hello")

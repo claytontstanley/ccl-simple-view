@@ -33,6 +33,8 @@
 #+clozure (load "~/src/mcl-migration/binccl/resources.lisp")
 #+clozure (load "~/src/mcl-migration/binccl/mcl-ccl-colors.lisp")
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/share.lisp")
+#+clozure (load "~/src/mcl-migration/rmcl/lib/ccl-menus.lisp")
+#+clozure (load "~/src/mcl-migration/rmcl/lib/dialogs.lisp")
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/device.lisp")
 #+clozure (load "~/src/mcl-migration/actr6/devices/ccl/uwi.lisp")
 

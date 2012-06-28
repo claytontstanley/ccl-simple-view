@@ -16,7 +16,7 @@
 (require :cocoa)
 
 (defun init-pool ()
-  (make-hash-table :test #'equal))
+  (make-hash-table :test #'equalp))
 
 (defvar *pool* (init-pool))
 
@@ -137,17 +137,19 @@
   (remove-if-not-predicate lst "self ENDSWITH '.tiff'"))
 
 (defun remove-if-not-sound (lst)
-  (remove-if-not-predicate lst "self ENDSWITH '.m4a'"))
+  (remove-if-not-predicate lst "self ENDSWITH '.aif'"))
 
 (defun open-resource-folder (dir)
   (let ((dir (if (pathnamep dir) 
                (directory-namestring dir)
                dir)))
-    (dolist (image-name (remove-if-not-image (contents-of-directory dir)))
-      (let* ((image-name-lisp-str (objc:lisp-string-from-nsstring image-name))
-             (image-name-no-ext (#/stringByDeletingPathExtension image-name))
-             (res (create-resource 'image (format nil "~a~a" dir image-name-lisp-str))))
-        (add-resource res (objc:lisp-string-from-nsstring image-name-no-ext))))))
+    (loop for (type filter-fun) in (list (list 'image #'remove-if-not-image)
+                                         (list 'sound #'remove-if-not-sound))
+          do (dolist (image-name (funcall filter-fun (contents-of-directory dir)))
+               (let* ((image-name-lisp-str (objc:lisp-string-from-nsstring image-name))
+                      (image-name-no-ext (#/stringByDeletingPathExtension image-name))
+                      (res (create-resource type (format nil "~a~a" dir image-name-lisp-str))))
+                 (add-resource res (objc:lisp-string-from-nsstring image-name-no-ext)))))))
 
 ; This is a wrapper function to maintain backwards compatibility with lab code that was loading a resource file.
 ; The idea is that we take all images and sounds in the resource file, and place them into a single folder. Then

@@ -1,0 +1,2 @@
+diff-rmcl:
+	diff ZZZZ

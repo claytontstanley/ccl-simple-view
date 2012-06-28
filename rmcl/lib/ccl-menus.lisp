@@ -1,3 +1,28 @@
+(defparameter *tool-back-color* 15658734)
+
+
+(defclass string-dialog (dialog)
+  ((allow-empty-strings :initform nil :initarg :allow-empty-strings)))
+
+(defmethod update-default-button ((obj string-dialog)) ())
+
+(defclass get-string-dialog (string-dialog)())
+
+(defmethod set-view-size ((dialog get-string-dialog) h &optional v)
+  (declare (ignore h v))
+  (let* ((old-size (view-size dialog)))
+    (call-next-method)
+    (let* ((new-size (view-size dialog))
+           (hdelta (make-point (- (point-h old-size)(point-h new-size)) 0))
+           (subs (view-subviews dialog))
+           (len (length subs)))
+      (dotimes (i len)
+        (let ((sub (elt subs i)))
+          (if (typep sub 'button-dialog-item)
+            (set-view-position sub (subtract-points (view-position sub) hdelta))
+            (if (typep sub 'editable-text-dialog-item)
+              (set-view-size sub (subtract-points (view-size sub) hdelta)))))))))
+
 ;; could be prettier, need a set-view-size method - move buttons, resize editable-text - done
 ; 140 x 80 is about minumum useful size - neg size is invisible
 (with-continue
@@ -5,7 +30,8 @@
                                 &key
                                 initial-string
                                 (size (make-point 365 100))
-                                (position '(:bottom 140))
+                                ;(position '(:bottom 140))
+                                (position #@(140 140))
                                 (ok-text "OK")
                                 (cancel-text "Cancel")
                                 (modeless nil)

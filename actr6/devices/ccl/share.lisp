@@ -23,7 +23,7 @@
   ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
 
 (defclass view-mixin (easygui:view)
-  ((easygui::size :initarg :view-size)
+  ((easygui::size :initarg :view-size :initform (make-point 100 100))
    (easygui::position :initarg :view-position)
    (easygui::foreground :initarg :color)
    (temp-view-subviews :initarg :view-subviews)))
@@ -35,6 +35,10 @@
 (defclass simple-view (easygui::simple-view view-mixin)
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))))
 
+; TODO: Use the MOP to remove this dup.
+
+(defmethod view-default-size ((view simple-view))
+  (make-point 100 100))
 
 (defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
   (if back-color
@@ -59,6 +63,10 @@
 
 (defclass window (easygui:window view-text-via-title-mixin view)
   ((grow-icon-p :initform nil :initarg :grow-icon-p :reader grow-icon-p)
+   (grow-box-p :initarg :grow-box-p)
+   (theme-background :initarg :theme-background)
+   (window-show :initarg :window-show)
+   (window-type :initarg :window-type)
    (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)))
 
 (defclass windoid (window) ())
@@ -81,6 +89,12 @@
 
 (defclass bu-liner (liner) ())
 
+(defclass dialog (window)
+  ()
+  (:default-initargs
+    :window-title "Untitled Dialog"
+    :window-type :document))
+
 (defclass dialog-item (view view-text-mixin)  ())
 
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
@@ -93,11 +107,17 @@
 ; [2] As the clos classes are extended, the :specifically values are inherited/over-ridden in the usual way.
 
 (defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin easygui::text-fonting-mixin dialog-item)
-  ((easygui::default-button-p :initarg :default-button))
+  ((easygui::default-button-p :initarg :default-button)
+   (cancel-button :initarg :cancel-button))
   (:default-initargs :specifically 'easygui::cocoa-button))
 
+(defclass default-button-dialog-item (button-dialog-item)
+  ()
+  (:default-initargs :dialog-item-text "OK" :default-button t :cancel-button nil))
+
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
-  ((part-color-list :reader part-color-list :initarg :part-color-list))
+  ((part-color-list :reader part-color-list :initarg :part-color-list)
+   (text-truncation :initarg :text-truncation))
   (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
 
 ; FIXME: part-color-list and foreground/background slots should all remain in sync; how does MCL achieve this cleanly?
@@ -242,6 +262,9 @@
   (declare (ignore subview-type))
   (easygui:view-subviews view))
 
+(defmethod view-subviews ((view easygui::view))
+  (easygui:view-subviews view))
+
 (defmethod view-named (name (view view))
   (easygui:view-named name view))
 
@@ -250,6 +273,15 @@
 
 (defmethod window-select ((win window))
   (easygui:window-show win))
+
+(defmethod window-show ((win window))
+  (easygui:window-show win))
+
+(defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))
+  (window-select w))
+
+(defmethod set-window-layer ((window window) new-layer &optional include-invisibles)
+  'fixme)
 
 (defmethod window-close ((win window))
   (easygui:perform-close win))

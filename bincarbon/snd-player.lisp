@@ -70,6 +70,8 @@
 ;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#+:clozure (require :resources)
+
 ;;; CHECK-MAC-ERROR      [Macro]
 ;;; Description : Little macro to wrap around functions that return Macintosh
 ;;;             : Error codes.  If an error value (i.e. non-zero) is returns,
@@ -124,6 +126,15 @@
                          (#_GetNamedResource "snd " pname)))
             (snd-alis self)))))
 
+#+:clozure
+(defmethod initialize-instance :after ((self snd-player) &key)
+  (unless (and (slot-boundp self 'snd-alis) (not (null (snd-alis self))))
+    ; Cross over to resources.lisp and grab the default resource pool
+    (setf (snd-alis self) *pool*))
+  (when (preload self)
+    (dolist (name (preload self) nil)
+      (get-resource-val name (snd-alis self)))))
+
 ;;; RELEASE-PLAYER      [Method]
 ;;; Date        : 97.01.21
 ;;; Description : When finished with the sound player, it must be disposed
@@ -161,6 +172,12 @@
      (#_SndPlay (the-channel player)
       (with-pstrs ((pname snd-name))
         (#_GetNamedResource "snd " pname)) async))))
+
+#+:clozure
+(defmethod play-snd ((player snd-player) snd-name &optional async)
+  (unless async
+    (error "need to implement synchronous play"))
+  (#/play (get-resource-val snd-name (snd-alis player))))
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;;  bookkeeping
