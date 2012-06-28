@@ -83,7 +83,15 @@
        (#/alloc ns:ns-image) 
        (objc:make-nsstring path)))))
 
-; TODO: Write the create-resource for 'sound
+(defmethod create-resource ((type (eql 'sound)) path)
+  (make-instance
+    'resource
+    :alloc-fn
+    (lambda ()
+      (#/initWithContentsOfFile:byReference:
+       (#/alloc ns:ns-sound)
+       (objc:make-nsstring path)
+       nil))))
 
 ; I am requiring all objective-c/lisp functions to not ever use ns-arrays as inputs or outputs
 ; This slows down computation time b/c conversions have to be done within each function, but it
