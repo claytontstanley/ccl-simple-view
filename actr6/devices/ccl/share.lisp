@@ -233,6 +233,7 @@
 (ccl::register-character-name "ForwardArrow" #\U+F703)
 (defparameter *arrow-cursor* 'fixme)
 (defparameter *black-pattern* 'fixme)
+(defparameter *tool-back-color* 15658734)
 
 (defun make-point (x y)
   (make-instance 'easygui::eg-point :x x :y y))
@@ -329,6 +330,8 @@
 
 (defmethod radio-button-push ((item radio-button-dialog-item))
   (easygui:radio-button-select item))
+
+(defmethod update-default-button ((obj string-dialog)) ())
 
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
