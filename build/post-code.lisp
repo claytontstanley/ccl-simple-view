@@ -1,1 +1,1 @@
-(pushnew :ccl-gui *features*)
+(pushnew :ccl-simple-view *features*)

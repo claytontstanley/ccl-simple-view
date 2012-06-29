@@ -25,8 +25,8 @@ Directory Structure:
 │   └── utilities.lisp
 ├── build
 │   ├── Makefile
-│   ├── ccl-gui.dx64fsl
-│   ├── ccl-gui.lisp
+│   ├── ccl-simple-view.dx64fsl
+│   ├── ccl-simple-view.lisp
 │   ├── file-list.txt
 │   ├── outFileHeader.lisp
 │   ├── post-code.lisp
@@ -134,10 +134,10 @@ To run the tests:
 		e.g.:
 		Launch Clozure CL
 		Load act-r in ./submodules/actr6/load-act-r-6.lisp
-		Load ccl-gui in ./build/ccl-gui.lisp
+		Load ccl-simple-view in ./build/ccl-simple-view.lisp
 		Load Votebox in ./testing/testVotebox.lisp
 
-		If you don't want to run the votebox test code, and just votebox, then after the ccl-gui is loaded, you can refer to the votebox docs and load it that way.
+		If you don't want to run the votebox test code, and just votebox, then after the ccl-simple-view is loaded, you can refer to the votebox docs and load it that way.
 		testVotebox.lisp just loads the files for votebox that are listed in the docs.
 	
 

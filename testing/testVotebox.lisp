@@ -1,5 +1,5 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
-#-:ccl-gui (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
+#-:ccl-simple-view (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
 (load-as-lst "votebox" "Virtual Cursor" "osx-virtual-cursor.lisp")
 (load-as-lst "bincarbon" "misc-lib.lisp")

@@ -1,5 +1,5 @@
 
-outFile = ccl-gui.lisp
+outFile = ccl-simple-view.lisp
 
 
 
