@@ -4,3 +4,6 @@
 [submodule "submodules/ccl"]
 	path = submodules/ccl
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/ccl
+[submodule "submodules/rmcl"]
+	path = submodules/rmcl
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/rmcl.git
