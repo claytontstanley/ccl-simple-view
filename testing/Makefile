@@ -15,7 +15,7 @@ unit:
 	${ccl} ${initString} ${testString} ${cclQuit}
 
 continuous-integration: clean-actr-compiled-files
-	make -C ../build cclgui
+	make -C ../build ccl-simple-view
 	make unit initFiles='actr6/load-act-r-6.lisp ../build/ccl-simple-view.lisp'
 
 clean-actr-compiled-files:

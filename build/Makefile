@@ -11,7 +11,7 @@ footer = \n\n\n; ---------------------------------------------------------------
 date = $(shell date)
 commitID = $(shell git log -n 1 | grep '^commit' | awk '{print $$2}')
 
-cclgui: clean outFileHeader
+ccl-simple-view: clean outFileHeader
 	cat file-list.txt post-file-list.txt | while read file; do \
 		printf "${header}" >> ${outFile}; \
 		cat "../$$file" >> ${outFile}; \
