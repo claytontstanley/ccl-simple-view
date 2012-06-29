@@ -2,9 +2,9 @@
   (require :cocoa)
   (require :easygui))
 
-(import 'easygui:cocoa-ref)
-(import 'easygui:dcc)
-(import 'easygui::running-on-main-thread)
+(shadowing-import 'easygui:cocoa-ref)
+(shadowing-import 'easygui:dcc)
+(shadowing-import 'easygui::running-on-main-thread)
 
 (defun easygui::eg-point-from-ns-point (point)
   (easygui::point 

@@ -5,13 +5,13 @@ outFile = ccl-gui.lisp
 
 header = ; ----------------------------------------------------------------------\n; Begin file: $$file\n; ----------------------------------------------------------------------\n\n\n
 
-footer = ; ----------------------------------------------------------------------\n; End file: $$file\n; ----------------------------------------------------------------------\n\n\n
+footer = \n\n\n; ----------------------------------------------------------------------\n; End file: $$file\n; ----------------------------------------------------------------------\n
 
 date = $(shell date)
 commitID = $(shell git log -n 1 | grep '^commit' | awk '{print $$2}')
 
 cclgui: clean outFileHeader
-	cat file-list.txt | while read file; do \
+	cat file-list.txt post-file-list.txt | while read file; do \
 		printf "${header}" >> ${outFile}; \
 		cat "../$$file" >> ${outFile}; \
 		printf "${footer}" >> ${outFile}; \

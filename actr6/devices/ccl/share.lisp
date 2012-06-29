@@ -14,6 +14,10 @@
 ; MCL's spec.
 ; ----------------------------------------------------------------------
 
+(defconstant $tejustleft :left)
+(defconstant $tejustcenter :center)
+(defconstant $tejustright :right)
+
 (defclass view-text-via-title-mixin (easygui::view-text-via-title-mixin)
   ((easygui::text :initarg :window-title)))
 
@@ -228,8 +232,8 @@
 
 (setf (symbol-function 'point-v) #'easygui:point-y)
 (setf (symbol-function 'point-h) #'easygui:point-x)
-(import 'easygui:point-x)
-(import 'easygui:point-y)
+(shadowing-import 'easygui:point-x)
+(shadowing-import 'easygui:point-y)
 
 (ccl::register-character-name "UpArrow" #\U+F700)
 (ccl::register-character-name "DownArrow" #\U+F701)
@@ -676,33 +680,33 @@
 ; and have CCL do the standard thing to try to find the foreign function
 ; ----------------------------------------------------------------------
 
-(defvar *load-external-function-orig* #'ccl::load-external-function)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *load-external-function-orig* #'ccl::load-external-function)
+  (with-continue 
+    (defun ccl::load-external-function (sym query)
+      (let* ((fun-names (list "showmenubar" "hidemenubar" "getcursor" "showcursor" "ShowCursor" "HideCursor"))
+             (the-package (find-package :X86-Darwin64))
+             (fun-syms (mapcar (lambda (name)
+                                 (intern name the-package))
+                               fun-names)))
+        (if (member sym fun-syms)
+          (return-from ccl::load-external-function sym)
+          (funcall *load-external-function-orig* sym query))))))
 
-(with-continue 
-  (defun ccl::load-external-function (sym query)
-    (let* ((fun-names (list "showmenubar" "hidemenubar" "getcursor" "showcursor" "ShowCursor" "HideCursor"))
-           (the-package (find-package :X86-Darwin64))
-           (fun-syms (mapcar (lambda (name)
-                               (intern name the-package))
-                             fun-names)))
-      (if (member sym fun-syms)
-        (return-from ccl::load-external-function sym)
-        (funcall *load-external-function-orig* sym query)))))
+  ; Use the same approach to define foreign constants that MCL uses that no longer exist for CCL
 
-; Use the same approach to define foreign constants that MCL uses that no longer exist for CCL
-
-(defvar *load-os-constant-orig* #'ccl::load-os-constant)
-
-(with-continue
-  (defun ccl::load-os-constant (sym &optional query)
-    (let* ((con-names (list "tejustleft" "tejustcenter" "tejustright"))
-           (the-package (find-package :X86-Darwin64))
-           (con-syms (mapcar (lambda (name)
-                               (intern name the-package))
-                             con-names)))
-      (if (member sym con-syms)
-        (return-from ccl::load-os-constant sym)
-        (funcall *load-os-constant-orig* sym query)))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *load-os-constant-orig* #'ccl::load-os-constant)
+  (with-continue
+    (defun ccl::load-os-constant (sym &optional query)
+      (let* ((con-names (list "tejustleft" "tejustcenter" "tejustright"))
+             (the-package (find-package :X86-Darwin64))
+             (con-syms (mapcar (lambda (name)
+                                 (intern name the-package))
+                               con-names)))
+        (if (member sym con-syms)
+          (return-from ccl::load-os-constant sym)
+          (funcall *load-os-constant-orig* sym query))))))
 
 ; All of the functions being natively defined are here
 
@@ -722,12 +726,8 @@
   t)
 
 ; And the constants are here
-
-(defconstant $tejustleft :left)
-(defconstant $tejustcenter :center)
-(defconstant $tejustright :right)
-
-(defconstant X86-Darwin64::|tejustleft| $tejustleft)
-(defconstant X86-Darwin64::|tejustcenter| $tejustcenter)
-(defconstant X86-Darwin64::|tejustright| $tejustright)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defconstant X86-Darwin64::|tejustleft| $tejustleft)
+  (defconstant X86-Darwin64::|tejustcenter| $tejustcenter)
+  (defconstant X86-Darwin64::|tejustright| $tejustright))
 
