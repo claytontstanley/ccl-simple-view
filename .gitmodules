@@ -7,3 +7,6 @@
 [submodule "submodules/rmcl"]
 	path = submodules/rmcl
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/rmcl.git
+[submodule "submodules/lisp-dev"]
+	path = submodules/lisp-dev
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/lisp-dev
