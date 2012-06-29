@@ -14,7 +14,9 @@ ccl = rlwrap ./ccl
 unit:
 	${ccl} ${initString} ${testString} ${cclQuit}
 
-
-continuous-integration:
+continuous-integration: clean-actr-compiled-files
 	make -C ../build cclgui
 	make unit initFiles='actr6/load-act-r-6.lisp ../build/ccl-simple-view.lisp'
+
+clean-actr-compiled-files:
+	find actr6/ -name '*.dx64fsl' -exec rm '{}' \;

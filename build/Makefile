@@ -27,6 +27,7 @@ outFileHeader:
 
 deploy:
 	cd ${depdir}; git ru; git rb origin/master; git submodule init; git su
+	cd ${depdir}; make -C testing continuous-integration
 
 
 
