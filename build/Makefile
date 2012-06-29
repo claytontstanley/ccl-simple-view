@@ -1,5 +1,3 @@
-
-
 outFile = ccl-simple-view.lisp
 
 depdir = /Volumes/RedGiant/Projects/mcl-migration 
@@ -11,6 +9,9 @@ footer = \n\n\n; ---------------------------------------------------------------
 date = $(shell date)
 commitID = $(shell git log -n 1 | grep '^commit' | awk '{print $$2}')
 
+clean:
+	rm -f ${outFile} 
+
 ccl-simple-view: clean outFileHeader
 	cat file-list.txt post-file-list.txt | while read file; do \
 		printf "${header}" >> ${outFile}; \
@@ -18,19 +19,12 @@ ccl-simple-view: clean outFileHeader
 		printf "${footer}" >> ${outFile}; \
 	done
 
-clean:
-	rm -f ${outFile} 
 
 outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g' >> ${outFile}
 
-
 deploy:
 	cd ${depdir}; git ru; git rb origin/master; git submodule init; git su
+	cd ${depdir}; make -C deploy ccl-simple-view
 	cd ${depdir}; make -C testing continuous-integration
-
-
-
-
-
 
