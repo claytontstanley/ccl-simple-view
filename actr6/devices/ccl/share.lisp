@@ -1,7 +1,8 @@
-(require :cocoa)
-(require :easygui)
-(require :resources)
-(require :mcl-ccl-colors)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (require :cocoa)
+  (require :easygui)
+  (require :resources)
+  (require :mcl-ccl-colors))
 
 ; ----------------------------------------------------------------------
 ; Building class definitions to match MCL's GUI class heirarchy
@@ -23,7 +24,8 @@
   ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
 
 (defclass view-mixin (easygui:view)
-  ((easygui::size :initarg :view-size :initform (make-point 100 100))
+  ;((easygui::size :initarg :view-size :initform (make-point 100 100))
+  ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position)
    (easygui::foreground :initarg :color)
    (temp-view-subviews :initarg :view-subviews)))
@@ -182,12 +184,14 @@
    #$NSWindowBelow
    nil))
 
-(provide :icon-dialog-item)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (provide :icon-dialog-item))
 
 (defclass thermometer (simple-view)
   ())
 
-(provide :thermometer)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (provide :thermometer))
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   ; easygui's action slot takes a lambda with zero arguments; mcl's action slots take a lambda 
@@ -617,7 +621,8 @@
   (:use "COMMON-LISP")
   (:nicknames :quickdraw))
 
-(provide :quickdraw)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (provide :quickdraw))
 
 ; nothing has broken yet with this one...
 (defun event-dispatch ()
@@ -643,17 +648,17 @@
 ; after this read-table mod is made. If this needs to be done, restore the readtable first
 ; ----------------------------------------------------------------------
 
-(defvar *nonhacked-readtable* (copy-readtable))
-; Code grabbed from RMCL, since MCL is now open-sourced (yay!)
-; For reading #@(h v) as points.
-(set-dispatch-macro-character 
-  #\# #\@
-  (defun |#@-reader| (stream char arg)
-    (declare (ignore arg char))
-    (let ((list (read stream t nil t)))
-      (unless *read-suppress*
-        (let ((point (apply #'make-point list)))
-          point)))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *nonhacked-readtable* (copy-readtable))
+  ; Code grabbed from RMCL, since MCL is now open-sourced (yay!)
+  ; For reading #@(h v) as points.
+  (set-dispatch-macro-character 
+    #\# #\@
+    (defun |#@-reader| (stream char arg)
+      (declare (ignore arg char))
+      (let ((list (read stream t nil t)))
+        (unless *read-suppress*
+          `(make-point ,@list))))))
 
 (defun set-cursor (cursor)
   cursor)

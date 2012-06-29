@@ -1,5 +1,6 @@
-(require :cocoa)
-(require :easygui)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (require :cocoa)
+  (require :easygui))
 
 ; ----------------------------------------------------------------------
 ; Defining color-symbol->system-color and system-color->symbol for CCL.
@@ -234,4 +235,5 @@
   (multiple-value-bind (r g b) (color-values color)
     (rgb->system-color r g b)))
 
-(provide :mcl-ccl-colors)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (provide :mcl-ccl-colors))

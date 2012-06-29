@@ -1,31 +1,34 @@
-(require :cocoa)
-(require :easygui)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (require :cocoa)
+  (require :easygui))
 
-(in-package :easygui)
+(import 'easygui:cocoa-ref)
+(import 'easygui:dcc)
+(import 'easygui::running-on-main-thread)
 
-(defun eg-point-from-ns-point (point)
+(defun easygui::eg-point-from-ns-point (point)
   (easygui::point 
     (ns:ns-point-x point)
     (ns:ns-point-y point)))
 
 ; I think I found a bug in these two methods in the easygui package, so redefining them here with correct setNeedsDisplay: call
-(defmethod (setf view-position) (point (self view))
+(defmethod (setf easygui::view-position) (point (self easygui::view))
   (running-on-main-thread ()
-    (setf (slot-value self 'position) point)
-    (when (slot-value self 'frame-inited-p)
-      (dcc (#/setFrame: (cocoa-ref self) (view-content-rect self)))
+    (setf (slot-value self 'easygui::position) point)
+    (when (slot-value self 'easygui::frame-inited-p)
+      (dcc (#/setFrame: (cocoa-ref self) (easygui::view-content-rect self)))
       (dcc (#/setNeedsDisplay: (cocoa-ref self) t)))))
 
-(defmethod (setf view-size) (point (self view))
+(defmethod (setf easygui::view-size) (point (self easygui::view))
   (running-on-main-thread ()
-    (setf (slot-value self 'size) point)
-    (when (slot-value self 'frame-inited-p)
-      (dcc (#/setFrame: (cocoa-ref self) (view-content-rect self)))
+    (setf (slot-value self 'easygui::size) point)
+    (when (slot-value self 'easygui::frame-inited-p)
+      (dcc (#/setFrame: (cocoa-ref self) (easygui::view-content-rect self)))
       (dcc (#/setNeedsDisplay: (cocoa-ref self) t)))))
 
 ; easygui by default starts position 0,0 at bottom left, going to the right and up for positive values
 ; This flips the screen vertically, so that it matches MCL's default. That is, position 0,0 is at top left
-(setf *screen-flipped* t)
+(setf easygui::*screen-flipped* t)
 
 ; ----------------------------------------------------------------------
 ; Extend the Objective C cocoa-drawing-view in the easygui package with a view that does not monitor mouse movement or clicks
@@ -58,11 +61,11 @@
 ; subviews), create an instance of the consuming-view class. 
 ; ----------------------------------------------------------------------
 
-(defclass cocoa-drawing-consuming-view (cocoa-drawing-view)
+(defclass easygui::cocoa-drawing-consuming-view (easygui::cocoa-drawing-view)
   ()
   (:metaclass ns:+ns-object))
 
-(defclass drawing-consuming-view (easygui::drawing-view)
+(defclass easygui::drawing-consuming-view (easygui::drawing-view)
   ()
   (:default-initargs :specifically 'easygui::cocoa-drawing-consuming-view))
 
@@ -73,7 +76,7 @@
 ; Ref. this url for call-next-method syntax in objc:defmethod macro: 
 ; http://clozure.com/pipermail/openmcl-devel/2008-November/008645.html
 
-(objc:defmethod #/hitTest: ((self cocoa-drawing-consuming-view) (point :<NSP>oint))
+(objc:defmethod #/hitTest: ((self easygui::cocoa-drawing-consuming-view) (point :<NSP>oint))
   (let ((ret (call-next-method point)))
     (if (not (equal ccl:+null-ptr+ ret))
       self
@@ -83,11 +86,11 @@
 ; Providing a view container to hold and display images.
 ; ----------------------------------------------------------------------
 
-(defclass cocoa-image-view (cocoa-extension-mixin ns:ns-image-view)
+(defclass easygui::cocoa-image-view (easygui::cocoa-extension-mixin ns:ns-image-view)
   ()
   (:metaclass ns:+ns-object))
 
-(defclass image-view (easygui::view)
+(defclass easygui::image-view (easygui::view)
   ()
   (:default-initargs :specifically 'easygui::cocoa-image-view))
 
@@ -106,22 +109,22 @@
 ; ----------------------------------------------------------------------
 
 (defclass easygui::simple-view (easygui::view)
-  ((flipped :initform *screen-flipped* :initarg :flipped :reader flipped-p))
+  ((easygui::flipped :initform easygui::*screen-flipped* :initarg :flipped :reader easygui::flipped-p))
   (:default-initargs :specifically 'easygui::cocoa-drawing-view))
 
 ; This section is the additional code required to have a simple-view object behave mostly like a drawing-view type object, 
 ; but without inheriting from drawing-view. Sort of a workaround to avoid the drawing-view mouse-tracking methods, since those aren't mixins (yet).
 
-(defmethod link-cocoa-view ((cocoa-view ns:ns-view) view)
+(defmethod easygui::link-cocoa-view ((cocoa-view ns:ns-view) view)
   ())
 
-(defmethod link-cocoa-view ((cocoa-view ns:ns-window) view)
+(defmethod easygui::link-cocoa-view ((cocoa-view ns:ns-window) view)
   ())
 
-(defmethod link-cocoa-view ((cocoa-view cocoa-drawing-view) view)
-  (setf (slot-value cocoa-view 'flipped) (slot-value view 'flipped))
-  (setf (slot-value cocoa-view 'easygui-view) view))
+(defmethod easygui::link-cocoa-view ((cocoa-view easygui::cocoa-drawing-view) view)
+  (setf (slot-value cocoa-view 'easygui::flipped) (slot-value view 'easygui::flipped))
+  (setf (slot-value cocoa-view 'easygui::easygui-view) view))
 
 (defmethod easygui::initialize-view :after ((view easygui::simple-view))
-  (link-cocoa-view (cocoa-ref view) view))
+  (easygui::link-cocoa-view (cocoa-ref view) view))
 

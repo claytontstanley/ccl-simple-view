@@ -13,7 +13,8 @@
 ; added to the pool. If you want to alloc all resources currently in the pool (for pre-caching), 
 ; call #'alloc-resources
 
-(require :cocoa)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (require :cocoa))
 
 (defun init-pool ()
   (make-hash-table :test #'equalp))
@@ -160,7 +161,8 @@
 (defun open-resource-file (dir &key if-does-not-exist errorp direction perm data-fork-p)
   (open-resource-folder dir))|#
 
-(provide :resources)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (provide :resources))
 
 ; Section for test code:
 #| 
