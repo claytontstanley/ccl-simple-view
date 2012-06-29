@@ -126,7 +126,6 @@ To run the tests:
 		-Mount RedGiant volume	
 		-Navigate to the Projects/mcl-migration folder on RedGiant
 		-Either access the data in the folder over the network (preferred), or copy the folder locally if you want to access it w/o internet.
-			Note that the ideal way IMO to keep a copy of that folder on your local machine is to 'git clone' that folder. Then you can get updates with 'git pull'.
 		-Download Clozure CL from the App Store and install if you don't have it yet.
 		-Launch Clozure CL
 		-Use the Cocoa listener to load ACT-R, then the GUI interface code, then a test file
