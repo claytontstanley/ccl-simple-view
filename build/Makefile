@@ -1,7 +1,8 @@
 
+
 outFile = ccl-simple-view.lisp
 
-
+depdir = /Volumes/RedGiant/Projects/mcl-migration 
 
 header = ; ----------------------------------------------------------------------\n; Begin file: $$file\n; ----------------------------------------------------------------------\n\n\n
 
@@ -22,6 +23,11 @@ clean:
 
 outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g' >> ${outFile}
+
+
+deploy:
+	cd ${depdir}; git ru; git rb origin/master; git submodule init; git su
+
 
 
 
