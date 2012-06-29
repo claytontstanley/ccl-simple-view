@@ -102,8 +102,7 @@ scratch:	Stray lisp code, experimental, etc.
 
 submodules:	Source code for actr and ccl
 		-actr is newest version (as of Jun 2012). All code is same except that loader files (loader.lisp) are inside each of the tutorial folders
-		-ccl is newest version (as of Jun 2012). Image is modified. I added a few helper functions/packages that I like to use for a testing environment.
-			This means that you'll have to load this ccl image if you want to run the tests (for now)
+		-ccl is newest version (as of Jun 2012). Original image. Used to reference ccl src and run basic ccl core file
 		-lisp-dev is a git repo for building a custom ccl core that I use during development. I'm using some of the src for the utilities in the GUI code,
 			so the builds here grab some of that src.
 		-rmcl is the newest version; no changes; used to reference rmcl src, and run rmcl for each of the tests.
