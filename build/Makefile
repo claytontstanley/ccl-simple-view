@@ -25,6 +25,6 @@ outFileHeader:
 
 deploy:
 	cd ${depdir}; git ru; git rb origin/master; git submodule init; git su
-	cd ${depdir}; make -C deploy ccl-simple-view
+	cd ${depdir}; make -C build ccl-simple-view
 	cd ${depdir}; make -C testing continuous-integration
 
