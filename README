@@ -15,17 +15,14 @@ Directory Structure:
 │   ├── pict-svm.lisp
 │   ├── procedure-window2.lisp
 │   ├── seq-math.lisp
-│   ├── snd-player.dx64fsl
 │   ├── snd-player.lisp
 │   └── timer.lisp
 ├── binccl
 │   ├── mcl-ccl-colors.lisp
-│   ├── resources.dx64fsl
 │   ├── resources.lisp
 │   └── utilities.lisp
 ├── build
 │   ├── Makefile
-│   ├── ccl-simple-view.dx64fsl
 │   ├── ccl-simple-view.lisp
 │   ├── file-list.txt
 │   ├── outFileHeader.lisp
@@ -36,7 +33,6 @@ Directory Structure:
 │   ├── InterfaceBuilderWithCCLTutorial.pdf
 │   └── Macintosh\ Common\ Lisp\ Ref.pdf
 ├── easygui
-│   ├── extensions.dx64fsl
 │   └── extensions.lisp
 ├── rmcl
 │   └── lib
@@ -47,6 +43,8 @@ Directory Structure:
 │   ├── it-example1.lisp
 │   └── scratch.lisp
 ├── submodules
+│   ├── ACT-R-VoteBox-Models
+│   ├── X83-Frank-Trek-11
 │   ├── actr6
 │   ├── ccl
 │   ├── lisp-dev
@@ -56,29 +54,19 @@ Directory Structure:
     ├── actr6 -> ../submodules/actr6
     ├── bincarbon -> ../bincarbon
     ├── bootstrap-mcl.lisp
-    ├── bootstrap.dx64fsl
     ├── bootstrap.lisp
     ├── ccl -> ../submodules/ccl/dx86cl64
     ├── data
-    ├── phaser -> /Volumes/RedGiant/X\ Support/X83\ Frank\ Trek\ 11/Experiment
-    ├── testCCLDevice.dx64fsl
+    ├── phaser -> ../submodules/X83-Frank-Trek-11/Experiment
     ├── testCCLDevice.lisp
-    ├── testGetText.dx64fsl
     ├── testGetText.lisp
-    ├── testImages.dx64fsl
     ├── testImages.lisp
-    ├── testPhaser.dx64fsl
     ├── testPhaser.lisp
-    ├── testSound.dx64fsl
     ├── testSound.lisp
-    ├── testTutorials.dx64fsl
     ├── testTutorials.lisp
-    ├── testVotebox.dx64fsl
     ├── testVotebox.lisp
     ├── utilities.lisp -> ../binccl/utilities.lisp
-    └── votebox -> /Volumes/RedGiant/Projects/ACCURATE/ACT-R\ VoteBox\ Models
-
-
+    └── votebox -> ../submodules/ACT-R-VoteBox-Models
 
 actr6:		All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. 
 		-Note the share.lisp file lives here for now, which contains the MCL GUI interface for CCL

@@ -9,3 +9,8 @@
   (defconstant $tejustcenter :center)
   (defconstant #$tejustright :right)
   (defconstant $tejustright :right))
+
+(set-dispatch-macro-character 
+  #\# #\/
+  (defun |#/-reader| (stream char arg)
+    nil))
