@@ -970,10 +970,11 @@
 ;;; here's the actual focus ring itself
 
 (defclass focus-ring (rpm-overlay)
-  ((color :accessor color :initarg :color :initform *red-color*))
+  ((easygui::foreground :reader color))
   (:default-initargs 
     :view-size #@(19 19)
-    :offset #@(-10 -10)))
+    :offset #@(-10 -10)
+    :color 14485510))
 
 
 (defmethod view-draw-contents ((self focus-ring))
