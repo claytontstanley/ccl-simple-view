@@ -8,7 +8,7 @@
 
 (load-as-lst "votebox" "Emulator Files" "VBEmulator.lisp")
 
-(load-as-lst "votebox" "VB Models" "Bryan PSYC 543 Project (2009)/BryansVBModel (Navigation + Selection - Best Fit).lisp")
+(load-as-lst "votebox" "VB Models" "Bryan PSYC 543 Project (2009)" "BryansVBModel (Navigation + Selection - Best Fit).lisp")
 
 (do-experiment wind)
 
