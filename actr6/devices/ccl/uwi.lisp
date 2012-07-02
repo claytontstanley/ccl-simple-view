@@ -224,7 +224,7 @@
         (make-instance (if (> endy starty) 'td-liner 'bu-liner)
                        :position vp
                        :size vs
-                       :fore-color (color-symbol->system-color color))))))
+                       :color (color-symbol->system-color color))))))
 
 ;;; ALLOW-EVENT-MANAGER  [Method]
 ;;; Description : Call event-dispatch.  This is used while waiting for

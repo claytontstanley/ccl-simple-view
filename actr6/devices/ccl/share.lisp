@@ -31,11 +31,9 @@
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position)
-   (easygui::foreground :initarg :color)
-   (temp-view-subviews :initarg :view-subviews))
-  (:default-initargs 
-    :back-color 16777215
-    :color 0))
+   (temp-view-subviews :initarg :view-subviews)
+   (easygui::foreground :initform (color-symbol->system-color 'black))
+   (easygui::background :initform (color-symbol->system-color 'white))))
 
 ; Try to keep the class hierarchy of the public interface the same as it is for MCL.
 ; So, simple-view is top; then view (allows subviews); then types that inherit from view,
@@ -49,12 +47,12 @@
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
 
-(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color color)
-  (apply #'call-next-method view
+(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
+  (if back-color
+    (apply #'call-next-method view
          :back-color (mcl-color->system-color back-color)
-         :color (mcl-color->system-color color)
-         args))
-
+         args)
+    (call-next-method)))
 
 #|
 (defmethod initialize-instance :after ((view simple-view) &key)
@@ -95,7 +93,7 @@
   (:documentation "Top-level class for windows"))
 
 (defclass liner (simple-view)
-  ((easygui::foreground :reader color)))
+  ((easygui::foreground :reader color :initarg :color)))
 
 (defclass td-liner (liner) ())
 
