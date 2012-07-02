@@ -75,6 +75,12 @@
                'green))
 (add-visual-items-to-rpm-window *win* *view*)
 
+(setf *view* (make-instance 'check-box-dialog-item
+                            :view-position (make-point 20 20)))
+(add-visual-items-to-rpm-window *win* *view*)
+(assert (> (point-h (view-size *view*))
+           0))
+
 (setf *view* (make-line-for-rpm-window
                *win*
                (list 100 220)

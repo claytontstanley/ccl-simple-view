@@ -202,6 +202,7 @@
 (defparameter *black-color* (color-symbol->system-color 'black))
 (defparameter *red-color* (color-symbol->system-color 'red))
 (defparameter *light-gray-pattern* (color-symbol->system-color 'gray))
+(defparameter *green-color* (color-symbol->system-color 'green))
 
 ; Converting MCL colors (specified as a huge (technical term) integer) to 'system' colors
 

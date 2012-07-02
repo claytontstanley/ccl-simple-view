@@ -26,6 +26,31 @@
       (dcc (#/setFrame: (cocoa-ref self) (easygui::view-content-rect self)))
       (dcc (#/setNeedsDisplay: (cocoa-ref self) t)))))
 
+; Overwriting this method; patching it so that the view-size slot is initialized after 
+; the view is drawn, if it wasn't already
+
+(defmethod easygui::add-1-subview :around ((view easygui:view) (super-view easygui:view))
+  "Correctly initialize view positions"
+  (call-next-method)
+  (with-slots (easygui::position easygui::size easygui::frame-inited-p) view
+    (unless easygui::frame-inited-p
+      (setf easygui::frame-inited-p t)
+      (easygui::running-on-this-thread ()
+                              (let ((cocoa-view (cocoa-ref view)))
+                                (dcc (#/setFrameOrigin: cocoa-view (easygui::ns-point-from-point easygui::position)))
+                                (if (slot-boundp view 'easygui::size)
+                                  (dcc (#/setFrameSize: cocoa-view (easygui::ns-point-from-point easygui::size)))
+                                  (dcc (#/sizeToFit cocoa-view))))))
+    ; Section for the patched code. I would have liked to have done this with an :after method, but I don't think a specialied class can
+    ; get :around an :around method.
+    (unless (slot-boundp view 'easygui::size)
+      (let ((frame (#/frame (cocoa-ref view))))
+        (setf (slot-value view 'easygui::size)
+              (make-point (ns:ns-rect-width frame)
+                          (ns:ns-rect-height frame)))))
+    (easygui::set-needs-display view t)
+    (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t))))
+
 ; easygui by default starts position 0,0 at bottom left, going to the right and up for positive values
 ; This flips the screen vertically, so that it matches MCL's default. That is, position 0,0 is at top left
 (setf easygui::*screen-flipped* t)

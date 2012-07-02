@@ -27,12 +27,15 @@
 (defclass view-text-mixin (easygui::view-text-mixin)
   ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
 
+;((easygui::size :initarg :view-size :initform (make-point 100 100))
 (defclass view-mixin (easygui:view)
-  ;((easygui::size :initarg :view-size :initform (make-point 100 100))
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position)
    (easygui::foreground :initarg :color)
-   (temp-view-subviews :initarg :view-subviews)))
+   (temp-view-subviews :initarg :view-subviews))
+  (:default-initargs 
+    :back-color 16777215
+    :color 0))
 
 ; Try to keep the class hierarchy of the public interface the same as it is for MCL.
 ; So, simple-view is top; then view (allows subviews); then types that inherit from view,
@@ -46,10 +49,12 @@
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
 
-(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
-  (if back-color
-    (apply #'call-next-method view :back-color (mcl-color->system-color back-color) args)
-    (call-next-method)))
+(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color color)
+  (apply #'call-next-method view
+         :back-color (mcl-color->system-color back-color)
+         :color (mcl-color->system-color color)
+         args))
+
 
 #|
 (defmethod initialize-instance :after ((view simple-view) &key)
@@ -73,7 +78,8 @@
    (theme-background :initarg :theme-background)
    (window-show :initarg :window-show)
    (window-type :initarg :window-type)
-   (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)))
+   (close-box-p :accessor close-box-p :initarg :close-box-p :initform t))
+  (:default-initargs :view-position (make-point 200 200)))
 
 (defclass windoid (window) ())
 
@@ -333,6 +339,9 @@
 (defmethod check-box-uncheck ((item check-box-dialog-item))
   (easygui:check-box-uncheck item nil))
 
+(defmethod check-box-checked-p ((item check-box-dialog-item))
+  (easygui:check-box-checked-p item))
+
 (defmethod radio-button-unpush ((item radio-button-dialog-item))
   (easygui:radio-button-deselect item))
 
@@ -342,20 +351,25 @@
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
 
+(defun canonicalize-point (x y)
+  (cond (y (list x y))
+        (t (list (point-h x) (point-v x)))))
+
 (defmethod set-view-position ((view simple-view) x &optional (y nil))
-  (let ((pos (if y
-               (make-point x y)
-               x)))
-    (setf (easygui:view-position view) pos)))
+  (destructuring-bind (x y) (canonicalize-point x y)
+    (let ((pos (make-point x y)))
+      (setf (easygui:view-position view) pos))))
 
 (defmethod set-view-size ((view simple-view) x &optional (y nil))
-  (let ((size (if y
-                (make-point x y)
-                x)))
-    (setf (easygui:view-size view) size)))
+  (destructuring-bind (x y) (canonicalize-point x y)
+    (let ((size (make-point x y)))
+      (setf (easygui:view-size view) size))))
 
 (defmethod view-size ((view simple-view))
   (easygui:view-size view))
+
+(defmethod width ((view simple-view))
+  (point-h (view-size view)))
 
 (defmethod view-window ((view window))
   view)
@@ -399,14 +413,15 @@
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (easygui:view-position view) local-pos))
 
-(defmethod move-to ((view simple-view) position)
-  (setf (pen-position view) position))
+(defmethod move-to ((view simple-view) x &optional (y nil))
+  (destructuring-bind (x y) (canonicalize-point x y)
+    (let ((position (make-point x y)))
+      (setf (pen-position view) position))))
 
-(defmethod line-to ((view simple-view) position)
-  (destructuring-bind (startx starty) (list (point-x (pen-position view))
-                                            (point-y (pen-position view)))
-    (destructuring-bind (endx endy) (list (point-x position)
-                                          (point-y position))
+(defmethod line-to ((view simple-view) x &optional (y nil))
+  (destructuring-bind (endx endy) (canonicalize-point x y)
+    (destructuring-bind (startx starty) (list (point-x (pen-position view))
+                                              (point-y (pen-position view)))
       (with-fore-color (get-fore-color view)
         (#/strokeLineFromPoint:toPoint:
          ns:ns-bezier-path
@@ -439,6 +454,9 @@
 
 (defmethod easygui::mouse-down ((view simple-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
+
+(defmethod window-update-cursor ((window window) point)
+  nil)
 
 (defmethod view-click-event-handler ((device easygui:view) position)
   (awhen (view-container device) 
