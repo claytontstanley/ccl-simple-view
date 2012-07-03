@@ -127,8 +127,13 @@
 
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
   ((part-color-list :reader part-color-list :initarg :part-color-list)
+   (bordered-p :reader bordered-p)
    (text-truncation :initarg :text-truncation))
   (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
+
+(defmethod (setf bordered-p) (bordered-p (view static-text-dialog-item))
+  (unwind-protect (setf (slot-value view 'bordered-p) bordered-p)
+    (#/setBordered: (easygui:cocoa-ref view) (if bordered-p #$YES #$NO))))
 
 ; FIXME: part-color-list and foreground/background slots should all remain in sync; how does MCL achieve this cleanly?
 
@@ -434,6 +439,9 @@
 
 (defmethod set-part-color ((view static-text-dialog-item) (part (eql :text)) new-color)
   (set-fore-color view new-color))
+
+(defmethod set-part-color ((view static-text-dialog-item) (part (eql :frame)) new-color)
+  (setf (bordered-p view) t))
 
 (defmethod get-fore-color ((view simple-view))
   (easygui:get-fore-color view))
