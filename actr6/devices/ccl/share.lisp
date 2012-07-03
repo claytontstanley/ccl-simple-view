@@ -221,10 +221,15 @@
                      :view-size size
                      :text text
                      :action (if action 
-                               (lambda () (funcall action obj))
+                               (lambda ()
+                                 ;(process-run-function
+                                 ;  "action"
+                                 ;  (lambda ()
+                                       (funcall action obj))
+                                       ;))
                                nil)
                      attributes))
-    obj))
+                     obj))
 
 ; ----------------------------------------------------------------------
 ; Building methods that allow CCL to understand basic MCL drawing commands
@@ -357,6 +362,17 @@
   (cond (y (list x y))
         (t (list (point-h x) (point-v x)))))
 
+(defun canonicalize-rect (left top right bottom)
+  (cond (bottom (list left top right bottom))
+        (top (list (point-h left)
+                   (point-v left)
+                   (point-h top)
+                   (point-v top)))
+        (t (list (ns:ns-rect-x left)
+                 (ns:ns-rect-y left)
+                 (+ (ns:ns-rect-x left) (ns:ns-rect-width left))
+                 (+ (ns:ns-rect-y left) (ns:ns-rect-height left))))))
+
 (defmethod set-view-position ((view simple-view) x &optional (y nil))
   (destructuring-bind (x y) (canonicalize-point x y)
     (let ((pos (make-point x y)))
@@ -444,6 +460,9 @@
 
 (defmethod get-fore-color ((view simple-view))
   (easygui:get-fore-color view))
+
+(defmethod get-back-color ((view easygui:view))
+  (easygui:get-back-color view))
 
 (defmethod set-fore-color ((view simple-view) new-color)
   (easygui:set-fore-color view new-color))
@@ -541,8 +560,7 @@
 ; Drawing methods
 
 (defmethod view-draw-contents ((view easygui:view))
-  (declare (ignore view))
-  ())
+  (easygui::set-needs-display view t))
 
 (defmethod get-start ((view bu-liner))
   (make-point 0 (point-y (view-size view))))
@@ -586,6 +604,16 @@
 (defmethod fill-rect ((view simple-view) pattern left &optional top right bottom)
   (let ((rect (ns:make-ns-rect left top right bottom)))
     (#/fillRect: ns:ns-bezier-path rect)))
+
+(defmethod erase-rect ((view window) left &optional top right bottom)
+  (erase-rect (easygui::content-view view) left top right bottom))
+
+(defmethod erase-rect ((view easygui:view) left &optional top right bottom)
+  (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
+    (let ((rect (ns:make-ns-rect left top right bottom)))
+      (with-focused-view view
+        (with-fore-color (get-back-color view)
+          (#/fillRect: ns:ns-bezier-path rect))))))
 
 ; Handling fonts and string width/height in pixels
 
@@ -685,6 +713,9 @@
 
 (defun set-cursor (cursor)
   cursor)
+
+(defun beep ()
+  (#_NSBeep))
 
 ; ----------------------------------------------------------------------
 ; Manipulate reader functionality so that references to foreign functions that no longer exist can
