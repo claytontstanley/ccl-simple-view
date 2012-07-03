@@ -420,11 +420,10 @@
   (destructuring-bind (endx endy) (canonicalize-point x y)
     (destructuring-bind (startx starty) (list (point-x (pen-position view))
                                               (point-y (pen-position view)))
-      (with-fore-color (get-fore-color view)
         (#/strokeLineFromPoint:toPoint:
          ns:ns-bezier-path
          (ns:make-ns-point startx starty) 
-         (ns:make-ns-point endx endy))))))
+         (ns:make-ns-point endx endy)))))
 
 (defmethod part-color ((view easygui:static-text-view) (part (eql :text)))
   (declare (ignore part))
@@ -556,7 +555,8 @@
 
 (defmethod view-draw-contents ((view liner))
   (move-to view (get-start view))
-  (line-to view (get-end view)))
+  (with-fore-color (get-fore-color view) 
+    (line-to view (get-end view))))
 
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
   (assert (not right))
