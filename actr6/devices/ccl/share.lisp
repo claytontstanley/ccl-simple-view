@@ -248,7 +248,7 @@
 (defparameter *tool-back-color* 15658734)
 
 (defun make-point (x y)
-  (make-instance 'easygui::eg-point :x x :y y))
+  (easygui::point x y :allow-negative-p t))
 
 (defmethod add-points ((p1 easygui::eg-point) (p2 easygui::eg-point))
   (make-point
@@ -465,11 +465,7 @@
                                                  (point-v xyloc))))
 
 (defmethod view-mouse-position ((view simple-view))
-  (let* ((w (easygui:cocoa-ref (easygui::easygui-window-of view)))
-         (mouselocation (easygui:dcc (#/mouseLocationOutsideOfEventStream w)))
-         (cview (if (typep view 'window) (easygui:content-view view) view))
-         (nspt (easygui:dcc (#/convertPoint:fromView: (easygui:cocoa-ref cview) mouselocation NIL))))
-    (make-point (ns:ns-point-x nspt) (ns:ns-point-y nspt))))
+  (easygui:view-mouse-position view :allow-negative-position-p t))
 
 (defun create-mouse-event (event pos)
   (#_CGEventCreateMouseEvent

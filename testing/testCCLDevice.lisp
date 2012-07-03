@@ -42,6 +42,8 @@
               :title *win-title*
               ))
 
+(view-mouse-position *win*)
+
 (select-rpm-window *win*)
 (assert (string-equal
           (rpm-window-title *win*)

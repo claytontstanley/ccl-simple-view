@@ -7,6 +7,24 @@
   (shadowing-import 'easygui:dcc)
   (shadowing-import 'easygui::running-on-main-thread))
 
+; Providing a keyword argument to allow negative points; used for mouse coordinates
+(defun easygui::point (x y &key (allow-negative-p nil))
+  (unless allow-negative-p
+    (assert (>= x 0))
+    (assert (>= y 0)))
+  (make-instance 'easygui::eg-point :x x :y y))
+
+; Patching the function to provide a keyword argument that allows for negative mouse coordinates
+(defun easygui::view-mouse-position (view &key (allow-negative-position-p nil))
+  (let* ((w (cocoa-ref (easygui::easygui-window-of view)))
+         (mouselocation (dcc (#/mouseLocationOutsideOfEventStream w)))
+         (cview (if (typep view 'window) (easygui::content-view view) view))
+         (nspt (dcc (#/convertPoint:fromView: (cocoa-ref cview) mouselocation NIL))))
+    ;; todo: check point is inside bounds, lest negative coords
+    (easygui:point (ns:ns-point-x nspt)
+                   (ns:ns-point-y nspt)
+                   :allow-negative-p allow-negative-position-p)))
+
 ; I think I found a bug in these two methods in the easygui package, so redefining them here with correct setNeedsDisplay: call
 (defmethod (setf easygui::view-position) (point (self easygui::view))
   (running-on-main-thread ()
@@ -23,7 +41,7 @@
       (dcc (#/setNeedsDisplay: (cocoa-ref self) t)))))
 
 ; Overwriting this method; patching it so that the view-size slot is initialized after 
-; the view is drawn, if it wasn't already
+; the view is drawn, if it wasn't already.
 (defmethod easygui::add-1-subview :around ((view easygui:view) (super-view easygui:view))
   "Correctly initialize view positions"
   (call-next-method)
