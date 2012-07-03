@@ -24,7 +24,7 @@ outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g' >> ${outFile}
 
 deploy:
-	cd ${depdir}; git ru; git rb origin/master; git submodule init; git su
+	cd ${depdir}; git ru; git rb origin/master; git submodule init; git su; git submodule foreach git submodule init; git su
 	cd ${depdir}; make -C build ccl-simple-view
 	cd ${depdir}; make -C testing continuous-integration
 
