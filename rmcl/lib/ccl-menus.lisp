@@ -103,4 +103,45 @@
           (t (window-show dialog)
              dialog)))))
 
+; need close box if modal nil 
+(defun message-dialog (message &key (ok-text "OK")
+                              (size #@(335 100))
+                              (modal t)   ; if not modal its callers job to select
+                              (title "Warning")
+                              window-type
+                              (back-color *tool-back-color*)
+                              (theme-background t)
+                              (position (list :top (+ *menubar-bottom* 10))))
+  (let* ((message-width (- (point-h size) 85))
+         (new-dialog
+          (make-instance
+           'dialog
+           :view-position position
+           :view-size size
+           :window-title title
+           :window-type (or window-type (if modal :movable-dialog :document))
+           :close-box-p (if modal nil t)
+           :window-show nil
+           :back-color back-color
+           :theme-background theme-background
+           :view-subviews
+           `(,(make-instance
+               'static-text-dialog-item
+               :dialog-item-text message
+               :view-size (make-point
+                                  message-width
+                                  (- (point-v size)
+                                     30)))
+             ,@(if modal
+                 (list (make-dialog-item
+                        'default-button-dialog-item
+                        (subtract-points size #@(75 35))
+                        #@(62 20)
+                        ok-text
+                        #'(lambda (item)
+                            (declare (ignore item))
+                            (return-from-modal-dialog t)))))))))
+    (if modal
+      (modal-dialog new-dialog)
+      new-dialog)))
 

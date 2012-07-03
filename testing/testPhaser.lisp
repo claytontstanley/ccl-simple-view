@@ -13,4 +13,6 @@
 
 (load-as-lst "phaser" "X83.lisp")
 
-(get-string-from-user "hello")
+;(get-string-from-user "hello")
+;
+;(setf *ret* (list 5 4))

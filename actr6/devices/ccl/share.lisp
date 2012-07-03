@@ -30,7 +30,7 @@
 ;((easygui::size :initarg :view-size :initform (make-point 100 100))
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
-   (easygui::position :initarg :view-position)
+   (easygui::position :initarg :view-position :initform (make-point 0 0))
    (temp-view-subviews :initarg :view-subviews)
    (easygui::foreground :initform (color-symbol->system-color 'black))
    (easygui::background :initform (color-symbol->system-color 'white))))
@@ -250,7 +250,6 @@
 (ccl::register-character-name "ForwardArrow" #\U+F703)
 (defparameter *arrow-cursor* 'fixme)
 (defparameter *black-pattern* 'fixme)
-(defparameter *tool-back-color* 15658734)
 
 (defun make-point (x y)
   (easygui::point x y :allow-negative-p t))
