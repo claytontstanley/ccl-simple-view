@@ -222,11 +222,11 @@
                      :text text
                      :action (if action 
                                (lambda ()
-                                 ;(process-run-function
-                                 ;  "action"
-                                 ;  (lambda ()
-                                       (funcall action obj))
-                                       ;))
+                                 (process-run-function
+                                   "action"
+                                   (lambda ()
+                                     (format t "action triggered for object ~a~%" obj)
+                                     (funcall action obj))))
                                nil)
                      attributes))
                      obj))
@@ -560,7 +560,8 @@
 ; Drawing methods
 
 (defmethod view-draw-contents ((view easygui:view))
-  (easygui::set-needs-display view t))
+  ())
+  ;(easygui::set-needs-display view t))
 
 (defmethod get-start ((view bu-liner))
   (make-point 0 (point-y (view-size view))))
