@@ -33,7 +33,8 @@
    (easygui::position :initarg :view-position :initform (make-point 0 0))
    (temp-view-subviews :initarg :view-subviews)
    (easygui::foreground :initform (color-symbol->system-color 'black))
-   (easygui::background :initform (color-symbol->system-color 'white))))
+   ;(easygui::background :initform (#/clearColor ns:ns-color))))
+   (easygui::background :initform (#/clearColor ns:ns-color))))
 
 ; Try to keep the class hierarchy of the public interface the same as it is for MCL.
 ; So, simple-view is top; then view (allows subviews); then types that inherit from view,
@@ -76,7 +77,8 @@
    (theme-background :initarg :theme-background)
    (window-show :initarg :window-show)
    (window-type :initarg :window-type)
-   (close-box-p :accessor close-box-p :initarg :close-box-p :initform t))
+   (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)
+   (easygui::background :initform (color-symbol->system-color 'white)))
   (:default-initargs :view-position (make-point 200 200)))
 
 (defclass windoid (window) ())
@@ -128,8 +130,16 @@
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
   ((part-color-list :reader part-color-list :initarg :part-color-list)
    (bordered-p :reader bordered-p)
-   (text-truncation :initarg :text-truncation))
+   (text-truncation :initarg :text-truncation)
+   (easygui::drawsbackground :initform nil))
   (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
+
+(defmethod initialize-instance :around ((view static-text-dialog-item) &rest args &key back-color)
+  (if back-color
+    (apply #'call-next-method view
+         :drawsbackground t
+         args)
+    (call-next-method)))
 
 (defmethod (setf bordered-p) (bordered-p (view static-text-dialog-item))
   (unwind-protect (setf (slot-value view 'bordered-p) bordered-p)
