@@ -223,9 +223,8 @@
                      :action (if action 
                                (lambda ()
                                  (process-run-function
-                                   "action"
+                                   (format nil "action for obj ~a" obj)
                                    (lambda ()
-                                     (format t "action triggered for object ~a~%" obj)
                                      (funcall action obj))))
                                nil)
                      attributes))
