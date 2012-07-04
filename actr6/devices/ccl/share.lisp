@@ -134,6 +134,10 @@
    (easygui::drawsbackground :initform nil))
   (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
 
+; Cocoa doesn't automatically determine the value of drawsbackground dependent on the background color.
+; If the back color is clear, drawsbackground should be nil, otherwise t. So if a back-color is passed in
+; as an initform, inform easygui that the background should be drawn by passing a t for :drawsbackground keyword.
+
 (defmethod initialize-instance :around ((view static-text-dialog-item) &rest args &key back-color)
   (if back-color
     (apply #'call-next-method view
@@ -478,6 +482,14 @@
 
 (defmethod set-back-color ((view simple-view) new-color)
   (easygui:set-back-color view new-color))
+
+; This keeps the setDrawsBackground attribute on the Cocoa object in sync with the 
+; current background color (is it transparent or not).
+
+(defmethod set-back-color :after ((view static-text-dialog-item) new-color)
+  (setf (slot-value view 'easygui::drawsbackground) 
+        (if (equal (#/clearColor ns:ns-color) new-color) nil t))
+  (#/setDrawsBackground: (cocoa-ref view) (slot-value view 'easygui::drawsbackground)))
 
 ; Handling mouse movement/interaction
 

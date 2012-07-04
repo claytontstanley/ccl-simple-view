@@ -25,4 +25,13 @@
 
 (add-subviews wind *view*)
 
+(view-named :office-name wind)
+(inspect *)
+()
+
+(set-back-color * (color-symbol->system-color 'blue))
+(set-back-color * (#/clearColor ns:ns-color))
+
+(#/setDrawsBackground: (cocoa-ref *) #$YES)
+
 |#
