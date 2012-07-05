@@ -109,3 +109,11 @@
 (defmethod easygui::initialize-view :after ((view easygui::simple-view))
   (easygui::link-cocoa-view (easygui:cocoa-ref view) view))
 
+; This keeps the setDrawsBackground attribute on the Cocoa object in sync with the 
+; current background color (is it transparent or not).
+(defmethod easygui:set-back-color :after ((view easygui::background-coloring-mixin) (new-color ns:ns-color) &optional redisplay-p)
+  (setf (slot-value view 'easygui::drawsbackground) 
+        (if (equal (#/clearColor ns:ns-color) new-color) nil t))
+  (#/setDrawsBackground: (cocoa-ref view) (slot-value view 'easygui::drawsbackground))
+  (when redisplay-p 
+    (easygui:invalidate-view view)))

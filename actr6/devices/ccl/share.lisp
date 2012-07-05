@@ -483,14 +483,6 @@
 (defmethod set-back-color ((view simple-view) new-color)
   (easygui:set-back-color view new-color))
 
-; This keeps the setDrawsBackground attribute on the Cocoa object in sync with the 
-; current background color (is it transparent or not).
-
-(defmethod set-back-color :after ((view static-text-dialog-item) new-color)
-  (setf (slot-value view 'easygui::drawsbackground) 
-        (if (equal (#/clearColor ns:ns-color) new-color) nil t))
-  (#/setDrawsBackground: (cocoa-ref view) (slot-value view 'easygui::drawsbackground)))
-
 ; Handling mouse movement/interaction
 
 (defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)

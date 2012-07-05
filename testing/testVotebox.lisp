@@ -29,6 +29,9 @@
 (inspect *)
 ()
 
+(fmakunbound 'easygui:set-back-color)
+(inspect #'easygui:set-back-color)
+
 (set-back-color * (color-symbol->system-color 'blue))
 (set-back-color * (#/clearColor ns:ns-color))
 
