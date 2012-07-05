@@ -64,11 +64,15 @@
     (easygui::set-needs-display view t)
     (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t))))
 
+; I wanted to instantiate my own extended contained-view class, but I didn't see an easy way to do this given the current
+; easygui code. So adding a contained-view-specifically slot to the mixin class, defaulting it to the contained-view class
+; defined in easygui. If you want to instantiate a different class for the contianed view, just overwrite this default.
 (defclass easygui::content-view-mixin ()
   ((easygui::content-view)
    (easygui::flipped :initarg :flipped :initform easygui::*screen-flipped*)
    (easygui::contained-view-specifically :initarg :contained-view-specifically :initform 'easygui::contained-view)))
 
+; Added code to instantiate the contained view class that is stored as a slot on the mixin object
 (defmethod easygui::initialize-view :after ((view easygui::content-view-mixin))
   (unless (slot-boundp view 'easygui::content-view)
     (let ((containee (make-instance (slot-value view 'easygui::contained-view-specifically) 
