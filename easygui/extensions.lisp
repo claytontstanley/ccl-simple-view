@@ -117,3 +117,8 @@
   (#/setDrawsBackground: (cocoa-ref view) (slot-value view 'easygui::drawsbackground))
   (when redisplay-p 
     (easygui:invalidate-view view)))
+
+(objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-field) the-event)
+  (call-next-method the-event)
+  (#/keyDown: (#/window cocoa-self) the-event))
+

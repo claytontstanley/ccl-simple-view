@@ -1074,6 +1074,16 @@
     (dialog-item-enable ted)
     (set-selection-range ted 0 1)))
 
+#|
+(inspect *exp*)
+(setf wind (task-window *experiment*))
+(view-named :frequency *wind*)
+(view-named :calibration *wind*)
+(inspect *)
+(dialog-item-disable *)
+(dialog-item-enable *)
+(curr-state *wind*)
+|#
 
 (defmethod check-freq ((wind transporter-window))
   (let ((freq (freq-val wind)))

@@ -172,7 +172,7 @@
   ((icon :reader icon :initarg :icon)
    (easygui::view-text :accessor easygui::view-text :initarg :view-text)))
 
-(defclass image-view (view-mixin easygui::image-view) ())
+(defclass image-view (easygui::image-view view) ())
 
 (defun convert-icon (icon)
   (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
@@ -343,6 +343,9 @@
 
 (defmethod set-dialog-item-text ((view easygui::view-text-mixin) text)
   (setf (easygui:view-text view) text))
+
+(defmethod set-selection-range ((view view-text-mixin) &optional position cursorpos)
+  ())
 
 (defmethod dialog-item-enable ((view easygui::action-view-mixin))
   (easygui:set-dialog-item-enabled-p view t))
@@ -527,8 +530,11 @@
 
 ; Handling keyboard interaction
 
-(defmethod easygui::view-key-event-handler ((device color-dialog) key)
+(defmethod easygui::view-key-event-handler ((device window) key)
   (view-key-event-handler device key))
+
+(defmethod view-key-event-handler ((device window) key)
+  ())
 
 ; MCL's Pen
 
@@ -569,7 +575,7 @@
 
 ; Drawing methods
 
-(defmethod view-draw-contents ((view view))
+(defmethod view-draw-contents ((view simple-view))
   ())
   ;(easygui::set-needs-display view t))
 
@@ -628,14 +634,22 @@
 
 ; Handling fonts and string width/height in pixels
 
+(defparameter *break-if-font-to-be-converted* nil)
+
 (defun convert-font (font)
   (etypecase font
     (ns:ns-font font)
     (list 
       (destructuring-bind (name pt &rest rest) font
-        (#/fontWithName:size: ns:ns-font
-         (objc:make-nsstring name)
-         pt)))))
+        (let* ((unavailable-fonts (list "Avant Garde" "Charcoal")))
+          (when (member name unavailable-fonts :test #'string-equal)
+            (when *break-if-font-to-be-converted*
+              (break "font not found for font-name ~a" name))
+            (setf name "Times Roman")))
+        (guard ((not (equal it1 ccl:+null-ptr+)) "font not found for font-name ~a" name)
+          (#/fontWithName:size: ns:ns-font
+           (objc:make-nsstring name)
+           pt))))))
 
 ; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
 ; same slot name and expects the font slot to be initialized with a font spec as a list.

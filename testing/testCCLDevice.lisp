@@ -4,17 +4,18 @@
 (defparameter *key* nil)
 
 (defun flash-text (&optional (text "!!!!"))
-  (setf *view* (make-static-text-for-rpm-window
+  (process-run-function
+    "flash"
+    (lambda ()
+      (setf *view* (make-static-text-for-rpm-window
                  *win*
                  :x 10 
                  :y 10 
                  :text text
                  :color 'orange))
-  (add-visual-items-to-rpm-window *win* *view*)
-  ;(inspect (easygui:view-subviews *win*))
-  ;(sleep 1)
-  ;(remove-visual-items-from-rpm-window *win* *view*)
-)
+      (add-visual-items-to-rpm-window *win* *view*)
+      (sleep .1)
+      (remove-visual-items-from-rpm-window *win* *view*))))
 
 (defmethod rpm-window-click-event-handler ((device rpm-real-window) position)
   (declare (ignore device position))
@@ -115,6 +116,13 @@
 (sleep .1)
 (remove-visual-items-from-rpm-window *win* *view*)
 (sleep .5)
+
+
+(setf *view* (make-instance 'editable-text-dialog-item
+                            :view-position (make-point 10 300)
+                            :text "here"))
+(add-visual-items-to-rpm-window *win* *view*)
+
 
 #|(setf *cocoa-win* (easygui:cocoa-ref *win*))
 (compute-class-precedence-list (find-class 'contained-view))
