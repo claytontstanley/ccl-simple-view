@@ -27,13 +27,11 @@
 (defclass view-text-mixin (easygui::view-text-mixin)
   ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
 
-;((easygui::size :initarg :view-size :initform (make-point 100 100))
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position :initform (make-point 0 0))
    (temp-view-subviews :initarg :view-subviews)
    (easygui::foreground :initform (color-symbol->system-color 'black))
-   ;(easygui::background :initform (#/clearColor ns:ns-color))))
    (easygui::background :initform (#/clearColor ns:ns-color))))
 
 ; Try to keep the class hierarchy of the public interface the same as it is for MCL.
@@ -42,8 +40,6 @@
 
 (defclass simple-view (easygui::simple-view view-mixin)
   ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))))
-
-; TODO: Use the MOP to remove this dup.
 
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
