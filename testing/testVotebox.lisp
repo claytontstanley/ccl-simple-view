@@ -28,7 +28,7 @@
 (view-named :office-name wind)
 (inspect *)
 ()
-
+(inspect #'initialize-instance)
 (fmakunbound 'easygui:set-back-color)
 (inspect #'easygui:set-back-color)
 

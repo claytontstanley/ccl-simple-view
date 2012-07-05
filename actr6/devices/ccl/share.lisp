@@ -50,9 +50,7 @@
 
 (defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
   (if back-color
-    (apply #'call-next-method view
-         :back-color (mcl-color->system-color back-color)
-         args)
+    (apply #'call-next-method view :back-color (mcl-color->system-color back-color) args)
     (call-next-method)))
 
 #|
@@ -138,11 +136,9 @@
 ; If the back color is clear, drawsbackground should be nil, otherwise t. So if a back-color is passed in
 ; as an initform, inform easygui that the background should be drawn by passing a t for :drawsbackground keyword.
 
-(defmethod initialize-instance :around ((view static-text-dialog-item) &rest args &key back-color)
+(defmethod initialize-instance :around ((view easygui::background-coloring-mixin) &rest args &key back-color)
   (if back-color
-    (apply #'call-next-method view
-         :drawsbackground t
-         args)
+    (apply #'call-next-method view :drawsbackground t args)
     (call-next-method)))
 
 (defmethod (setf bordered-p) (bordered-p (view static-text-dialog-item))
