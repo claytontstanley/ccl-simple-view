@@ -63,3 +63,27 @@
                           (ns:ns-rect-height frame)))))
     (easygui::set-needs-display view t)
     (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t))))
+
+(defclass easygui::content-view-mixin ()
+  ((easygui::content-view)
+   (easygui::flipped :initarg :flipped :initform easygui::*screen-flipped*)
+   (easygui::contained-view-specifically :initarg :contained-view-specifically :initform 'easygui::contained-view)))
+
+(defmethod easygui::initialize-view :after ((view easygui::content-view-mixin))
+  (unless (slot-boundp view 'easygui::content-view)
+    (let ((containee (make-instance (slot-value view 'easygui::contained-view-specifically) 
+                       :cocoa-ref (dcc (#/contentView (cocoa-ref view)))
+                       :view-nick-name 'easygui::%CONTENT-OF-CONTENT-VIEW%
+                       :flipped (slot-value view 'easygui::flipped))))
+      (setf (slot-value view 'easygui::content-view) containee
+            (slot-value containee 'easygui::parent) view))))
+
+
+
+
+
+
+
+
+
+

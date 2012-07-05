@@ -65,6 +65,8 @@
   ()
   (:documentation "Top-level class for views"))
 
+(defclass contained-view (view easygui::contained-view) ())
+
 (defclass window (easygui:window view-text-via-title-mixin view)
   ((grow-icon-p :initform nil :initarg :grow-icon-p :reader grow-icon-p)
    (grow-box-p :initarg :grow-box-p)
@@ -73,7 +75,11 @@
    (window-type :initarg :window-type)
    (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)
    (easygui::background :initform (color-symbol->system-color 'white)))
-  (:default-initargs :view-position (make-point 200 200)))
+  (:default-initargs 
+    :view-position (make-point 200 200)
+    :contained-view-specifically 'easygui::contained-view))
+
+    ;:contained-view-specifically 'contained-view))
 
 (defclass windoid (window) ())
 
@@ -289,7 +295,7 @@
   (declare (ignore subview-type))
   (easygui:view-subviews view))
 
-(defmethod view-subviews ((view easygui::view))
+(defmethod view-subviews ((view view))
   (easygui:view-subviews view))
 
 (defmethod view-named (name (view view))

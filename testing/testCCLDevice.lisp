@@ -116,8 +116,9 @@
 (remove-visual-items-from-rpm-window *win* *view*)
 (sleep .5)
 
-
 #|(setf *cocoa-win* (easygui:cocoa-ref *win*))
+(compute-class-precedence-list (find-class 'contained-view))
+(inspect *win*)
 (defun create-left-mouse-click (window)
   "Returns an NSEvent object that describes a left mouse click at the current mouse location"
   (#/mouseEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:clickCount:pressure: ns:ns-event
@@ -131,6 +132,9 @@
    1 ;clickCount
    (float 1)))
 (setf *the-event* (create-left-mouse-click *cocoa-win*))
+(inspect *win*)
+(class-precedence-list (find-class 'easygui::contained-view))
+
 (#/sendEvent: (#/sharedApplication ns:ns-application)
  *the-event*)|#
 
