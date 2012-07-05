@@ -5,4 +5,6 @@
 
 (print *str*)
 
+(print *ret*)
+
 

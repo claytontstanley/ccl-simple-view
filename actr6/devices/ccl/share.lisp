@@ -77,9 +77,8 @@
    (easygui::background :initform (color-symbol->system-color 'white)))
   (:default-initargs 
     :view-position (make-point 200 200)
-    :contained-view-specifically 'easygui::contained-view))
+    :contained-view-specifically 'contained-view))
 
-    ;:contained-view-specifically 'contained-view))
 
 (defclass windoid (window) ())
 
@@ -200,7 +199,7 @@
 ; specializing on the add-1-subview method in the easygui package. And call
 ; cocoa's method for adding a subview that is behind all other views
 
-(defmethod easygui::add-1-subview ((view image-view) (super-view easygui::view))
+(defmethod easygui::add-1-subview ((view image-view) (super-view view))
   (setf (slot-value view 'easygui::parent) super-view)
   (push view (slot-value super-view 'easygui::subviews))
   (#/addSubview:positioned:relativeTo: 
@@ -403,10 +402,10 @@
 (defmethod view-window ((view window))
   view)
 
-(defmethod view-container ((view easygui:view))
+(defmethod view-container ((view view))
   (easygui:view-container view))
 
-(defmethod view-window ((view easygui:view))
+(defmethod view-window ((view view))
   (awhen (view-container view)
     (view-window it)))
 
@@ -472,7 +471,7 @@
 (defmethod get-fore-color ((view simple-view))
   (easygui:get-fore-color view))
 
-(defmethod get-back-color ((view easygui:view))
+(defmethod get-back-color ((view view))
   (easygui:get-back-color view))
 
 (defmethod set-fore-color ((view simple-view) new-color)
@@ -492,7 +491,7 @@
 (defmethod window-update-cursor ((window window) point)
   nil)
 
-(defmethod view-click-event-handler ((device easygui:view) position)
+(defmethod view-click-event-handler ((device view) position)
   (awhen (view-container device) 
     (view-click-event-handler it position)))
 
@@ -570,7 +569,7 @@
 
 ; Drawing methods
 
-(defmethod view-draw-contents ((view easygui:view))
+(defmethod view-draw-contents ((view view))
   ())
   ;(easygui::set-needs-display view t))
 
@@ -620,7 +619,7 @@
 (defmethod erase-rect ((view window) left &optional top right bottom)
   (erase-rect (easygui::content-view view) left top right bottom))
 
-(defmethod erase-rect ((view easygui:view) left &optional top right bottom)
+(defmethod erase-rect ((view view) left &optional top right bottom)
   (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
     (let ((rect (ns:make-ns-rect left top right bottom)))
       (with-focused-view view
