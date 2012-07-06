@@ -7,15 +7,15 @@
   (process-run-function
     "flash"
     (lambda ()
-      (setf *view* (make-static-text-for-rpm-window
-                 *win*
-                 :x 10 
-                 :y 10 
-                 :text text
-                 :color 'orange))
-      (add-visual-items-to-rpm-window *win* *view*)
-      (sleep .1)
-      (remove-visual-items-from-rpm-window *win* *view*))))
+      (let ((*view* (make-static-text-for-rpm-window
+                      *win*
+                      :x 10 
+                      :y 10 
+                      :text text
+                      :color 'orange)))
+        (add-visual-items-to-rpm-window *win* *view*)
+        (sleep .1)
+        (remove-visual-items-from-rpm-window *win* *view*)))))
 
 (defmethod rpm-window-click-event-handler ((device rpm-real-window) position)
   (declare (ignore device position))

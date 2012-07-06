@@ -11,10 +11,10 @@ cclQuit = -e '(quit)'
 
 ccl = rlwrap ./ccl
 
-unit:
+unit: clean-actr-compiled-files
 	${ccl} ${initString} ${testString} ${cclQuit}
 
-continuous-integration: clean-actr-compiled-files
+continuous-integration:
 	make -C ../build ccl-simple-view
 	make unit initFiles='actr6/load-act-r-6.lisp ../build/ccl-simple-view.lisp'
 
