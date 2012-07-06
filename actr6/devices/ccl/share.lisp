@@ -174,9 +174,11 @@
 
 (defclass image-view (easygui::image-view view) ())
 
+#|
 (defun convert-icon (icon)
   (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
    (#_NSFileTypeForHFSTypeCode icon)))
+|#
 
 (defclass image-view-mixin ()
   ((pict-id :reader pict-id :initarg :pict-id)
@@ -332,7 +334,8 @@
   (let ((mapping (list (cons $tejustleft #$NSLeftTextAlignment)
                        (cons $tejustcenter #$NSCenterTextAlignment)
                        (cons $tejustright #$NSRightTextAlignment))))
-    (cdr (assoc justification mapping))))
+    (guard (it1 "No mapping found for justification ~a" justification)
+      (cdr (assoc justification mapping)))))
 
 (defmethod set-text-justification ((view view-text-mixin) justification)
   (#/setAlignment: (easygui:cocoa-ref view) (convert-justification justification))
@@ -438,8 +441,21 @@
   `(easygui:with-focused-view (easygui:cocoa-ref ,view)
      ,@body))
 
+; These are shorthand guard macros for usual cases. Only use these if you quickly want to add
+; a guard statement with minimal useful error messages. Otherwise, use the guard macro and 
+; provide a more meaningful error message
+
+(defmacro guard-!null-ptr (&body body)
+  `(guard ((not (equal it1 ccl:+null-ptr+)) "null ptr returned when evaling form ~a" ',body)
+     (progn ,@body)))
+
+(defmacro guard-!nil (&body body)
+  `(guard (it1 "nil returned when evaling form ~a" ',body)
+     (progn ,@body)))
+
 (defmethod wptr ((view window))
-  (#/isVisible (easygui::cocoa-ref view)))
+  (guard-!null-ptr
+    (#/isVisible (easygui::cocoa-ref view))))
 
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (easygui:view-position view) local-pos))
@@ -661,11 +677,12 @@
     (call-next-method)))
 
 (defmethod view-font ((view easygui::text-fonting-mixin))
-  (#/font (easygui:cocoa-ref view)))
+  (guard-!null-ptr
+    (#/font (easygui:cocoa-ref view))))
 
 (defun font-info (font-spec)
-  (values (#/ascender font-spec)
-          (abs (#/descender font-spec))))
+  (values (guard-!null-ptr (#/ascender font-spec))
+          (abs (guard-!null-ptr (#/descender font-spec)))))
 
 (defun string-width (str font)
   (let* ((dict (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
