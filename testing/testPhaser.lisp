@@ -27,6 +27,7 @@
 (setup-experiment *exp*)
 (run-experiment *exp*)
 (run-block *exp* (first (block-lst *exp*)))
+(all-processes)
 
 (task-window *experiment*)
 (foo)

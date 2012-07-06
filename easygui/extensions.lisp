@@ -75,6 +75,19 @@
   ()
   (:default-initargs :specifically 'easygui::cocoa-image-view))
 
+(defmethod easygui::initialize-view :after ((view easygui::image-view))
+  (setf (slot-value (cocoa-ref view) 'easygui::easygui-view) view))
+
+(defclass easygui::cocoa-clickable-image-view (easygui::cocoa-image-view)
+  ()
+  (:metaclass ns:+ns-object))
+
+(easygui::define-useful-mouse-event-handling-routines easygui::cocoa-clickable-image-view)
+
+(defclass easygui::clickable-image-view (easygui::image-view)
+  ()
+  (:default-initargs :specifically 'easygui::cocoa-clickable-image-view))
+
 ; ----------------------------------------------------------------------
 ; Creating MCL's top-level simple-view class
 ;

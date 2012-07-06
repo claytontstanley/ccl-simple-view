@@ -71,6 +71,14 @@
 (add-visual-items-to-rpm-window *win* *view*)
 (sleep .5)
 
+#|
+(cocoa-ref *win*)
+(easygui::cocoa-ref-valid-p *win*)
+(inspect *win*)
+(all-processes)
+(wptr *win*)
+|#
+
 (setf *view* (make-line-for-rpm-window
                *win*
                (list 100 200)

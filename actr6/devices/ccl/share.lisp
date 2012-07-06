@@ -4,6 +4,14 @@
   (require :resources)
   (require :mcl-ccl-colors))
 
+(defmacro guard-!null-ptr (&body body)
+  `(guard ((not (equal it1 ccl:+null-ptr+)) "null ptr returned when evaling form ~a" ',body)
+     (progn ,@body)))
+
+(defmacro guard-!nil (&body body)
+  `(guard (it1 "nil returned when evaling form ~a" ',body)
+     (progn ,@body)))
+
 ; ----------------------------------------------------------------------
 ; Building class definitions to match MCL's GUI class heirarchy
 ;
@@ -74,11 +82,23 @@
    (window-show :initarg :window-show)
    (window-type :initarg :window-type)
    (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)
+   (maintenance-thread :accessor maintenance-thread)
    (easygui::background :initform (color-symbol->system-color 'white)))
   (:default-initargs 
     :view-position (make-point 200 200)
     :contained-view-specifically 'contained-view))
 
+(defmethod initialize-instance :after ((win window) &key)
+  (setf (maintenance-thread win)
+        (process-run-function 
+          (format nil "maintenance thread for win ~a" win)
+          (lambda ()
+            (while (wptr win)
+              (sleep .1)
+              (window-null-event-handler win))))))
+
+(defmethod window-null-event-handler ((win window))
+  ())
 
 (defclass windoid (window) ())
 
@@ -166,19 +186,36 @@
   ((easygui::text :initform ""))
   (:default-initargs :specifically 'easygui::cocoa-button))
 
+(defclass image-view (easygui::image-view view) ())
+
+(defclass clickable-image-view (easygui::clickable-image-view image-view) ())
+
+(defclass back-image-view (image-view) ())
+
 ; FIXME: what's this view-text hack?
 
-(defclass icon-dialog-item (easygui::image-view easygui::action-view-mixin dialog-item)
+(defclass icon-dialog-item (clickable-image-view easygui::action-view-mixin dialog-item view)
   ((icon :reader icon :initarg :icon)
    (easygui::view-text :accessor easygui::view-text :initarg :view-text)))
 
-(defclass image-view (easygui::image-view view) ())
+#|(defun convert-icon (icon)
+  (guard-!null-ptr
+    (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
+     (#_NSFileTypeForHFSTypeCode icon))))|#
 
 #|
 (defun convert-icon (icon)
-  (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
-   (#_NSFileTypeForHFSTypeCode icon)))
+  (#/initWithIconRef: ns:ns-image
+   icon))
 |#
+
+(defun icon->pict-id (icon)
+  (format nil "~a" icon))
+
+(defmethod initialize-instance :after ((view icon-dialog-item) &key)
+  (when (slot-boundp view 'icon)
+    (#/setImage: (easygui:cocoa-ref view)
+     (get-resource-val (icon->pict-id (icon view))))))
 
 (defclass image-view-mixin ()
   ((pict-id :reader pict-id :initarg :pict-id)
@@ -189,7 +226,7 @@
     (#/setImage: (easygui:cocoa-ref (image-view view)) (get-resource-val pict-id))))
 
 (defmethod initialize-instance :after ((view image-view-mixin) &key)
-  (let ((image-view (make-instance 'image-view
+  (let ((image-view (make-instance 'back-image-view
                                    :view-size (view-size view)
                                    :view-position (make-point 0 0))))
     (setf (image-view view) image-view)
@@ -201,7 +238,7 @@
 ; specializing on the add-1-subview method in the easygui package. And call
 ; cocoa's method for adding a subview that is behind all other views
 
-(defmethod easygui::add-1-subview ((view image-view) (super-view view))
+(defmethod easygui::add-1-subview ((view back-image-view) (super-view view))
   (setf (slot-value view 'easygui::parent) super-view)
   (push view (slot-value super-view 'easygui::subviews))
   (#/addSubview:positioned:relativeTo: 
@@ -209,6 +246,14 @@
    (easygui:cocoa-ref view)
    #$NSWindowBelow
    nil))
+
+(defmethod easygui::add-1-subview :after ((view image-view) (super-view view))
+  (unless (slot-boundp view 'easygui::size)
+    (let ((ns-size (#/size (#/image (cocoa-ref view)))))
+      (destructuring-bind (width height) (list
+                                           (ns:ns-size-width ns-size)
+                                           (ns:ns-size-height ns-size))
+        (setf (slot-value view 'easygui::size) (make-point width height))))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :icon-dialog-item))
@@ -445,17 +490,15 @@
 ; a guard statement with minimal useful error messages. Otherwise, use the guard macro and 
 ; provide a more meaningful error message
 
-(defmacro guard-!null-ptr (&body body)
-  `(guard ((not (equal it1 ccl:+null-ptr+)) "null ptr returned when evaling form ~a" ',body)
-     (progn ,@body)))
-
-(defmacro guard-!nil (&body body)
-  `(guard (it1 "nil returned when evaling form ~a" ',body)
-     (progn ,@body)))
-
 (defmethod wptr ((view window))
-  (guard-!null-ptr
-    (#/isVisible (easygui::cocoa-ref view))))
+  (if (slot-boundp view 'easygui::ref)
+      (#/isVisible
+       (guard-!null-ptr
+         (easygui::cocoa-ref view)))))
+
+(defmethod easygui::window-may-close :around ((win window))
+  (when (call-next-method)
+    (slot-makunbound win 'easygui::ref)))
 
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (easygui:view-position view) local-pos))

@@ -8,7 +8,7 @@
   (process-wait
     "waiting for user to finish with dialog"
     (lambda ()
-         (format t "waiting for user to finish with dialog~%")
+         ;(format t "waiting for user to finish with dialog~%")
          *ret*))
   (unwind-protect (apply #'values (cdr *ret*))
     (when close-on-exit
