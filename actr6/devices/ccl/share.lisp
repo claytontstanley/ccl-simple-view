@@ -199,9 +199,9 @@
    (easygui::view-text :accessor easygui::view-text :initarg :view-text)))
 
 #|(defun convert-icon (icon)
-  (guard-!null-ptr
-    (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
-     (#_NSFileTypeForHFSTypeCode icon))))|#
+    (guard-!null-ptr
+      (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
+       (#_NSFileTypeForHFSTypeCode icon))))|#
 
 #|
 (defun convert-icon (icon)
@@ -286,7 +286,7 @@
                                      (funcall action obj))))
                                nil)
                      attributes))
-                     obj))
+    obj))
 
 ; ----------------------------------------------------------------------
 ; Building methods that allow CCL to understand basic MCL drawing commands
@@ -493,9 +493,9 @@
 
 (defmethod wptr ((view window))
   (if (slot-boundp view 'easygui::ref)
-      (#/isVisible
-       (guard-!null-ptr
-         (easygui::cocoa-ref view)))))
+    (#/isVisible
+     (guard-!null-ptr
+       (easygui::cocoa-ref view)))))
 
 (defmethod easygui::window-may-close :around ((win window))
   (when (call-next-method)
@@ -513,10 +513,10 @@
   (destructuring-bind (endx endy) (canonicalize-point x y)
     (destructuring-bind (startx starty) (list (point-x (pen-position view))
                                               (point-y (pen-position view)))
-        (#/strokeLineFromPoint:toPoint:
-         ns:ns-bezier-path
-         (ns:make-ns-point startx starty) 
-         (ns:make-ns-point endx endy)))))
+      (#/strokeLineFromPoint:toPoint:
+       ns:ns-bezier-path
+       (ns:make-ns-point startx starty) 
+       (ns:make-ns-point endx endy)))))
 
 (defmethod part-color ((view easygui:static-text-view) (part (eql :text)))
   (declare (ignore part))
@@ -637,7 +637,7 @@
 
 (defmethod view-draw-contents ((view simple-view))
   ())
-  ;(easygui::set-needs-display view t))
+;(easygui::set-needs-display view t))
 
 (defmethod get-start ((view bu-liner))
   (make-point 0 (point-y (view-size view))))
@@ -829,7 +829,7 @@
           (return-from ccl::load-external-function sym)
           (funcall *load-external-function-orig* sym query))))))
 
-  ; Use the same approach to define foreign constants that MCL uses that no longer exist for CCL
+; Use the same approach to define foreign constants that MCL uses that no longer exist for CCL
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *load-os-constant-orig* #'ccl::load-os-constant)

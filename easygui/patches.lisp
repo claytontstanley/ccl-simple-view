@@ -49,18 +49,18 @@
     (unless easygui::frame-inited-p
       (setf easygui::frame-inited-p t)
       (easygui::running-on-this-thread ()
-                              (let ((cocoa-view (cocoa-ref view)))
-                                (dcc (#/setFrameOrigin: cocoa-view (easygui::ns-point-from-point easygui::position)))
-                                (if (slot-boundp view 'easygui::size)
-                                  (dcc (#/setFrameSize: cocoa-view (easygui::ns-point-from-point easygui::size)))
-                                  (dcc (#/sizeToFit cocoa-view))))))
+                                       (let ((cocoa-view (cocoa-ref view)))
+                                         (dcc (#/setFrameOrigin: cocoa-view (easygui::ns-point-from-point easygui::position)))
+                                         (if (slot-boundp view 'easygui::size)
+                                           (dcc (#/setFrameSize: cocoa-view (easygui::ns-point-from-point easygui::size)))
+                                           (dcc (#/sizeToFit cocoa-view))))))
     ; Section for the patched code. I would have liked to have done this with an :after method, but I don't think a specialied class can
     ; get :around an :around method.
     (unless (slot-boundp view 'easygui::size)
       (let ((frame (#/frame (cocoa-ref view))))
         (setf (slot-value view 'easygui::size)
               (easygui:point (ns:ns-rect-width frame)
-                          (ns:ns-rect-height frame)))))
+                             (ns:ns-rect-height frame)))))
     (easygui::set-needs-display view t)
     (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t))))
 
@@ -76,9 +76,9 @@
 (defmethod easygui::initialize-view :after ((view easygui::content-view-mixin))
   (unless (slot-boundp view 'easygui::content-view)
     (let ((containee (make-instance (slot-value view 'easygui::contained-view-specifically) 
-                       :cocoa-ref (dcc (#/contentView (cocoa-ref view)))
-                       :view-nick-name 'easygui::%CONTENT-OF-CONTENT-VIEW%
-                       :flipped (slot-value view 'easygui::flipped))))
+                                    :cocoa-ref (dcc (#/contentView (cocoa-ref view)))
+                                    :view-nick-name 'easygui::%CONTENT-OF-CONTENT-VIEW%
+                                    :flipped (slot-value view 'easygui::flipped))))
       (setf (slot-value view 'easygui::content-view) containee
             (slot-value containee 'easygui::parent) view))))
 
