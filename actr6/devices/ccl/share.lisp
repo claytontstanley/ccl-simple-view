@@ -363,6 +363,7 @@
   'fixme)
 
 (defmethod window-close ((win window))
+  (guard ((wptr win) "Window ~a is already closed" win) ())
   (easygui:perform-close win))
 
 (defmethod window-title ((view window))
