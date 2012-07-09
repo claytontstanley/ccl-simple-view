@@ -300,10 +300,11 @@
 ; they are an already-defined ccl method)
 ; ----------------------------------------------------------------------
 
-(setf (symbol-function 'point-v) #'easygui:point-y)
-(setf (symbol-function 'point-h) #'easygui:point-x)
-(shadowing-import 'easygui:point-x)
-(shadowing-import 'easygui:point-y)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (setf (symbol-function 'point-v) #'easygui:point-y)
+  (setf (symbol-function 'point-h) #'easygui:point-x)
+  (shadowing-import 'easygui:point-x)
+  (shadowing-import 'easygui:point-y))
 
 (ccl::register-character-name "UpArrow" #\U+F700)
 (ccl::register-character-name "DownArrow" #\U+F701)
@@ -355,6 +356,7 @@
 (defmethod window-show ((win window))
   (easygui:window-show win))
 
+;FIXME: This looks very strange. Prob related to Phaser's floating window
 (defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))
   (window-select w))
 
@@ -425,6 +427,8 @@
   (make-point 0 0))
 
 (defmethod invalidate-view ((view simple-view) &optional erase-p)
+  ; Cocoa takes care of erasing and redrawing; AFAIK this is OK to ignore
+  (declare (ignore erase-p))
   (easygui:invalidate-view view))
 
 (defun canonicalize-point (x y)
@@ -541,6 +545,7 @@
 (defmethod set-part-color ((view static-text-dialog-item) (part (eql :text)) new-color)
   (set-fore-color view new-color))
 
+; FIXME: Keep this as a compiler warning until you figure out how to color a border with Cocoa
 (defmethod set-part-color ((view static-text-dialog-item) (part (eql :frame)) new-color)
   (setf (bordered-p view) t))
 
@@ -564,6 +569,7 @@
 (defmethod easygui::mouse-down ((view simple-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
 
+; FIXME: What does this do? Keep as compiler warning until you figure it out
 (defmethod window-update-cursor ((window window) point)
   nil)
 
@@ -607,7 +613,9 @@
   (view-key-event-handler device key))
 
 (defmethod view-key-event-handler ((device window) key)
-  ())
+  (declare (ignore key))
+  ; Default primary method on the window is to do nothing
+  (values))
 
 ; MCL's Pen
 

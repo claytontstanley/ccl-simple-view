@@ -67,12 +67,14 @@
   (get-val (get-resource id pool)))
 
 (defun get-id (resource &optional (pool *pool*))
+  (declare (ignore resource pool))
   (error "write this when needed"))
 
 (defun add-resource (resource id &optional (pool *pool*))
   (setf (gethash id pool) resource))
 
 (defun remove-resource (resource &optional (pool *pool*))
+  (declare (ignore resource pool))
   (error "write this when needed"))
 
 (defmethod create-resource ((type (eql 'image)) path)

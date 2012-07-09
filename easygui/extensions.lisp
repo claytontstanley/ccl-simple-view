@@ -110,10 +110,12 @@
 ; but without inheriting from drawing-view. Sort of a workaround to avoid the drawing-view mouse-tracking methods, since those aren't mixins (yet).
 
 (defmethod easygui::link-cocoa-view ((cocoa-view ns:ns-view) view)
-  ())
+  (declare (ignore view))
+  (values))
 
 (defmethod easygui::link-cocoa-view ((cocoa-view ns:ns-window) view)
-  ())
+  (declare (ignore view))
+  (values))
 
 (defmethod easygui::link-cocoa-view ((cocoa-view easygui::cocoa-drawing-view) view)
   (setf (slot-value cocoa-view 'easygui::flipped) (slot-value view 'easygui::flipped))
