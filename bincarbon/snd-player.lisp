@@ -175,9 +175,13 @@
 
 #+:clozure
 (defmethod play-snd ((player snd-player) snd-name &optional async)
-  (unless async
-    (error "need to implement synchronous play"))
-  (#/play (get-resource-val snd-name (snd-alis player))))
+  (let ((snd (get-resource-val snd-name (snd-alis player))))
+    (#/play snd)
+    (unless async
+      (process-wait
+        (format nil "waiting for sound ~a to finish" snd)
+        (lambda ()
+          (not (#/isPlaying snd)))))))
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;;  bookkeeping

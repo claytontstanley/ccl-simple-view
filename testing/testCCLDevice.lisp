@@ -17,6 +17,7 @@
         (sleep .1)
         (remove-visual-items-from-rpm-window *win* *view*)))))
 
+
 (defmethod rpm-window-click-event-handler ((device rpm-real-window) position)
   (declare (ignore device position))
   (flash-text "mouse down clicked")
@@ -124,7 +125,6 @@
 (sleep .1)
 (remove-visual-items-from-rpm-window *win* *view*)
 (sleep .5)
-
 
 (setf *view* (make-instance 'editable-text-dialog-item
                             :view-position (make-point 10 300)

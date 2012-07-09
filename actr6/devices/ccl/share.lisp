@@ -47,7 +47,8 @@
 ; like, window, dialog stuff, etc.
 
 (defclass simple-view (easygui::simple-view view-mixin)
-  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))))
+  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))
+   (bezier-path :accessor bezier-path :initform (#/bezierPath ns:ns-bezier-path))))
 
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
@@ -56,6 +57,9 @@
   (if back-color
     (apply #'call-next-method view :back-color (mcl-color->system-color back-color) args)
     (call-next-method)))
+
+(defmethod initialize-instance :after ((view simple-view) &key)
+  (move-to view (pen-position view)))
 
 #|
 (defmethod initialize-instance :after ((view simple-view) &key)
@@ -179,7 +183,8 @@
   (:default-initargs :specifically 'easygui::cocoa-text-field))
 
 (defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-title-mixin dialog-item)
-  ((easygui::cluster :initarg :radio-button-cluster))
+  ((easygui::cluster :initarg :radio-button-cluster)
+   (easygui::selected :initarg :radio-button-pushed-p))
   (:default-initargs :specifically 'easygui::cocoa-button))
 
 (defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin dialog-item)
@@ -257,12 +262,6 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :icon-dialog-item))
-
-(defclass thermometer (simple-view)
-  ())
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (provide :thermometer))
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   ; easygui's action slot takes a lambda with zero arguments; mcl's action slots take a lambda 
@@ -347,7 +346,7 @@
 (defmethod view-named (name (view view))
   (easygui:view-named name view))
 
-(defmethod view-nick-name ((view view))
+(defmethod view-nick-name ((view simple-view))
   (easygui:view-nick-name view))
 
 (defmethod window-select ((win window))
@@ -420,6 +419,14 @@
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
 
+; FIXME: This seems to work properly, but I don't currently understand why,
+; or what view-origin is supposed to do in MCL
+(defmethod view-origin ((view simple-view))
+  (make-point 0 0))
+
+(defmethod invalidate-view ((view simple-view) &optional erase-p)
+  (easygui:invalidate-view view))
+
 (defun canonicalize-point (x y)
   (cond (y (list x y))
         (t (list (point-h x) (point-v x)))))
@@ -451,13 +458,16 @@
 (defmethod width ((view simple-view))
   (point-h (view-size view)))
 
+(defmethod height ((view simple-view))
+  (point-v (view-size view)))
+
 (defmethod view-window ((view window))
   view)
 
-(defmethod view-container ((view view))
+(defmethod view-container ((view simple-view))
   (easygui:view-container view))
 
-(defmethod view-window ((view view))
+(defmethod view-window ((view simple-view))
   (awhen (view-container view)
     (view-window it)))
 
@@ -507,12 +517,15 @@
 (defmethod move-to ((view simple-view) x &optional (y nil))
   (destructuring-bind (x y) (canonicalize-point x y)
     (let ((position (make-point x y)))
+      (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y))
       (setf (pen-position view) position))))
 
 (defmethod line-to ((view simple-view) x &optional (y nil))
   (destructuring-bind (endx endy) (canonicalize-point x y)
     (destructuring-bind (startx starty) (list (point-x (pen-position view))
                                               (point-y (pen-position view)))
+      (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy))
+      (setf (pen-position view) (make-point endx endy))
       (#/strokeLineFromPoint:toPoint:
        ns:ns-bezier-path
        (ns:make-ns-point startx starty) 
@@ -691,6 +704,22 @@
       (with-focused-view view
         (with-fore-color (get-back-color view)
           (#/fillRect: ns:ns-bezier-path rect))))))
+
+(defmethod start-polygon ((view simple-view))
+  (#/closePath (bezier-path view)))
+
+(defun pattern->system-color (pattern)
+  (color-symbol->system-color
+    (guard-!nil
+      (cond ((eq pattern *black-pattern*) 'black)))))
+
+(defmethod fill-polygon ((view simple-view) pattern polygon)
+  (with-focused-view view
+    (with-fore-color (pattern->system-color pattern)
+      (#/fill (bezier-path view)))))
+
+(defmethod get-polygon ((view simple-view))
+  (bezier-path view))
 
 ; Handling fonts and string width/height in pixels
 
