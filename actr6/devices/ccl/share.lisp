@@ -732,7 +732,9 @@
             (#/fillRect: ns:ns-bezier-path rect)))))))
 
 (defmethod start-polygon ((view simple-view))
-  (setf (bezier-path view) (#/bezierPath ns:ns-bezier-path)))
+  (setf (bezier-path view) (#/bezierPath ns:ns-bezier-path))
+  (#/moveToPoint: (bezier-path view)
+   (easygui::ns-point-from-point (pen-position view))))
 
 (defun pattern->system-color (pattern)
   (color-symbol->system-color
