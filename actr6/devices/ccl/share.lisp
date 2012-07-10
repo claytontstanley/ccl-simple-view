@@ -52,7 +52,7 @@
 
 (defclass simple-view (easygui::simple-view view-mixin)
   ((pen-position :accessor pen-position)
-   (bezier-path)))
+   (bezier-path :accessor bezier-path :initform nil)))
 
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
@@ -61,18 +61,6 @@
   (if back-color
     (apply #'call-next-method view :back-color (mcl-color->system-color back-color) args)
     (call-next-method)))
-
-; There was something strange happening when I had the #/bezierPath inside the slot's initform.
-; It would initialize correctly for a 'window instance, but would point to a null ptr for that window's
-; 'contained-view instance. If I switched the initform to something other than a bezierPath (say number 5),
-; all worked just fine. So until I figure out what sort of objc/lisp interaction is causing this, I'm just using
-; a form of lazy evaluation, where the bezier-path slot is not initialized until the very last moment, when it 
-; is first accessed.
-
-(defmethod bezier-path ((view simple-view))
-  (unless (slot-boundp view 'bezier-path)
-    (setf (slot-value view 'bezier-path) (#/bezierPath ns:ns-bezier-path)))
-  (slot-value view 'bezier-path))
 
 #|
 (defmethod initialize-instance :after ((view simple-view) &key)
@@ -543,7 +531,8 @@
 (defmethod move-to ((view simple-view) x &optional (y nil))
   (destructuring-bind (x y) (canonicalize-point x y)
     (let ((position (make-point x y)))
-      (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y))
+      (when (bezier-path view)
+        (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y)))
       (setf (pen-position view) position))))
 
 (defmethod line-to ((view window) x &optional y)
@@ -553,7 +542,8 @@
   (destructuring-bind (endx endy) (canonicalize-point x y)
     (destructuring-bind (startx starty) (list (point-x (pen-position view))
                                               (point-y (pen-position view)))
-      (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy))
+      (when (bezier-path view)
+        (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
       (setf (pen-position view) (make-point endx endy))
       (#/strokeLineFromPoint:toPoint:
        ns:ns-bezier-path
@@ -742,7 +732,7 @@
             (#/fillRect: ns:ns-bezier-path rect)))))))
 
 (defmethod start-polygon ((view simple-view))
-  (#/closePath (bezier-path view)))
+  (setf (bezier-path view) (#/bezierPath ns:ns-bezier-path)))
 
 (defun pattern->system-color (pattern)
   (color-symbol->system-color
@@ -750,9 +740,10 @@
       (cond ((eq pattern *black-pattern*) 'black)))))
 
 (defmethod fill-polygon ((view simple-view) pattern polygon)
-  (with-focused-view view
-    (with-fore-color (pattern->system-color pattern)
-      (#/fill (bezier-path view)))))
+  (unwind-protect (with-focused-view view
+                    (with-fore-color (pattern->system-color pattern)
+                      (#/fill (bezier-path view))))
+    (setf (bezier-path view) nil)))
 
 (defmethod get-polygon ((view simple-view))
   (bezier-path view))
