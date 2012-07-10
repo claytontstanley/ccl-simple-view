@@ -22,6 +22,17 @@
         (t (cons (car lst) 
                  (cons item (sandwich item (cdr lst)))))))
 
+(defun lisp-file-p (str)
+  (if (search ".lisp" str)
+    t))
+
+(defun load-file-list (file-list)
+  (dolist (file (file-lines (path-as-lst file-list)))
+    (cond ((search "load-act-r-6.lisp" file)
+           #-:act-r-6.0 (load (path-as-lst file)))
+          (t
+           (load (path-as-lst file))))))
+
 (defun load-in-bincarbon (&rest files)
   (dolist (file files)
     (load-as-lst "bincarbon" file)))

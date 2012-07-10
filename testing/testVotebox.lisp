@@ -1,8 +1,7 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 #-:ccl-simple-view (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-(dolist (file (file-lines (path-as-lst "file-lists" "testVotebox.txt")))
-  (load (path-as-lst file)))
+(load-file-list "file-lists/Votebox/testVotebox.txt")
 
 (do-experiment wind)
 
