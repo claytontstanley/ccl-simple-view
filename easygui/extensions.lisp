@@ -89,6 +89,18 @@
   (:default-initargs :specifically 'easygui::cocoa-clickable-image-view))
 
 ; ----------------------------------------------------------------------
+; Providing a mixin class that keeps a view from implicitly redrawing each
+; time a subview is added to the display
+; ----------------------------------------------------------------------
+
+(defclass easygui::static-view-mixin ()
+  ())
+
+(defmethod easygui::set-needs-display ((view easygui::static-view-mixin) flag)
+  (declare (ignore flag))
+  (values))
+
+; ----------------------------------------------------------------------
 ; Creating MCL's top-level simple-view class
 ;
 ; In order to implement MCL's top-level simple-view class, I needed a cocoa view class that was capable of drawing to the display

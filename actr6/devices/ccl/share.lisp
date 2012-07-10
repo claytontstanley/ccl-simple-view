@@ -4,6 +4,10 @@
   (require :resources)
   (require :mcl-ccl-colors))
 
+; These are shorthand guard macros for usual cases. Only use these if you quickly want to add
+; a guard statement with minimal useful error messages. Otherwise, use the guard macro and 
+; provide a more meaningful error message
+
 (defmacro guard-!null-ptr (&body body)
   `(guard ((not (equal it1 ccl:+null-ptr+)) "null ptr returned when evaling form ~a" ',body)
      (progn ,@body)))
@@ -47,8 +51,8 @@
 ; like, window, dialog stuff, etc.
 
 (defclass simple-view (easygui::simple-view view-mixin)
-  ((pen-position :accessor pen-position :initarg :pen-position :initform (make-point 0 0))
-   (bezier-path :accessor bezier-path :initform (#/bezierPath ns:ns-bezier-path))))
+  ((pen-position :accessor pen-position)
+   (bezier-path)))
 
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
@@ -58,8 +62,17 @@
     (apply #'call-next-method view :back-color (mcl-color->system-color back-color) args)
     (call-next-method)))
 
-(defmethod initialize-instance :after ((view simple-view) &key)
-  (move-to view (pen-position view)))
+; There was something strange happening when I had the #/bezierPath inside the slot's initform.
+; It would initialize correctly for a 'window instance, but would point to a null ptr for that window's
+; 'contained-view instance. If I switched the initform to something other than a bezierPath (say number 5),
+; all worked just fine. So until I figure out what sort of objc/lisp interaction is causing this, I'm just using
+; a form of lazy evaluation, where the bezier-path slot is not initialized until the very last moment, when it 
+; is first accessed.
+
+(defmethod bezier-path ((view simple-view))
+  (unless (slot-boundp view 'bezier-path)
+    (setf (slot-value view 'bezier-path) (#/bezierPath ns:ns-bezier-path)))
+  (slot-value view 'bezier-path))
 
 #|
 (defmethod initialize-instance :after ((view simple-view) &key)
@@ -79,6 +92,8 @@
 
 (defclass contained-view (view easygui::contained-view) ())
 
+(defclass static-view-mixin (easygui::static-view-mixin) ())
+
 (defclass window (easygui:window view-text-via-title-mixin view)
   ((grow-icon-p :initform nil :initarg :grow-icon-p :reader grow-icon-p)
    (grow-box-p :initarg :grow-box-p)
@@ -90,6 +105,7 @@
    (easygui::background :initform (color-symbol->system-color 'white)))
   (:default-initargs 
     :view-position (make-point 200 200)
+    :view-size (make-point 200 200)
     :contained-view-specifically 'contained-view))
 
 (defmethod initialize-instance :after ((win window) &key)
@@ -310,8 +326,8 @@
 (ccl::register-character-name "DownArrow" #\U+F701)
 (ccl::register-character-name "BackArrow" #\U+F702)
 (ccl::register-character-name "ForwardArrow" #\U+F703)
-(defparameter *arrow-cursor* 'fixme)
-(defparameter *black-pattern* 'fixme)
+(defparameter *arrow-cursor* 'arrow-cursor-fixme)
+(defparameter *black-pattern* 'black-pattern-fixme)
 
 (defun make-point (x y)
   (easygui::point x y :allow-negative-p t))
@@ -345,7 +361,8 @@
   (easygui:view-subviews view))
 
 (defmethod view-named (name (view view))
-  (easygui:view-named name view))
+  (guard (it1 "no subview with view-nick-name ~a found in ~a" name view)
+    (easygui:view-named name view)))
 
 (defmethod view-nick-name ((view simple-view))
   (easygui:view-nick-name view))
@@ -475,6 +492,12 @@
   (awhen (view-container view)
     (view-window it)))
 
+(defmethod content-view ((view window))
+  (easygui::content-view view))
+
+(defmethod content-view ((view simple-view))
+  view)
+
 ; Other MCL drawing methods are not available in the easygui package.
 ; For these, move down a layer below easygui, and implement the functionality
 ; using CCL's Objective C bridge. Most bridge calls will have #/ or #_ reader
@@ -498,12 +521,8 @@
 
 (defmacro with-focused-view (view &body body)
   "Any changes to the graphics environment by body will be directed to the view object"
-  `(easygui:with-focused-view (easygui:cocoa-ref ,view)
+  `(easygui:with-focused-view (easygui:cocoa-ref (content-view ,view))
      ,@body))
-
-; These are shorthand guard macros for usual cases. Only use these if you quickly want to add
-; a guard statement with minimal useful error messages. Otherwise, use the guard macro and 
-; provide a more meaningful error message
 
 (defmethod wptr ((view window))
   (if (slot-boundp view 'easygui::ref)
@@ -518,11 +537,17 @@
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (easygui:view-position view) local-pos))
 
+(defmethod move-to ((view window) x &optional y)
+  (move-to (content-view view) x y))
+
 (defmethod move-to ((view simple-view) x &optional (y nil))
   (destructuring-bind (x y) (canonicalize-point x y)
     (let ((position (make-point x y)))
       (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y))
       (setf (pen-position view) position))))
+
+(defmethod line-to ((view window) x &optional y)
+  (line-to (content-view view) x y))
 
 (defmethod line-to ((view simple-view) x &optional (y nil))
   (destructuring-bind (endx endy) (canonicalize-point x y)
@@ -573,7 +598,7 @@
 (defmethod window-update-cursor ((window window) point)
   nil)
 
-(defmethod view-click-event-handler ((device view) position)
+(defmethod view-click-event-handler ((device simple-view) position)
   (awhen (view-container device) 
     (view-click-event-handler it position)))
 
@@ -658,6 +683,7 @@
 
 (defmethod view-draw-contents ((view simple-view))
   ())
+
 ;(easygui::set-needs-display view t))
 
 (defmethod get-start ((view bu-liner))
@@ -683,6 +709,14 @@
       (let* ((rect (ns:make-ns-rect startx starty width height))
              (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
         (#/stroke path)))))
+
+(defmethod fill-oval ((view simple-view) pattern left &optional top right bottom)
+  (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
+    (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
+      (let* ((rect (ns:make-ns-rect startx starty width height))
+             (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
+        (with-focused-view view
+          (#/fill path))))))
 
 (defmethod frame-rect ((view simple-view) left &optional top right bottom)
   (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
