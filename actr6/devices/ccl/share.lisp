@@ -755,18 +755,11 @@
 
 ; Handling fonts and string width/height in pixels
 
-(defparameter *break-if-font-to-be-converted* nil)
-
 (defun convert-font (font)
   (etypecase font
     (ns:ns-font font)
     (list 
       (destructuring-bind (name pt &rest rest) font
-        (let* ((unavailable-fonts (list "Avant Garde" "Charcoal")))
-          (when (member name unavailable-fonts :test #'string-equal)
-            (when *break-if-font-to-be-converted*
-              (break "font not found for font-name ~a" name))
-            (setf name "Times Roman")))
         (guard ((not (equal it1 ccl:+null-ptr+)) "font not found for font-name ~a" name)
           (#/fontWithName:size: ns:ns-font
            (objc:make-nsstring name)
