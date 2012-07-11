@@ -134,7 +134,9 @@
     :window-title "Untitled Dialog"
     :window-type :document))
 
-(defclass dialog-item (view view-text-mixin)  ())
+(defclass action-view-mixin (easygui::action-view-mixin) ())
+
+(defclass dialog-item (view view-text-mixin action-view-mixin)  ())
 
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
 ; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.
@@ -181,7 +183,7 @@
     (loop for (part color) in (group (part-color-list view) 2)
           do (set-part-color view part (mcl-color->system-color color)))))
 
-(defclass editable-text-dialog-item (easygui:text-input-view view-text-via-stringvalue-mixin easygui::action-view-mixin dialog-item)
+(defclass editable-text-dialog-item (easygui:text-input-view view-text-via-stringvalue-mixin dialog-item)
   ((allow-returns :initarg :allow-returns)
    (draw-outline :initarg :draw-outline))
   (:default-initargs :specifically 'easygui::cocoa-text-field))
@@ -203,7 +205,7 @@
 
 ; FIXME: what's this view-text hack?
 
-(defclass icon-dialog-item (clickable-image-view easygui::action-view-mixin dialog-item view)
+(defclass icon-dialog-item (clickable-image-view dialog-item view)
   ((icon :reader icon :initarg :icon)
    (easygui::view-text :accessor easygui::view-text :initarg :view-text)))
 
@@ -417,10 +419,10 @@
       (cocoa-ref view))
      (ns:make-ns-range position (- cursorpos position)))))
 
-(defmethod dialog-item-enable ((view easygui::action-view-mixin))
+(defmethod dialog-item-enable ((view action-view-mixin))
   (easygui:set-dialog-item-enabled-p view t))
 
-(defmethod dialog-item-disable ((view easygui::action-view-mixin))
+(defmethod dialog-item-disable ((view action-view-mixin))
   (easygui:set-dialog-item-enabled-p view nil))
 
 (defmethod check-box-check ((item check-box-dialog-item))

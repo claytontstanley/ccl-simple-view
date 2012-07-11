@@ -134,7 +134,6 @@
 
 (set-selection-range (view-named :et *win*) 1 2)
 
-
 #|
 (cocoa-ref (view-named :et *win*))
 (#/isEnabled *)
