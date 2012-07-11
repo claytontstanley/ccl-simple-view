@@ -496,7 +496,7 @@
     (view-window it)))
 
 (defmethod content-view ((view window))
-  (easygui::content-view view))
+  (easygui:content-view view))
 
 (defmethod content-view ((view simple-view))
   view)
@@ -539,31 +539,6 @@
 
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (easygui:view-position view) local-pos))
-
-(defmethod move-to ((view window) x &optional y)
-  (move-to (content-view view) x y))
-
-(defmethod move-to ((view simple-view) x &optional (y nil))
-  (destructuring-bind (x y) (canonicalize-point x y)
-    (let ((position (make-point x y)))
-      (when (bezier-path view)
-        (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y)))
-      (setf (pen-position view) position))))
-
-(defmethod line-to ((view window) x &optional y)
-  (line-to (content-view view) x y))
-
-(defmethod line-to ((view simple-view) x &optional (y nil))
-  (destructuring-bind (endx endy) (canonicalize-point x y)
-    (destructuring-bind (startx starty) (list (point-x (pen-position view))
-                                              (point-y (pen-position view)))
-      (when (bezier-path view)
-        (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
-      (setf (pen-position view) (make-point endx endy))
-      (#/strokeLineFromPoint:toPoint:
-       ns:ns-bezier-path
-       (ns:make-ns-point startx starty) 
-       (ns:make-ns-point endx endy)))))
 
 (defmethod part-color ((view easygui:static-text-view) (part (eql :text)))
   (declare (ignore part))
@@ -686,8 +661,6 @@
 (defmethod view-draw-contents ((view simple-view))
   ())
 
-;(easygui::set-needs-display view t))
-
 (defmethod get-start ((view bu-liner))
   (make-point 0 (point-y (view-size view))))
 
@@ -704,6 +677,31 @@
   (move-to view (get-start view))
   (with-fore-color (get-fore-color view) 
     (line-to view (get-end view))))
+
+(defmethod move-to ((view window) x &optional y)
+  (move-to (content-view view) x y))
+
+(defmethod move-to ((view simple-view) x &optional (y nil))
+  (destructuring-bind (x y) (canonicalize-point x y)
+    (let ((position (make-point x y)))
+      (when (bezier-path view)
+        (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y)))
+      (setf (pen-position view) position))))
+
+(defmethod line-to ((view window) x &optional y)
+  (line-to (content-view view) x y))
+
+(defmethod line-to ((view simple-view) x &optional (y nil))
+  (destructuring-bind (endx endy) (canonicalize-point x y)
+    (destructuring-bind (startx starty) (list (point-x (pen-position view))
+                                              (point-y (pen-position view)))
+      (when (bezier-path view)
+        (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
+      (setf (pen-position view) (make-point endx endy))
+      (#/strokeLineFromPoint:toPoint:
+       ns:ns-bezier-path
+       (ns:make-ns-point startx starty) 
+       (ns:make-ns-point endx endy)))))
 
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
   (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
@@ -733,7 +731,7 @@
         (#/fillRect: ns:ns-bezier-path rect)))))
 
 (defmethod erase-rect ((view window) left &optional top right bottom)
-  (erase-rect (easygui::content-view view) left top right bottom))
+  (erase-rect (content-view view) left top right bottom))
 
 (defmethod erase-rect ((view view) left &optional top right bottom)
   (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
