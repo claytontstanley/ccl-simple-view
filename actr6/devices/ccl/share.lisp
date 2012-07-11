@@ -593,9 +593,6 @@
 
 ; Handling mouse movement/interaction
 
-(defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
-  (view-click-event-handler view location))
-
 (defmethod easygui::mouse-down ((view simple-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
 
