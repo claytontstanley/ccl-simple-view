@@ -19,5 +19,5 @@ continuous-integration:
 	make unit initFiles='actr6/load-act-r-6.lisp ../build/ccl-simple-view.lisp'
 
 clean-actr-compiled-files:
-	find actr6/ -name '*.dx64fsl' -o -name '*.cfsl' -exec rm '{}' \;
+	find ../submodules/actr6/ -name '*.dx64fsl' -o -name '*.cfsl' -exec rm '{}' \;
 

@@ -7,7 +7,7 @@
 
 (load (format nil "~a~a" (directory-namestring *load-truename*) "utilities.lisp"))
 
-#-:act-r-6.0 (load-as-lst "actr6" "load-act-r-6.lisp")
+#-:act-r-6.0 (load-as-lst ".." "submodules" "actr6" "load-act-r-6.lisp")
 
 #+clozure
 (cond ((member "swank-repl" *modules* :test #'string-equal)

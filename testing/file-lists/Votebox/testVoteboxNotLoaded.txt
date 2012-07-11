@@ -3,7 +3,6 @@ testing/bootstrap.lisp
 testing/utilities.lisp
 binccl/utilities.lisp
 build/ccl-simple-view.lisp
-testing/actr6
 submodules/actr6
 submodules/ACT-R-VoteBox-Models/Emulator Files/resources
 testing/file-lists/Votebox/testVotebox.txt
