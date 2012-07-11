@@ -148,7 +148,7 @@
 (defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin easygui::text-fonting-mixin dialog-item)
   ((easygui::default-button-p :initarg :default-button)
    (cancel-button :initarg :cancel-button))
-  (:default-initargs :specifically 'easygui::cocoa-button))
+  (:default-initargs :specifically 'easygui::cocoa-button :text-justification $tejustcenter))
 
 (defclass default-button-dialog-item (button-dialog-item)
   ()
@@ -379,7 +379,7 @@
   ;TODO: Maybe use easygui:view-text method here?
   (easygui::window-title view))
 
-(defmethod dialog-item-text ((view easygui::view-text-mixin))
+(defmethod dialog-item-text ((view view-text-mixin))
   (easygui:view-text view))
 
 (defmethod text-just ((view view-text-mixin))
