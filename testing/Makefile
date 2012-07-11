@@ -7,6 +7,8 @@ initFiles =
 testString = ${testFiles:%=-l % }
 initString = ${initFiles:%=-l % }
 
+actr6 = ../submodules/actr6
+
 cclQuit = -e '(quit)'
 
 ccl = rlwrap ./ccl
@@ -16,8 +18,8 @@ unit: clean-actr-compiled-files
 
 continuous-integration:
 	make -C ../build ccl-simple-view
-	make unit initFiles='actr6/load-act-r-6.lisp ../build/ccl-simple-view.lisp'
+	make unit initFiles='${actr6}/load-act-r-6.lisp ../build/ccl-simple-view.lisp'
 
 clean-actr-compiled-files:
-	find ../submodules/actr6/ -name '*.dx64fsl' -o -name '*.cfsl' -exec rm '{}' \;
+	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' -exec rm '{}' \;
 
