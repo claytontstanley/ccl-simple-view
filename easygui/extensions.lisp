@@ -145,7 +145,9 @@
   (when redisplay-p 
     (easygui:invalidate-view view)))
 
+; Relay keypress events to the window, after allowing the text field to handle the keypress properly.
+; Note that #/keyUp is used for the text-field, which calls #/keyDown. I could only get keyUp: to fire
+; (not #/keyDown:) when typing in a text field, so that's why there's the discrepency here.
 (objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-field) the-event)
   (call-next-method the-event)
   (#/keyDown: (#/window cocoa-self) the-event))
-
