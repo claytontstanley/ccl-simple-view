@@ -21,10 +21,3 @@ continuous-integration:
 clean-actr-compiled-files:
 	find actr6/ -name '*.dx64fsl' -o -name '*.cfsl' -exec rm '{}' \;
 
-zip-%: clean-actr-compiled-files
-	make -C ../build ccl-simple-view
-	rm -f $*.zip	
-	make -s file-list-$* | while read line; do zip -r $*.zip "$$line"; done
-
-file-list-%:
-	cat file-lists/$*/*
