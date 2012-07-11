@@ -403,7 +403,19 @@
   (setf (easygui:view-text view) text))
 
 (defmethod set-selection-range ((view view-text-mixin) &optional position cursorpos)
-  ())
+  (destructuring-bind (position cursorpos) (if position
+                                             (list position cursorpos)
+                                             (list 0 0))
+    ; In order for setSelectedRange: to work, the view must be selected first, so the 
+    ; view is currently selected by calling selectText:, which actually highlights all
+    ; text in the view. So, a bit of a kludge, but it seems to behave just fine.
+    (#/selectText: (cocoa-ref view)
+     ccl:+null-ptr+)
+    (#/setSelectedRange:
+     (#/fieldEditor:forObject: (cocoa-ref (view-window view))
+      #$YES 
+      (cocoa-ref view))
+     (ns:make-ns-range position (- cursorpos position)))))
 
 (defmethod dialog-item-enable ((view easygui::action-view-mixin))
   (easygui:set-dialog-item-enabled-p view t))

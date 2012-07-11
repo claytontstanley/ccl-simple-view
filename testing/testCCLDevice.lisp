@@ -128,11 +128,21 @@
 
 (setf *view* (make-instance 'editable-text-dialog-item
                             :view-position (make-point 10 300)
+                            :view-nick-name :et
                             :text "here"))
 (add-visual-items-to-rpm-window *win* *view*)
 
+(set-selection-range (view-named :et *win*) 1 2)
 
-#|(setf *cocoa-win* (easygui:cocoa-ref *win*))
+
+#|
+(cocoa-ref (view-named :et *win*))
+(#/isEnabled *)
+(#/isSelected *)
+(#/selectedRanges
+ (#/fieldEditor:forObject: (cocoa-ref *win*) #$YES (cocoa-ref (view-named :et *win*))))
+
+(setf *cocoa-win* (easygui:cocoa-ref *win*))
 (compute-class-precedence-list (find-class 'contained-view))
 (inspect *win*)
 (defun create-left-mouse-click (window)
