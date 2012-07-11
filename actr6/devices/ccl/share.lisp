@@ -349,8 +349,11 @@
   (easygui:view-subviews view))
 
 (defmethod view-named (name (view view))
-  (guard (it1 "no subview with view-nick-name ~a found in ~a" name view)
-    (easygui:view-named name view)))
+  (acond ((easygui:view-named name view)
+          it)
+         (t
+           (format t "no subview with view-nick-name ~a found in ~a" name view)
+           nil)))
 
 (defmethod view-nick-name ((view simple-view))
   (easygui:view-nick-name view))
