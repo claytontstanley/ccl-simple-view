@@ -5,7 +5,7 @@ zip-%:
 	make -s file-list-$* | while read line; do zip --symlinks -r $*.zip "$$line"; done
 
 
-file-list-all : fl = Votebox VoteboxKristen
+file-list-all : fl = Votebox VoteboxKristen Phaser
 file-list-% : fl = $*
 
 
