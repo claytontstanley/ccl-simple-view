@@ -1,8 +1,4 @@
 testing/testVotebox.lisp
-testing/bootstrap.lisp
-testing/utilities.lisp
-binccl/utilities.lisp
-build/ccl-simple-view.lisp
 submodules/actr6
 submodules/ACT-R-VoteBox-Models/Emulator Files/resources
 testing/file-lists/Votebox/testVotebox.txt
