@@ -18,11 +18,12 @@ binaryFileLst = ade adp bat chm cmd com cpl exe hta ins isp jse lib mde msc msp 
 binaryFileStr = ${binaryFileLst:%= -o -name '*.%'}
 
 unit: clean-actr-compiled-files
+	make -C ../build ccl-simple-view
 	${ccl} ${initString} ${testString} ${cclQuit}
 
-continuous-integration:
-	make -C ../build ccl-simple-view
-	make unit initFiles='${actr6}/load-act-r-6.lisp ../build/ccl-simple-view.lisp'
+# FIXME: Should I do anything different for CI tests compared to unit tests.
+# All of the tests are pretty-much regression CI tests anyways. Don't really have unit tests (yet) for this repo
+continuous-integration: unit
 
 clean-actr-compiled-files:
 	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' ${binaryFileStr} | while read line; do rm "$$line"; done
