@@ -16,3 +16,6 @@
 [submodule "submodules/X83-Frank-Trek-11"]
 	path = submodules/X83-Frank-Trek-11
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/X83-Frank-Trek-11
+[submodule "submodules/kristenVotebox"]
+	path = submodules/kristenVotebox
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/kristenVotebox
