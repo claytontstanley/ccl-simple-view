@@ -203,6 +203,7 @@
 (defparameter *red-color* (color-symbol->system-color 'red))
 (defparameter *light-gray-pattern* (color-symbol->system-color 'gray))
 (defparameter *green-color* (color-symbol->system-color 'green))
+(defparameter *blue-color* (color-symbol->system-color 'blue))
 
 ; Converting MCL colors (specified as a huge (technical term) integer) to 'system' colors
 
@@ -233,8 +234,10 @@
 
 (defun mcl-color->system-color (color)
   "Converts an MCL color to a CCL system color"
-  (multiple-value-bind (r g b) (color-values color)
-    (rgb->system-color r g b)))
+  (etypecase color
+    (integer (multiple-value-bind (r g b) (color-values color)
+               (rgb->system-color r g b)))
+    (ns:ns-color color)))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :mcl-ccl-colors))

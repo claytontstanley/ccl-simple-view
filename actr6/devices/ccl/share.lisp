@@ -570,7 +570,12 @@
 
 ; Handling mouse movement/interaction
 
+; This one is not actually called. Do we want to have objc watch every view for mouse clicks?
 (defmethod easygui::mouse-down ((view simple-view) &key location &allow-other-keys)
+  (view-click-event-handler view location))
+
+; This one is called for now.
+(defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
 
 ; FIXME: What does this do? Keep as compiler warning until you figure it out
@@ -764,15 +769,35 @@
 
 ; Handling fonts and string width/height in pixels
 
-(defun convert-font (font)
-  (etypecase font
-    (ns:ns-font font)
-    (list 
-      (destructuring-bind (name pt &rest rest) font
-        (guard ((not (equal it1 ccl:+null-ptr+)) "font not found for font-name ~a" name)
-          (#/fontWithName:size: ns:ns-font
-           (objc:make-nsstring name)
-           pt))))))
+(defun convert-font (name pt)
+  (guard ((not (equal it1 ccl:+null-ptr+)) "font not found for font-name ~a" name)
+    (#/fontWithName:size: ns:ns-font
+     (objc:make-nsstring name)
+     pt)))
+
+(defun color-lst->color (lst)
+  (destructuring-bind (type val) lst
+    (ecase type
+      (:color (mcl-color->system-color val))
+      (:color-index
+        (unless (eq val 0)
+          (error "need to support this")
+          ; Default, so return nil
+          ())))))
+
+(defun parse-mcl-font-lst (font-lst)
+  (let ((name) (pt) (color))
+    (dolist (atom font-lst)
+      (etypecase atom
+        (string (setf name atom))
+        (integer (setf pt atom))
+        ; FIXME; Parse these style and transfer mode values
+        (keyword ())
+        (list (setf color (color-lst->color atom)))))
+    (append
+      (list :view-font (convert-font name pt))
+      (if color
+        (list :fore-color color)))))
 
 ; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
 ; same slot name and expects the font slot to be initialized with a font spec as a list.
@@ -780,7 +805,8 @@
 ; initarg if it is provided by the equivalent ns-font value
 (defmethod initialize-instance :around ((view easygui::text-fonting-mixin) &rest args &key view-font)
   (if view-font
-    (apply #'call-next-method view :view-font (convert-font view-font) args)
+    (let ((font-lst (parse-mcl-font-lst view-font)))
+      (apply #'call-next-method view (append font-lst args)))
     (call-next-method)))
 
 (defmethod view-font ((view easygui::text-fonting-mixin))
