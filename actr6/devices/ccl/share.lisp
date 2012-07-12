@@ -110,11 +110,11 @@
 
 (defclass windoid (window) ())
 
-(defclass simple-overlay-view (easygui::drawing-overlay-view view) 
+(defclass simple-overlay-view (easygui::drawing-overlay-view view easygui::drawing-view) 
   ()
   (:documentation "Top-level class for views that do not monitor mouse clicks and mouse movement"))
 
-(defclass consuming-view (easygui::drawing-consuming-view view)
+(defclass consuming-view (easygui::drawing-consuming-view view easygui::drawing-view)
   ())
 
 (defclass color-dialog (window)
@@ -572,10 +572,6 @@
 
 ; This one is not actually called. Do we want to have objc watch every view for mouse clicks?
 (defmethod easygui::mouse-down ((view simple-view) &key location &allow-other-keys)
-  (view-click-event-handler view location))
-
-; This one is called for now.
-(defmethod easygui::mouse-down ((view easygui::drawing-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
 
 ; FIXME: What does this do? Keep as compiler warning until you figure it out

@@ -13,6 +13,10 @@ cclQuit = -e '(quit)'
 
 ccl = rlwrap ./ccl
 
+binaryFileLst = ade adp bat chm cmd com cpl exe hta ins isp jse lib mde msc msp mst pif scr sct shb sys vb vbe vbs vxd wsc wsf wsh
+
+binaryFileStr = ${binaryFileLst:%= -o -name '*.%'}
+
 unit: clean-actr-compiled-files
 	${ccl} ${initString} ${testString} ${cclQuit}
 
@@ -21,5 +25,5 @@ continuous-integration:
 	make unit initFiles='${actr6}/load-act-r-6.lisp ../build/ccl-simple-view.lisp'
 
 clean-actr-compiled-files:
-	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' -exec rm '{}' \;
+	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' ${binaryFileStr} | while read line; do rm "$$line"; done
 
