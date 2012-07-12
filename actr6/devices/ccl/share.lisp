@@ -570,7 +570,6 @@
 
 ; Handling mouse movement/interaction
 
-; This one is not actually called. Do we want to have objc watch every view for mouse clicks?
 (defmethod easygui::mouse-down ((view simple-view) &key location &allow-other-keys)
   (view-click-event-handler view location))
 
