@@ -284,14 +284,12 @@
                      :view-size size
                      :text text
                      :action (if action 
-                               (lambda ()
-                                 (process-run-function
-                                   (format nil "action for obj ~a" obj)
                                    (lambda ()
-                                     (funcall action obj))))
+                                     (funcall action obj))
                                nil)
                      attributes))
     obj))
+
 
 ; ----------------------------------------------------------------------
 ; Building methods that allow CCL to understand basic MCL drawing commands
@@ -822,6 +820,11 @@
          (size (#/size attr)))
     (ns:ns-size-width size)))
 
+(defun string-width (str font)
+  5)
+
+  
+  
 ; Miscellaneous wrappers
 
 ; MCL allows for subviews to be passed at object initialization. I tried shadowing the 'easygui::subviews :initargs symbol

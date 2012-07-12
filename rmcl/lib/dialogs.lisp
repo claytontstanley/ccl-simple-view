@@ -1,15 +1,13 @@
 (defparameter *ret* nil)
 
 (defmacro return-from-modal-dialog (form)
-  `(setf *ret* (cons :return (multiple-value-list ,form))))
+  `(progn
+     (setf *ret* (cons :return (multiple-value-list ,form)))
+     (#/abortModal (#/sharedApplication ns:ns-application))))
 
 (defmethod modal-dialog ((dialog window) &optional (close-on-exit t))
-  (setf *modal-dialog-on-top* t)
-  (process-wait
-    "waiting for user to finish with dialog"
-    (lambda ()
-         ;(format t "waiting for user to finish with dialog~%")
-         *ret*))
+  (setf *modal-dialog-on-top* dialog)
+  (#/runModalForWindow: (#/sharedApplication ns:ns-application) (cocoa-ref dialog))
   (unwind-protect (apply #'values (cdr *ret*))
     (when close-on-exit
       (window-close dialog))
