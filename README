@@ -1,6 +1,7 @@
 Directory Structure:
 
 .
+├── Makefile
 ├── README
 ├── actr6
 │   └── devices
@@ -27,46 +28,58 @@ Directory Structure:
 │   ├── file-list.txt
 │   ├── outFileHeader.lisp
 │   ├── post-code.lisp
-│   └── post-file-list.txt
+│   ├── post-file-list.txt
 ├── docs
 │   ├── Getting\ Started\ with\ MCL.pdf
 │   ├── InterfaceBuilderWithCCLTutorial.pdf
 │   └── Macintosh\ Common\ Lisp\ Ref.pdf
 ├── easygui
-│   └── extensions.lisp
+│   ├── extensions.lisp
+│   └── patches.lisp
 ├── rmcl
+│   ├── examples
+│   ├── level-1
 │   └── lib
 ├── scratch
+│   ├── colors.lisp
 │   ├── dialog-item.lisp
 │   ├── ffi.lisp
 │   ├── image.lisp
 │   ├── it-example1.lisp
-│   └── scratch.lisp
+│   ├── mouse.lisp
+│   ├── scratch.lisp
+│   └── threads.lisp
 ├── submodules
 │   ├── ACT-R-VoteBox-Models
 │   ├── X83-Frank-Trek-11
 │   ├── actr6
 │   ├── ccl
+│   ├── kristenVotebox
 │   ├── lisp-dev
+│   ├── nextGen
 │   └── rmcl
 └── testing
     ├── Makefile
-    ├── actr6 -> ../submodules/actr6
-    ├── bincarbon -> ../bincarbon
     ├── bootstrap-mcl.lisp
     ├── bootstrap.lisp
     ├── ccl -> ../submodules/ccl/dx86cl64
     ├── data
-    ├── phaser -> ../submodules/X83-Frank-Trek-11/Experiment
+    ├── file-lists
     ├── testCCLDevice.lisp
     ├── testGetText.lisp
+    ├── testIcons.lisp
     ├── testImages.lisp
+    ├── testLevelIndicator.lisp
+    ├── testModalDialog.lisp
+    ├── testNextGen.lisp
     ├── testPhaser.lisp
+    ├── testPolygon.lisp
     ├── testSound.lisp
     ├── testTutorials.lisp
     ├── testVotebox.lisp
-    ├── utilities.lisp -> ../binccl/utilities.lisp
-    └── votebox -> ../submodules/ACT-R-VoteBox-Models
+    ├── testVoteboxKristen.lisp
+    ├── testWindow.lisp
+    └── utilities.lisp -> ../binccl/utilities.lisp
 
 actr6:		All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. 
 		-Note the share.lisp file lives here for now, which contains the MCL GUI interface for CCL
@@ -84,6 +97,8 @@ docs:		Archived documentation and reference manuals found online.
 
 easygui:	Any .lisp extensions to CCL's easygui package. 
 		-Contains a few bug fixes, and an extension which provides a Cocoa view that does not respond to mouse activity	
+rmcl:		Any lisp code from RMCL that was either directly copied to this distro (some of the digitool GUI code could be bootstrapped
+		after the CCL interface was defined) or rewritten for this distro (e.g., thermometer.lisp, the modal dialog implementation)
 
 scratch:	Stray lisp code, experimental, etc.
 		-None of this is loaded for any of the tests
