@@ -1,3 +1,7 @@
+(defparameter *path-separator*
+  #+:digitool ":"
+  #+:clozure "/")
+
 (defmacro with-continue (&body body)
   `(handler-bind ((error #'continue))
      ,@body))
@@ -54,20 +58,3 @@
 (defun lisp-file-p (str)
   (if (search ".lisp" str)
     t))
-
-(defun load-file-list (&rest file-list)
-  "Loads each file in file-list, where the location of 
-   file-list is a relative path from the load file's directory
-   and the location of each file in file-list is a relative path from
-   the base repo's directory"
-  (dolist (file (file-lines (apply #'path-as-lst file-list)))
-    (let ((file (replace-all file "/" *path-separator*)))
-      (let ((file (format nil "~a~a" *base-repo-namestring* file)))
-        (cond ((search "load-act-r-6.lisp" file)
-               #-:act-r-6.0 (load file))
-              (t
-               (load file)))))))
-
-(defun load-in-bincarbon (&rest files)
-  (dolist (file files)
-    (load-as-lst "bincarbon" file)))
