@@ -124,21 +124,20 @@ actr6/devices/ccl/uwi.lisp: CCL's implementation of the RPM interface. Note that
 actr6/devices/ccl/device.lisp: CCL's implementation of the RPM interface. Only slight changes to this file compared to MCL's file. I'm trying to keep these to a minimum.
 
 
-To run the tests:
+To run a test:
 		-Mount RedGiant volume	
 		-Navigate to the Projects/mcl-migration folder on RedGiant
 		-Either access the data in the folder over the network (preferred), or copy the folder locally if you want to access it w/o internet.
 		-Download Clozure CL from the App Store and install if you don't have it yet.
 		-Launch Clozure CL
-		-Use the Cocoa listener to load ACT-R, then the GUI interface code, then a test file
+		-Use the Cocoa listener to load one of the test files.
 
 		e.g.:
 		Launch Clozure CL
-		Load act-r in ./submodules/actr6/load-act-r-6.lisp
-		Load ccl-simple-view in ./build/ccl-simple-view.lisp
 		Load Votebox in ./testing/testVotebox.lisp
 
-		If you don't want to run the votebox test code, and just votebox, then after the ccl-simple-view is loaded, you can refer to the votebox docs and load it that way.
-		testVotebox.lisp just loads the files for votebox that are listed in the docs.
-	
+Notes about the tests:
+	Each test loads a bootstrap file, and then any necessary files to run that particular test.
+		The bootstrap file (bootstrap.lisp) loads up ccl-simple-view and any shared lisp code that is needed to run a test file (particularly the unit test framework). 
+		The necessary files to run the test are defined in ./testing/file-lists/[testName]/[testName].txt. If you wanted to bootstrap the test code manually, load each lisp file in the order in that file.
 
