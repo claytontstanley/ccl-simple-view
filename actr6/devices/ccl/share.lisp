@@ -862,7 +862,12 @@
   (gui::cocoa-choose-new-file-dialog :directory directory))
 
 (defun choose-directory-dialog (&key directory)
-  (easygui:choose-directory-dialog :directory directory))
+  (let ((directory
+          (aif directory
+            it
+            (aif *load-truename*
+              (directory-namestring it)))))
+    (easygui:choose-directory-dialog :directory directory)))
 
 ; ----------------------------------------------------------------------
 ; Manipulate the read table so that MCL's #@(a b) make-point shorthand works. 
