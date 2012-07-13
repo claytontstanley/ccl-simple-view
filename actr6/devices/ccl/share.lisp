@@ -820,11 +820,7 @@
          (size (#/size attr)))
     (ns:ns-size-width size)))
 
-(defun string-width (str font)
-  5)
 
-  
-  
 ; Miscellaneous wrappers
 
 ; MCL allows for subviews to be passed at object initialization. I tried shadowing the 'easygui::subviews :initargs symbol
