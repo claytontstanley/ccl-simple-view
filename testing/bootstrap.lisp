@@ -24,5 +24,7 @@
       (t
        (load-as-lst ".." "build" "ccl-simple-view.lisp")))
 
+(load-file-list "file-lists" "all.txt")
+
 #+digitool (load-as-lst "bootstrap-mcl.lisp")
 
