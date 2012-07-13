@@ -19,3 +19,6 @@
 [submodule "submodules/kristenVotebox"]
 	path = submodules/kristenVotebox
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/kristenVotebox
+[submodule "submodules/nextGen"]
+	path = submodules/nextGen
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/nextGen
