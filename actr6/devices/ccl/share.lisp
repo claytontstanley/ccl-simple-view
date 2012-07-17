@@ -42,7 +42,7 @@
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position :initform (make-point 0 0))
-   (easygui::font :initform (second (parse-mcl-font-lst '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0)))))
+   (easygui::font :initform (second (parse-mcl-initarg :view-font '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0)))))
    (temp-view-subviews :initarg :view-subviews)
    (easygui::foreground :initform (color-symbol->system-color 'black))
    (easygui::background :initform (#/clearColor ns:ns-color))))
@@ -58,10 +58,6 @@
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
 
-(defun parse-mcl-back-color (back-color)
-  (if back-color
-    (list :back-color (mcl-color->system-color back-color))))
-
 ; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
 ; same slot name and expects the font slot to be initialized with a font spec as a list.
 ; So in order to make it so that the font slot is correct for easygui, shadow the :view-font
@@ -69,8 +65,8 @@
 
 (defmethod initialize-instance :around ((view simple-view) &rest args &key back-color view-font)
   (if (or back-color view-font)
-    (let ((view-font-lst (parse-mcl-font-lst view-font))
-          (back-color-lst (parse-mcl-back-color back-color)))
+    (let ((view-font-lst (parse-mcl-initarg :view-font view-font))
+          (back-color-lst (parse-mcl-initarg :back-color back-color)))
       (apply #'call-next-method view (append view-font-lst back-color-lst args)))
     (call-next-method)))
 
@@ -808,7 +804,7 @@
      (easygui::ns-point-from-point (pen-position v))
      dict)))
 
-; Handling fonts and string width/height in pixels
+; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
 
 (defun convert-font (name pt)
   (guard ((not (equal it1 ccl:+null-ptr+)) "font not found for font-name ~a" name)
@@ -826,7 +822,7 @@
           ; Default, so return nil
           ())))))
 
-(defun parse-mcl-font-lst (font-lst)
+(defmethod parse-mcl-initarg ((keyword (eql :view-font)) font-lst)
   (let ((name) (pt) (color))
     (dolist (atom font-lst)
       (etypecase atom
@@ -840,10 +836,16 @@
       (if color
         (list :fore-color color)))))
 
+(defmethod parse-mcl-initarg ((keyword (eql :back-color)) back-color)
+  (if back-color
+    (list :back-color (mcl-color->system-color back-color))))
+
 (defmethod view-font ((view simple-view))
   (guard-!null-ptr
     (guard-!nil
       (easygui:view-font view))))
+
+; Handling fonts and string width/height in pixels
 
 (defun font-info (font-spec)
   (values (guard-!null-ptr (#/ascender font-spec))
