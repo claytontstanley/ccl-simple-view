@@ -296,8 +296,8 @@
                      :view-size size
                      :text text
                      :action (if action 
-                                   (lambda ()
-                                     (funcall action obj))
+                               (lambda ()
+                                 (funcall action obj))
                                nil)
                      attributes))
     obj))
@@ -730,9 +730,9 @@
        (ns:make-ns-point endx endy)))))
 
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
-      (let* ((rect (make-rect :from-mcl-spec left top right bottom))
-             (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
-        (#/stroke path)))
+  (let* ((rect (make-rect :from-mcl-spec left top right bottom))
+         (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
+    (#/stroke path)))
 
 (defmethod fill-oval ((view simple-view) pattern left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
@@ -779,13 +779,13 @@
 
 (defmethod fill-polygon ((view simple-view) pattern polygon)
   (unwind-protect (with-focused-view view
-                      (#/fill (bezier-path view))))
-    ())
+                    (#/fill (bezier-path view)))
+    ()))
 
 (defmethod frame-polygon ((view simple-view) polygon)
   (unwind-protect (with-focused-view view
-                      (#/stroke (bezier-path view))))
-    ())
+                    (#/stroke (bezier-path view)))
+    ()))
 
 (defmethod kill-polygon ((polygon ns:ns-bezier-path))
   (#/release polygon)
