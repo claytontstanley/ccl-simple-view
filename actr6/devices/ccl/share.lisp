@@ -805,28 +805,39 @@
 (defmethod get-polygon ((view simple-view))
   (bezier-path view))
 
+
+; FIXME: Currently it's expected that a format call to a view is done only once per view-draw-contents. So write
+; a single string to the view, etc. But CCL calls write-char when the string has a negative sign at the beginning.
+; So the current workaround is to keep a dynamic variable around that keeps track of all of this, and throw in a few
+; guard statements to make sure that things are being called in a way that won't break the formatting.
+
+(defparameter *stream-prefix-char* nil)
+
 (defmethod stream-write-char ((v simple-view) char)
-  'fixme)
+  (guard ((null *stream-prefix-char*) "expecting only a single prefix char before the string; prefix was ~a; new char is ~a" *stream-prefix-char* char) ())
+  (setf *stream-prefix-char* char))
 
 (defmethod stream-write-string ((v simple-view) string &optional start end)
   (guard-!nil *current-graphics-context-stroke-color*)
   (let* ((string
            (objc:make-nsstring
-             (if start
-               (subseq string start end)
-               string)))
+             (format nil "~a~a" (aif *stream-prefix-char* it "")
+                     (if start
+                       (subseq string start end)
+                       string))))
          (dict (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
                 (view-font v) #$NSFontAttributeName
                 *current-graphics-context-stroke-color* #$NSForegroundColorAttributeName
                 ccl:+null-ptr+))
          (pt (pen-position v)))
-    (#/drawAtPoint:withAttributes: string
-     (ns:make-ns-point
-       (point-h pt)
-       ; To mimic MCL positioning, I had to subtract of the ascend pixels from the y position of the pen
-       (- (point-v pt)
-          (first (multiple-value-list (font-info (view-font v))))))
-     dict)))
+    (unwind-protect (#/drawAtPoint:withAttributes: string
+                     (ns:make-ns-point
+                       (point-h pt)
+                       ; To mimic MCL positioning, I had to subtract of the ascend pixels from the y position of the pen
+                       (- (point-v pt)
+                          (first (multiple-value-list (font-info (view-font v))))))
+                     dict)
+      (setf *stream-prefix-char* nil))))
 
 ; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
 
