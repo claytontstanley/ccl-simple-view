@@ -524,12 +524,12 @@
 
 (defparameter *current-graphics-context-stroke-color* nil)
 
-(defmacro with-fore-color (color &body body)
+(defmacro! with-fore-color (o!color &body body)
   `(progn
-     (guard ((eq (type-of ,color) 'ns:ns-color) "color ~a is not a system color" ,color) ())
-     (let ((*current-graphics-context-stroke-color* ,color))
+     (guard ((eq (type-of ,g!color) 'ns:ns-color) "color ~a is not a system color" ,g!color) ())
+     (let ((*current-graphics-context-stroke-color* ,g!color))
        (with-graphics-context
-         (#/set ,color)
+         (#/set ,g!color)
          ,@body))))
 
 (defmacro with-focused-view (view &body body)
@@ -804,9 +804,14 @@
          (dict (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
                 (view-font v) #$NSFontAttributeName
                 *current-graphics-context-stroke-color* #$NSForegroundColorAttributeName
-                ccl:+null-ptr+)))
+                ccl:+null-ptr+))
+         (pt (pen-position v)))
     (#/drawAtPoint:withAttributes: string
-     (easygui::ns-point-from-point (pen-position v))
+     (ns:make-ns-point
+       (point-h pt)
+       ; To mimic MCL positioning, I had to subtract of the ascend pixels from the y position of the pen
+       (- (point-v pt)
+          (first (multiple-value-list (font-info (view-font v))))))
      dict)))
 
 ; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
