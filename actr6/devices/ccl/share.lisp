@@ -332,16 +332,6 @@
 (defun make-point (x y)
   (easygui::point x y :allow-negative-p t))
 
-(defun make-rect (&rest args)
-  (let ((topleft) (bottomright))
-    (loop for (key val) in (group args 2)
-          do (ecase key
-               (:topleft (setf topleft val))
-               (:bottomright (setf bottomright val))))
-    (destructuring-bind (left top right bottom) (canonicalize-rect topleft bottomright nil nil)
-      (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
-        (ns:make-ns-rect startx starty width height)))))
-
 (defmethod add-points ((p1 easygui::eg-point) (p2 easygui::eg-point))
   (make-point
     (+ (point-x p1) (point-x p2))
@@ -479,17 +469,6 @@
 (defun canonicalize-point (x y)
   (cond (y (list x y))
         (t (list (point-h x) (point-v x)))))
-
-(defun canonicalize-rect (left top right bottom)
-  (cond (bottom (list left top right bottom))
-        (top (list (point-h left)
-                   (point-v left)
-                   (point-h top)
-                   (point-v top)))
-        (t (list (ns:ns-rect-x left)
-                 (ns:ns-rect-y left)
-                 (+ (ns:ns-rect-x left) (ns:ns-rect-width left))
-                 (+ (ns:ns-rect-y left) (ns:ns-rect-height left))))))
 
 (defmethod set-view-position ((view simple-view) x &optional (y nil))
   (destructuring-bind (x y) (canonicalize-point x y)
@@ -688,6 +667,23 @@
 
 ; Drawing methods
 
+(defun canonicalize-rect (left top right bottom)
+  (cond (bottom (list left top right bottom))
+        (top (list (point-h left)
+                   (point-v left)
+                   (point-h top)
+                   (point-v top)))
+        (t (list (ns:ns-rect-x left)
+                 (ns:ns-rect-y left)
+                 (+ (ns:ns-rect-x left) (ns:ns-rect-width left))
+                 (+ (ns:ns-rect-y left) (ns:ns-rect-height left))))))
+
+(defmethod make-rect ((mode (eql :from-mcl-spec)) &rest args)
+  (destructuring-bind (left top right bottom) args
+    (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
+      (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
+        (ns:make-ns-rect startx starty width height)))))
+
 (defmethod view-draw-contents ((view simple-view))
   ())
 
@@ -734,37 +730,29 @@
        (ns:make-ns-point endx endy)))))
 
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
-  (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
-    (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
-      (let* ((rect (ns:make-ns-rect startx starty width height))
+      (let* ((rect (make-rect :from-mcl-spec left top right bottom))
              (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
-        (#/stroke path)))))
+        (#/stroke path)))
 
 (defmethod fill-oval ((view simple-view) pattern left &optional top right bottom)
-  (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
-    (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
-      (let* ((rect (ns:make-ns-rect startx starty width height))
-             (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
-        (with-focused-view view
-          (#/fill path))))))
+  (let* ((rect (make-rect :from-mcl-spec left top right bottom))
+         (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
+    (with-focused-view view
+      (#/fill path))))
 
 (defmethod stroke-ns-rect ((rect ns:ns-rect))
   (#/strokeRect: ns:ns-bezier-path rect))
 
 (defmethod frame-rect ((view simple-view) left &optional top right bottom)
-  (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
-    (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
-      (let ((rect (ns:make-ns-rect startx starty width height)))
-        (stroke-ns-rect rect)))))
+  (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
+    (stroke-ns-rect rect)))
 
 (defmethod fill-ns-rect ((rect ns:ns-rect) &optional pattern)
   (#/fillRect: ns:ns-bezier-path rect))
 
 (defmethod fill-rect ((view simple-view) pattern left &optional top right bottom)
-  (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
-    (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
-      (let ((rect (ns:make-ns-rect startx starty width height)))
-        (fill-ns-rect rect pattern)))))
+  (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
+    (fill-ns-rect rect pattern)))
 
 (defmethod paint-rect ((view simple-view) left &optional top right bottom)
   (fill-rect view (pen-pattern view) left top right bottom))
@@ -773,12 +761,10 @@
   (erase-rect (content-view view) left top right bottom))
 
 (defmethod erase-rect ((view view) left &optional top right bottom)
-  (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
-    (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
-      (let ((rect (ns:make-ns-rect startx starty width height)))
-        (with-focused-view view
-          (with-fore-color (get-back-color view)
-            (fill-ns-rect rect)))))))
+  (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
+    (with-focused-view view
+      (with-fore-color (get-back-color view)
+        (fill-ns-rect rect)))))
 
 (defmethod start-polygon ((view simple-view))
   (setf (bezier-path view) (#/bezierPath ns:ns-bezier-path))
