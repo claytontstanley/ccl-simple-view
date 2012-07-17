@@ -266,6 +266,7 @@
 (defparameter *white-color* (color-symbol->system-color 'white))
 (defparameter *gray-color* (mcl-color->system-color 8421504))
 (defparameter *yellow-color* (color-symbol->system-color 'yellow))
+(defparameter *orange-color* (mcl-color->system-color 16737282))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :mcl-ccl-colors))

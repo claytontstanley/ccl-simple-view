@@ -51,9 +51,8 @@
 ; So, simple-view is top; then view (allows subviews); then types that inherit from view,
 ; like, window, dialog stuff, etc.
 
-(defclass simple-view (easygui::simple-view view-mixin output-stream)
-  ((pen-position :accessor pen-position :initform (make-point 0 0))
-   (bezier-path :accessor bezier-path :initform nil)))
+(defclass simple-view (easygui::simple-view view-mixin output-stream pen-mixin)
+  ((bezier-path :accessor bezier-path :initform nil)))
 
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
@@ -457,10 +456,16 @@
 ; FIXME: This seems to work properly, but I don't currently understand why,
 ; or what view-origin is supposed to do in MCL
 (defmethod view-origin ((view simple-view))
-  (make-point 0 0))
+  (let ((bounds (#/bounds (cocoa-ref view))))
+    (make-point (ns:ns-rect-x bounds)
+                (ns:ns-rect-y bounds))))
 
 (defmethod origin ((view simple-view))
   (view-origin view))
+
+(defmethod set-origin ((view simple-view) h &optional v)
+  (destructuring-bind (h v) (canonicalize-point h v)
+    (#/setBoundsOrigin: (cocoa-ref view) (ns:make-ns-point h v))))
 
 (defmethod invalidate-view ((view simple-view) &optional erase-p)
   ; Cocoa takes care of erasing and redrawing; AFAIK this is OK to ignore
@@ -631,24 +636,29 @@
 
 ; MCL's Pen
 
-(defmethod pen-mode ((view simple-view)) ())
+(defclass pen-mixin ()
+  ((pen-mode :accessor pen-mode)
+   (pen-size :accessor pen-size)
+   (pen-position :accessor pen-position :initform (make-point 0 0))
+   (pen-pattern :accessor pen-pattern)))
 
-(defmethod pen-pattern ((view simple-view)) ())
-
-(defmethod pen-size ((view simple-view))
-  (make-point 4 4))
+(defmethod initialize-instance :after ((view pen-mixin) &key)
+  (pen-normal view))
 
 (defmethod set-pen-mode ((view simple-view) newmode)
-  (declare (ignore newmode))
-  ())
+  (setf (pen-mode view) newmode))
 
 (defmethod set-pen-pattern ((view simple-view) newpattern)
-  (declare (ignore newpattern))
-  ())
+  (setf (pen-pattern view) newpattern))
 
 (defmethod set-pen-size ((view simple-view) h &optional v)
-  (declare (ignore h v))
-  ())
+  (destructuring-bind (h v) (canonicalize-point h v)
+    (setf (pen-size view) (make-point h v))))
+
+(defmethod pen-normal ((view simple-view))
+  (setf (pen-mode view) :patCopy)
+  (setf (pen-size view) (make-point 1 1))
+  (setf (pen-pattern view) *black-pattern*))
 
 ; ----------------------------------------------------------------------
 ; Triggering MCL's view-draw-contents method on a Cocoa redraw of views.
@@ -795,7 +805,11 @@
 (defmethod get-polygon ((view simple-view))
   (bezier-path view))
 
+(defmethod stream-write-char ((v simple-view) char)
+  'fixme)
+
 (defmethod stream-write-string ((v simple-view) string &optional start end)
+  (guard-!nil *current-graphics-context-stroke-color*)
   (let* ((string
            (objc:make-nsstring
              (if start

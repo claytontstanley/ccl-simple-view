@@ -1,2 +1,3 @@
 submodules/nextGen/Comm Plugin/x-plane-client.lisp
 submodules/nextGen/Model/virtual-cockpit v62.lisp
+submodules/nextGen/Model/actr-pilot v52.lisp
