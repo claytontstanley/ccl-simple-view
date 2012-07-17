@@ -65,8 +65,10 @@
 
 (defmethod initialize-instance :around ((view simple-view) &rest args &key back-color view-font)
   (if (or back-color view-font)
-    (let ((view-font-lst (parse-mcl-initarg :view-font view-font))
-          (back-color-lst (parse-mcl-initarg :back-color back-color)))
+    (let ((view-font-lst (if view-font
+                           (parse-mcl-initarg :view-font view-font)))
+          (back-color-lst (if back-color
+                            (parse-mcl-initarg :back-color back-color))))
       (apply #'call-next-method view (append view-font-lst back-color-lst args)))
     (call-next-method)))
 
@@ -144,7 +146,10 @@
 
 (defclass action-view-mixin (easygui::action-view-mixin) ())
 
-(defclass dialog-item (view view-text-mixin action-view-mixin)  ())
+(defclass dialog-item (view view-text-mixin action-view-mixin)
+  ()
+  (:default-initargs 
+    :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
 
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
 ; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.
@@ -837,8 +842,7 @@
         (list :fore-color color)))))
 
 (defmethod parse-mcl-initarg ((keyword (eql :back-color)) back-color)
-  (if back-color
-    (list :back-color (mcl-color->system-color back-color))))
+  (list :back-color (mcl-color->system-color back-color)))
 
 (defmethod view-font ((view simple-view))
   (guard-!null-ptr
