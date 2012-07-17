@@ -199,16 +199,34 @@
         (blue (easygui:rgb-blue color)))
     (rgb->color-symbol (list red green blue))))
 
-(defparameter *black-color* (color-symbol->system-color 'black))
-(defparameter *red-color* (color-symbol->system-color 'red))
-(defparameter *light-gray-pattern* (color-symbol->system-color 'gray))
-(defparameter *green-color* (color-symbol->system-color 'green))
-(defparameter *blue-color* (color-symbol->system-color 'blue))
-
 ; Converting MCL colors (specified as a huge (technical term) integer) to 'system' colors
 
 ; FIXME: Stole this code from CCL's src; couldn't figure out how to load it with a require;
 ; fix this. This code was initially stolen from MCL, so this is the actual MCL code to do the conversion
+
+(defun make-mcl-color (red green blue)
+  "given red, green, and blue, returns an encoded rgb value"
+  (flet ((check-color (color)
+           (unless (and (fixnump color)
+                        (<= 0 (the fixnum color))
+                        (<= (the fixnum color) 65535))
+             (error "Illegal color component: ~s" color))))
+    (declare (inline check-color))
+    (check-color red)
+    (check-color green)
+    (check-color blue))
+  (locally (declare (fixnum red green blue))
+           (let* ((r (logand red #xff00))
+                  (g (logand green #xff00))
+                  (b (logand blue #xff00)))
+             (declare (fixnum r g b))
+             (logior (the fixnum (ash  r 8))
+                     (the fixnum g)
+                     (the fixnum (ash b -8))))))
+
+(defun make-color (red green blue)
+  (mcl-color->system-color 
+    (make-mcl-color red green blue)))
 
 (defun color-red (color &optional (component (logand (the fixnum (lsh color -16)) #xff)))
   "Returns the red portion of the color"
@@ -238,6 +256,16 @@
     (integer (multiple-value-bind (r g b) (color-values color)
                (rgb->system-color r g b)))
     (ns:ns-color color)))
+
+(defparameter *black-color* (color-symbol->system-color 'black))
+(defparameter *red-color* (color-symbol->system-color 'red))
+(defparameter *light-gray-pattern* (color-symbol->system-color 'gray))
+(defparameter *green-color* (color-symbol->system-color 'green))
+(defparameter *blue-color* (color-symbol->system-color 'blue))
+(defparameter *dark-green-color* (color-symbol->system-color 'DarkGreen))
+(defparameter *white-color* (color-symbol->system-color 'white))
+(defparameter *gray-color* (mcl-color->system-color 8421504))
+(defparameter *yellow-color* (color-symbol->system-color 'yellow))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :mcl-ccl-colors))

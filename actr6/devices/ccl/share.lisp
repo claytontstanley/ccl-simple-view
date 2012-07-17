@@ -42,6 +42,7 @@
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position :initform (make-point 0 0))
+   (easygui::font :initform (second (parse-mcl-font-lst '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0)))))
    (temp-view-subviews :initarg :view-subviews)
    (easygui::foreground :initform (color-symbol->system-color 'black))
    (easygui::background :initform (#/clearColor ns:ns-color))))
@@ -50,16 +51,27 @@
 ; So, simple-view is top; then view (allows subviews); then types that inherit from view,
 ; like, window, dialog stuff, etc.
 
-(defclass simple-view (easygui::simple-view view-mixin)
-  ((pen-position :accessor pen-position)
+(defclass simple-view (easygui::simple-view view-mixin output-stream)
+  ((pen-position :accessor pen-position :initform (make-point 0 0))
    (bezier-path :accessor bezier-path :initform nil)))
 
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
 
-(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color)
+(defun parse-mcl-back-color (back-color)
   (if back-color
-    (apply #'call-next-method view :back-color (mcl-color->system-color back-color) args)
+    (list :back-color (mcl-color->system-color back-color))))
+
+; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
+; same slot name and expects the font slot to be initialized with a font spec as a list.
+; So in order to make it so that the font slot is correct for easygui, shadow the :view-font
+; initarg if it is provided by the equivalent ns-font value
+
+(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color view-font)
+  (if (or back-color view-font)
+    (let ((view-font-lst (parse-mcl-font-lst view-font))
+          (back-color-lst (parse-mcl-back-color back-color)))
+      (apply #'call-next-method view (append view-font-lst back-color-lst args)))
     (call-next-method)))
 
 #|
@@ -320,6 +332,16 @@
 (defun make-point (x y)
   (easygui::point x y :allow-negative-p t))
 
+(defun make-rect (&rest args)
+  (let ((topleft) (bottomright))
+    (loop for (key val) in (group args 2)
+          do (ecase key
+               (:topleft (setf topleft val))
+               (:bottomright (setf bottomright val))))
+    (destructuring-bind (left top right bottom) (canonicalize-rect topleft bottomright nil nil)
+      (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
+        (ns:make-ns-rect startx starty width height)))))
+
 (defmethod add-points ((p1 easygui::eg-point) (p2 easygui::eg-point))
   (make-point
     (+ (point-x p1) (point-x p2))
@@ -446,6 +468,9 @@
 (defmethod view-origin ((view simple-view))
   (make-point 0 0))
 
+(defmethod origin ((view simple-view))
+  (view-origin view))
+
 (defmethod invalidate-view ((view simple-view) &optional erase-p)
   ; Cocoa takes care of erasing and redrawing; AFAIK this is OK to ignore
   (declare (ignore erase-p))
@@ -517,10 +542,15 @@
                        ,@body)
        (#/restoreGraphicsState ,g!context))))
 
+(defparameter *current-graphics-context-stroke-color* nil)
+
 (defmacro with-fore-color (color &body body)
-  `(with-graphics-context
-     (#/set ,color)
-     ,@body))
+  `(progn
+     (guard ((eq (type-of ,color) 'ns:ns-color) "color ~a is not a system color" ,color) ())
+     (let ((*current-graphics-context-stroke-color* ,color))
+       (with-graphics-context
+         (#/set ,color)
+         ,@body))))
 
 (defmacro with-focused-view (view &body body)
   "Any changes to the graphics environment by body will be directed to the view object"
@@ -718,17 +748,26 @@
         (with-focused-view view
           (#/fill path))))))
 
+(defmethod stroke-ns-rect ((rect ns:ns-rect))
+  (#/strokeRect: ns:ns-bezier-path rect))
+
 (defmethod frame-rect ((view simple-view) left &optional top right bottom)
   (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
     (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
       (let ((rect (ns:make-ns-rect startx starty width height)))
-        (#/strokeRect: ns:ns-bezier-path rect)))))
+        (stroke-ns-rect rect)))))
+
+(defmethod fill-ns-rect ((rect ns:ns-rect) &optional pattern)
+  (#/fillRect: ns:ns-bezier-path rect))
 
 (defmethod fill-rect ((view simple-view) pattern left &optional top right bottom)
   (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
     (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
       (let ((rect (ns:make-ns-rect startx starty width height)))
-        (#/fillRect: ns:ns-bezier-path rect)))))
+        (fill-ns-rect rect pattern)))))
+
+(defmethod paint-rect ((view simple-view) left &optional top right bottom)
+  (fill-rect view (pen-pattern view) left top right bottom))
 
 (defmethod erase-rect ((view window) left &optional top right bottom)
   (erase-rect (content-view view) left top right bottom))
@@ -739,10 +778,11 @@
       (let ((rect (ns:make-ns-rect startx starty width height)))
         (with-focused-view view
           (with-fore-color (get-back-color view)
-            (#/fillRect: ns:ns-bezier-path rect)))))))
+            (fill-ns-rect rect)))))))
 
 (defmethod start-polygon ((view simple-view))
   (setf (bezier-path view) (#/bezierPath ns:ns-bezier-path))
+  (#/retain (bezier-path view))
   (#/moveToPoint: (bezier-path view)
    (easygui::ns-point-from-point (pen-position view))))
 
@@ -753,12 +793,34 @@
 
 (defmethod fill-polygon ((view simple-view) pattern polygon)
   (unwind-protect (with-focused-view view
-                    (with-fore-color (pattern->system-color pattern)
                       (#/fill (bezier-path view))))
-    (setf (bezier-path view) nil)))
+    ())
+
+(defmethod frame-polygon ((view simple-view) polygon)
+  (unwind-protect (with-focused-view view
+                      (#/stroke (bezier-path view))))
+    ())
+
+(defmethod kill-polygon ((polygon ns:ns-bezier-path))
+  (#/release polygon)
+  (setf polygon nil))
 
 (defmethod get-polygon ((view simple-view))
   (bezier-path view))
+
+(defmethod stream-write-string ((v simple-view) string &optional start end)
+  (let* ((string
+           (objc:make-nsstring
+             (if start
+               (subseq string start end)
+               string)))
+         (dict (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
+                (view-font v) #$NSFontAttributeName
+                *current-graphics-context-stroke-color* #$NSForegroundColorAttributeName
+                ccl:+null-ptr+)))
+    (#/drawAtPoint:withAttributes: string
+     (easygui::ns-point-from-point (pen-position v))
+     dict)))
 
 ; Handling fonts and string width/height in pixels
 
@@ -792,19 +854,10 @@
       (if color
         (list :fore-color color)))))
 
-; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
-; same slot name and expects the font slot to be initialized with a font spec as a list.
-; So in order to make it so that the font slot is correct for easygui, shadow the :view-font
-; initarg if it is provided by the equivalent ns-font value
-(defmethod initialize-instance :around ((view easygui::text-fonting-mixin) &rest args &key view-font)
-  (if view-font
-    (let ((font-lst (parse-mcl-font-lst view-font)))
-      (apply #'call-next-method view (append font-lst args)))
-    (call-next-method)))
-
-(defmethod view-font ((view easygui::text-fonting-mixin))
+(defmethod view-font ((view simple-view))
   (guard-!null-ptr
-    (#/font (easygui:cocoa-ref view))))
+    (guard-!nil
+      (easygui:view-font view))))
 
 (defun font-info (font-spec)
   (values (guard-!null-ptr (#/ascender font-spec))
@@ -819,7 +872,6 @@
                 dict))
          (size (#/size attr)))
     (ns:ns-size-width size)))
-
 
 ; Miscellaneous wrappers
 
@@ -908,7 +960,8 @@
   (defvar *load-external-function-orig* #'ccl::load-external-function)
   (with-continue 
     (defun ccl::load-external-function (sym query)
-      (let* ((fun-names (list "showmenubar" "hidemenubar" "getcursor" "showcursor" "ShowCursor" "HideCursor"))
+      (let* ((fun-names (list "showmenubar" "hidemenubar" "getcursor" "showcursor" "ShowCursor" "HideCursor"
+                              "paintrect" "framerect" "drawstring"))
              (the-package (find-package :X86-Darwin64))
              (fun-syms (mapcar (lambda (name)
                                  (intern name the-package))
@@ -947,6 +1000,15 @@
   t)
 
 (defun X86-Darwin64::|showmenubar| ()
+  t)
+
+(defun X86-Darwin64::|paintrect| (rect)
+  (fill-ns-rect rect))
+
+(defun X86-Darwin64::|framerect| (rect)
+  (stroke-ns-rect rect))
+
+(defun X86-Darwin64::|drawstring| ()
   t)
 
 ; And the constants are here

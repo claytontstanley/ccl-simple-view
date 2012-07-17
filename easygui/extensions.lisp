@@ -11,6 +11,9 @@
 ; This flips the screen vertically, so that it matches MCL's default. That is, position 0,0 is at top left
 (setf easygui::*screen-flipped* t)
 
+
+(setf easygui::*debug-cocoa-calls* nil)
+
 ; ----------------------------------------------------------------------
 ; Extend the Objective C cocoa-drawing-view in the easygui package with a view that does not monitor mouse movement or clicks
 ;
