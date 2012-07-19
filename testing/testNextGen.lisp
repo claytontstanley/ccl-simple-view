@@ -5,7 +5,7 @@
 
 (load-file-list "file-lists" "NextGen" "testNextGen.txt")
 
-(simulate-xplane 1 100)
+(simulate-xplane 1 1000)
 
 #|
 ;(view-draw-contents *win*)
