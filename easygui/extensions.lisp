@@ -103,6 +103,10 @@
   (declare (ignore flag))
   (values))
 
+(defmethod easygui::invalidate-view ((view easygui::static-view-mixin) &optional total)
+  (declare (ignore total))
+  (mapc #'easygui::invalidate-view (easygui:view-subviews view)))
+
 ; ----------------------------------------------------------------------
 ; Creating MCL's top-level simple-view class
 ;

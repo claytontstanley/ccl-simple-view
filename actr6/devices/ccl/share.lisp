@@ -117,6 +117,12 @@
 (defmethod window-null-event-handler ((win window))
   ())
 
+(defclass static-contained-view (static-view-mixin contained-view) ())
+
+(defclass static-window (static-view-mixin window)
+  ()
+  (:default-initargs :contained-view-specifically 'static-contained-view)) 
+
 (defclass windoid (window) ())
 
 (defclass simple-overlay-view (easygui::drawing-overlay-view view easygui::drawing-view) 
@@ -467,9 +473,7 @@
   (destructuring-bind (h v) (canonicalize-point h v)
     (#/setBoundsOrigin: (cocoa-ref view) (ns:make-ns-point h v))))
 
-(defmethod invalidate-view ((view simple-view) &optional erase-p)
-  ; Cocoa takes care of erasing and redrawing; AFAIK this is OK to ignore
-  (declare (ignore erase-p))
+(defmethod invalidate-view ((view simple-view))
   (easygui:invalidate-view view))
 
 (defun canonicalize-point (x y)
