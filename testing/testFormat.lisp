@@ -6,6 +6,7 @@
 
 (setf *win*
       (make-instance 'window
+                     :view-position (make-point 10 600)
                      :view-subviews 
                      (list *sv*)))
 (defmethod view-draw-contents ((view (eql *sv*)))
