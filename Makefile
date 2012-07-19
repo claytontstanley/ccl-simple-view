@@ -13,3 +13,6 @@ file-list-% : fl = $*
 file-list-%:
 	cat testing/file-lists/allNotLoaded.txt
 	for fl in ${fl}; do cat testing/file-lists/$$fl/*; done
+
+reformat:
+	git ls-files | grep '.lisp$$' | xargs -n 1 -o -I {} bash -ic "ai {} || true"
