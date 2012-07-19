@@ -559,7 +559,7 @@
   "Any changes to the graphics environment by body will be directed to the view object"
   `(let ((*current-focused-view* ,g!view))
      (easygui:with-focused-view (easygui:cocoa-ref (content-view ,g!view))
-     ,@body)))
+       ,@body)))
 
 (defmacro! with-font-view (o!view &body body)
   `(let ((*current-font-view* ,g!view))
