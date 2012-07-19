@@ -81,14 +81,6 @@
 ;;;; Ships' course class definition
 ;;;; ---------------------------------------------------------------------- ;;;;
 
-#+:clozure
-(defclass static-contained-view (static-view-mixin contained-view) ())
-
-#+:clozure
-(defclass static-window (window)
-  ()
-  (:default-initargs :contained-view-specifically 'static-contained-view)) 
-
 (defclass ships-course-window (procedure-window #+:clozure static-window)
   ((draw-hack-p :accessor draw-hack-p :initarg :draw-hack-p :initform t) 
    (match-p :accessor match-p :initarg :match-p :initform (flip)))
