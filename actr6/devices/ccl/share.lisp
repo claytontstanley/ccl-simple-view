@@ -541,9 +541,58 @@
          (#/set ,g!color)
          ,@body))))
 
-(defmacro with-focused-view (view &body body)
+(defmacro with-fallback-fore-color (color &body body)
+  `(if (null *current-graphics-context-stroke-color*)
+     (with-fore-color ,color
+       ,@body)
+     (progn ,@body)))
+
+(defmacro with-window-fallback-fore-color (view &body body)
+  `(with-fallback-fore-color (get-fore-color (view-window ,view))
+     ,@body))
+
+(defparameter *current-focused-view* nil)
+(defparameter *current-font-view* nil)
+(defparameter *current-graphics-context-font* nil)
+
+(defmacro! with-focused-view (o!view &body body)
   "Any changes to the graphics environment by body will be directed to the view object"
-  `(easygui:with-focused-view (easygui:cocoa-ref (content-view ,view))
+  `(let ((*current-focused-view* ,g!view))
+     (easygui:with-focused-view (easygui:cocoa-ref (content-view ,g!view))
+     ,@body)))
+
+(defmacro! with-font-view (o!view &body body)
+  `(let ((*current-font-view* ,g!view))
+     ,@body))
+
+(defmacro! with-font-focused-view (o!view &body body)
+  `(with-font-view ,g!view
+     (with-focused-view ,g!view
+       ,@body)))
+
+(defmacro with-fallback-focused-view (view &body body)
+  `(if (null *current-focused-view*)
+     (with-focused-view ,view
+       ,@body)
+     (progn ,@body)))
+
+(defmacro with-fallback-font-view (view &body body)
+  `(if (null *current-font-view*)
+     (with-font-view ,view
+       ,@body)
+     (progn ,@body)))
+
+(defmacro! with-fallback-font-focused-view (o!view &body body)
+  `(with-fallback-font-view ,g!view
+     (with-fallback-focused-view ,g!view
+       ,@body)))
+
+(defmacro with-window-of-focused-view-fallback-fore-color (&body body)
+  `(with-window-fallback-fore-color (guard-!nil *current-focused-view*)
+     ,@body))
+
+(defmacro with-font-view-fallback-font (&body body)
+  `(let ((*current-graphics-context-font* (view-font (guard-!nil *current-font-view*))))
      ,@body))
 
 (defmethod wptr ((view window))
@@ -747,30 +796,37 @@
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
          (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
-    (#/stroke path)))
+    (with-fallback-focused-view view
+      (with-window-of-focused-view-fallback-fore-color
+        (#/stroke path)))))
 
 (defmethod fill-oval ((view simple-view) pattern left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
          (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
     (with-focused-view view
-      (#/fill path))))
+      (with-window-of-focused-view-fallback-fore-color
+        (#/fill path)))))
 
 (defmethod stroke-ns-rect ((rect ns:ns-rect))
-  (#/strokeRect: ns:ns-bezier-path rect))
+  (with-window-of-focused-view-fallback-fore-color
+    (#/strokeRect: ns:ns-bezier-path rect)))
 
 (defmethod frame-rect ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
-    (stroke-ns-rect rect)))
+    (with-fallback-focused-view view
+      (stroke-ns-rect rect))))
 
 (defmethod fill-ns-rect ((rect ns:ns-rect) &optional pattern)
-  (#/fillRect: ns:ns-bezier-path rect))
+  (with-window-of-focused-view-fallback-fore-color
+    (#/fillRect: ns:ns-bezier-path rect)))
 
 (defmethod fill-rect ((view simple-view) pattern left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
     (fill-ns-rect rect pattern)))
 
 (defmethod paint-rect ((view simple-view) left &optional top right bottom)
-  (fill-rect view (pen-pattern view) left top right bottom))
+  (with-fallback-focused-view view
+    (fill-rect view (pen-pattern view) left top right bottom)))
 
 (defmethod erase-rect ((view window) left &optional top right bottom)
   (erase-rect (content-view view) left top right bottom))
@@ -794,12 +850,14 @@
 
 (defmethod fill-polygon ((view simple-view) pattern polygon)
   (unwind-protect (with-focused-view view
-                    (#/fill (bezier-path view)))
+                    (with-window-of-focused-view-fallback-fore-color
+                      (#/fill (bezier-path view))))
     ()))
 
 (defmethod frame-polygon ((view simple-view) polygon)
   (unwind-protect (with-focused-view view
-                    (#/stroke (bezier-path view)))
+                    (with-window-of-focused-view-fallback-fore-color
+                      (#/stroke (bezier-path view))))
     ()))
 
 (defmethod kill-polygon ((polygon ns:ns-bezier-path))
@@ -821,27 +879,32 @@
   (guard ((null *stream-prefix-char*) "expecting only a single prefix char before the string; prefix was ~a; new char is ~a" *stream-prefix-char* char) ())
   (setf *stream-prefix-char* char))
 
+(defun draw-string (string)
+  (with-window-of-focused-view-fallback-fore-color
+    (with-font-view-fallback-font
+      (let ((dict (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
+                   *current-graphics-context-font* #$NSFontAttributeName
+                   *current-graphics-context-stroke-color* #$NSForegroundColorAttributeName
+                   ccl:+null-ptr+))
+            (pt (pen-position *current-focused-view*)))
+        (unwind-protect (#/drawAtPoint:withAttributes: string
+                         (ns:make-ns-point
+                           (point-h pt)
+                           ; To mimic MCL positioning, I had to subtract of the ascend pixels from the y position of the pen
+                           (- (point-v pt)
+                              (first (multiple-value-list (font-info *current-graphics-context-font*)))))
+                         dict)
+          (setf *stream-prefix-char* nil))))))
+
 (defmethod stream-write-string ((v simple-view) string &optional start end)
-  (guard-!nil *current-graphics-context-stroke-color*)
-  (let* ((string
-           (objc:make-nsstring
-             (format nil "~a~a" (aif *stream-prefix-char* it "")
-                     (if start
-                       (subseq string start end)
-                       string))))
-         (dict (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
-                (view-font v) #$NSFontAttributeName
-                *current-graphics-context-stroke-color* #$NSForegroundColorAttributeName
-                ccl:+null-ptr+))
-         (pt (pen-position v)))
-    (unwind-protect (#/drawAtPoint:withAttributes: string
-                     (ns:make-ns-point
-                       (point-h pt)
-                       ; To mimic MCL positioning, I had to subtract of the ascend pixels from the y position of the pen
-                       (- (point-v pt)
-                          (first (multiple-value-list (font-info (view-font v))))))
-                     dict)
-      (setf *stream-prefix-char* nil))))
+  (with-fallback-font-focused-view v
+    (let* ((string
+             (objc:make-nsstring
+               (format nil "~a~a" (aif *stream-prefix-char* it "")
+                       (if start
+                         (subseq string start end)
+                         string)))))
+      (draw-string string))))
 
 ; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
 
@@ -1034,8 +1097,8 @@
 (defun X86-Darwin64::|framerect| (rect)
   (stroke-ns-rect rect))
 
-(defun X86-Darwin64::|drawstring| ()
-  t)
+(defun X86-Darwin64::|drawstring| (str)
+  (draw-string str))
 
 ; And the constants are here
 (eval-when (:compile-toplevel :load-toplevel :execute)
