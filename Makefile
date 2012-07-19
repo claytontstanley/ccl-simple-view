@@ -14,5 +14,7 @@ file-list-%:
 	cat testing/file-lists/allNotLoaded.txt
 	for fl in ${fl}; do cat testing/file-lists/$$fl/*; done
 
+exclude-list = ^bincarbon*|^testing|^actr6/devices/ccl/device.lisp|^rmcl/lib/ccl-menus.lisp
+
 reformat:
-	git ls-files | grep '.lisp$$' | xargs -n 1 -o -I {} bash -ic "ai {} || true"
+	git ls-files | grep '.lisp$$' | egrep -v '${exclude-list}' | xargs -n 1 -o -I {} bash -ic "ai {} || true"

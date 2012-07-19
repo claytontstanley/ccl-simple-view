@@ -135,11 +135,11 @@
                              (EASYGUI::POINT 218 125)
                              :TEXT
                              "Design the dialog using MCL's 
-                             Interface Toolkit, then generate
-                             Cocoa user interface code for 
-                             Clozure. ")))
-                             NIL
-                             VIEW)
+                              Interface Toolkit, then generate
+                              Cocoa user interface code for 
+                              Clozure. ")))
+                              NIL
+                              VIEW)
                            (MAKE-INSTANCE
                              'EASYGUI::PUSH-BUTTON-VIEW
                              :POSITION
