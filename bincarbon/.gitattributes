@@ -1,1 +1,1 @@
-procedure-window2.lisp merge=verify
+*.lisp merge=verify
