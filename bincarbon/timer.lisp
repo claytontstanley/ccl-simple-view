@@ -21,20 +21,23 @@
 ;;; Todo        : 
 ;;; 
 ;;; ----- History -----
-;;; 2006.03.03 mdb [r4]
-;;;             : Now works with ACT-R 6.
+;;; 99.11.05 Mike Byrne
+;;;             :  Incept date.
+;;; 00.02.02 mdb
+;;;             : Added unless bound modifications.
+;;; 00.11.15 mdb
+;;;             : Added exit methods.
+;;; 2002.11.24 mdb [r2]
+;;;             : Minor bug fix.
 ;;; 2004.10.31 mdb [r3]
 ;;;             : Added FIND-KEY-COORDS function.  Use 
 ;;;             : (wait-for-keys <timer> #'find-key-coords) to figure out
 ;;;             : what the values are for any particular key.
-;;; 2002.11.24 mdb [r2]
-;;;             : Minor bug fix.
-;;; 00.11.15 mdb
-;;;             : Added exit methods.
-;;; 00.02.02 mdb
-;;;             : Added unless bound modifications.
-;;; 99.11.05 Mike Byrne
-;;;             :  Incept date.
+;;; 2008.06.11 fpt [r4]
+;;;		: ACT-R 6 dropped pm-get-time for mp-time, so I updated
+;;;		current-time and the appropriate unless bound function
+;;;		to reflect this change.
+;;;		
 ;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -68,7 +71,7 @@
    (start-time :accessor start-time :initarg :start-time :initform nil)
    ))
 
-#+:digitool
+
 (defclass ms-timer (timer)
   ((keymap :accessor keymap :initarg :keymap :initform (make-record keymap))
    (map-ptr :accessor map-ptr :initarg :map-ptr :initform nil)
@@ -119,17 +122,12 @@
 (defgeneric current-time (tmr)
   (:documentation "Returns the current time in milliseconds."))
 
-#+:digitool
 (defmethod current-time ((tmr event-timer))
-  (cond (*actr-enabled-p* (pm-get-time))
+  (cond (*actr-enabled-p* (mp-time))
         ((boundp '*current-event*)
          (tick->ms tmr (pref *current-event* :eventrecord.when)))
         (t (tick->ms tmr (#_tickcount)))))
 
-
-#+:clozure
-(defmethod current-time ((tmr event-timer))
-  0)
 
 (defgeneric stop-timing (tmr)
   (:documentation "Stops an event timer at the current event and returns the time in ms."))
@@ -147,13 +145,10 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; ms-level (roughly) keyboard timing
 
-#+:digitool
 (defmethod initialize-instance :after ((tmr ms-timer) &key)
-  ;(setf (map-ptr tmr) (rref (keymap tmr) keymap.array)))
-  (setf (map-ptr tmr) (rref (keymap tmr) keymap.contents)))
+  (setf (map-ptr tmr) (rref (keymap tmr) keymap.array)))
 
 
-#+:digitool
 (defmethod dispose-timer ((tmr ms-timer))
   (dispose-record (keymap tmr)))
 
@@ -161,7 +156,6 @@
   (:documentation "Wait for FCT [a test on the state of keys] to be true, returning the time and optionally which key was pressed."))
 
 
-#+:digitool
 (defmethod wait-for-keys ((tmr ms-timer) (fct function))
   (without-interrupts
    (let ((start (get-internal-real-time)))
@@ -216,7 +210,6 @@
 (defgeneric wait-for-no-keys (tmr)
   (:documentation "Wait until no key is down, returning latency."))
 
-#+:digitool
 (defmethod wait-for-no-keys ((tmr ms-timer))
   (without-interrupts
    (let ((start (get-internal-real-time)))
@@ -225,7 +218,6 @@
        (#_getkeys (keymap tmr)))
      (- (get-internal-real-time) start))))
 
-#+:digitool
 (defmethod test-for-no-key-down ((tmr ms-timer))
   (dotimes (i 16)
     (when (not (= 0 (%get-unsigned-byte (map-ptr tmr) i)))
@@ -236,7 +228,6 @@
 (defgeneric wait-for-any-key (tmr)
   (:documentation "Spins the system until a key is pressed, returns the latency in ms."))
 
-#+:digitool
 (defmethod wait-for-any-key ((tmr ms-timer))
   (without-interrupts
    (let ((start (get-internal-real-time)))
@@ -400,10 +391,8 @@ Else returns sound latency in ms."))
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; bookkeeping
 
-(unless (fboundp 'pm-get-time)
-  (if (fboundp 'get-time)
-    (defun pm-get-time () (get-time))   ; for ACT-R 6
-    (defun pm-get-time () nil)))
+(unless (fboundp 'mp-time)
+  (defun mp-time () nil))
 
 
 (provide :timer)
