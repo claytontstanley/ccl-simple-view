@@ -22,3 +22,6 @@
 [submodule "submodules/nextGen"]
 	path = submodules/nextGen
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/nextGen
+[submodule "submodules/tambo-diss"]
+	path = submodules/tambo-diss
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/tambo-diss
