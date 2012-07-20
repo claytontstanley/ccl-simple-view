@@ -12,7 +12,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 
 ;;; Filename    : procedure-window2.lisp
-;;; Version     : 2.0r5
+;;; Version     : 2.0r6
 ;;; 
 ;;; Description : Code to manage windows that run procedures.
 ;;; 
@@ -21,6 +21,9 @@
 ;;; Todo        : 
 ;;; 
 ;;; ----- History -----
+;;; 2008.03.20 fpt [r6]
+;;;		: Added another slot to proc-action class, info2, to handle
+;;;		subtask-order information from X84.
 ;;; 2006.02.22 mdb
 ;;;             : Now checks to make sure PROBE is not "" in DO-PROBE.  This
 ;;;             : really should never happen anyway, but for some reason it
@@ -287,6 +290,7 @@
    (got :accessor got :initarg :got :initform nil)
    (step-num :accessor step-num :initarg :step-num :initform nil)
    (info :accessor info :initarg :info :initform nil)
+   (info2 :accessor info2 :initarg :info2 :initform nil)
    ))
 
 (defmethod is-error ((p-act proc-action))
@@ -305,6 +309,7 @@
           (got p-act))))
     (terpri strm)
     (when (info p-act) (setf out-lst (append out-lst (list (info p-act)))))
+    (when (info2 p-act) (setf out-lst (append out-lst (list (info2 p-act)))))
     (tab-output out-lst strm)))
 
 
@@ -453,38 +458,9 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; subclasses for use with procedure windows
 
-#+:clozure
-(defclass easygui::cocoa-button-checker (easygui::cocoa-button)
-  ()
-  (:metaclass ns:+ns-object))
-
-#+:clozure
-(defclass checker (easygui::view)
-  ()
-  (:default-initargs :specifically 'easygui::cocoa-button-checker))
-
-; FIXME: I don't like that I have to manage converting the point (so that when the screen is 
-; flipped for MCL, the coordinates are correct). I'm betting there's a more appropriate funciton to
-; use instead of #/locationInWindow, that handles this appropriately
-
-#+:clozure
-(objc:defmethod (#/mouseDown: :void) ((cocoa-self easygui::cocoa-button-checker) the-event)
-  (let* ((self (easygui::easygui-view-of cocoa-self))
-         (ns-point (#/locationInWindow the-event))
-         (ns-converted-point (#/convertPoint:fromView: (#/superview cocoa-self)
-                              ns-point
-                              nil))
-         (where (easygui::eg-point-from-ns-point ns-converted-point)))
-    (when (eq (view-nick-name self) (curr-state (view-window self)))
-      (call-next-method the-event))
-    (handle-click self (point-string (subtract-points where
-                                                      (view-position self))))))
-
-#+:digitool
 (defclass checker ()
   ())
 
-#+:digitool
 (defmethod view-click-event-handler :around ((self checker) where)
   (when (eq (view-nick-name self) (curr-state (view-window self)))
     (call-next-method))
