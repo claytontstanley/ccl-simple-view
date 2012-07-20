@@ -1,4 +1,3 @@
-
 ;;;  -*- mode: LISP; Package: CL-USER; Syntax: COMMON-LISP;  Base: 10 -*-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 
@@ -22,20 +21,23 @@
 ;;; Todo        : 
 ;;; 
 ;;; ----- History -----
-;;; 2006.03.03 mdb [r4]
-;;;             : Now works with ACT-R 6.
+;;; 99.11.05 Mike Byrne
+;;;             :  Incept date.
+;;; 00.02.02 mdb
+;;;             : Added unless bound modifications.
+;;; 00.11.15 mdb
+;;;             : Added exit methods.
+;;; 2002.11.24 mdb [r2]
+;;;             : Minor bug fix.
 ;;; 2004.10.31 mdb [r3]
 ;;;             : Added FIND-KEY-COORDS function.  Use 
 ;;;             : (wait-for-keys <timer> #'find-key-coords) to figure out
 ;;;             : what the values are for any particular key.
-;;; 2002.11.24 mdb [r2]
-;;;             : Minor bug fix.
-;;; 00.11.15 mdb
-;;;             : Added exit methods.
-;;; 00.02.02 mdb
-;;;             : Added unless bound modifications.
-;;; 99.11.05 Mike Byrne
-;;;             :  Incept date.
+;;; 2008.06.11 fpt [r4]
+;;;		: ACT-R 6 dropped pm-get-time for mp-time, so I updated
+;;;		current-time and the appropriate unless bound function
+;;;		to reflect this change.
+;;;		
 ;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -122,7 +124,7 @@
 
 #+:digitool
 (defmethod current-time ((tmr event-timer))
-  (cond (*actr-enabled-p* (pm-get-time))
+  (cond (*actr-enabled-p* (mp-time))
         ((boundp '*current-event*)
          (tick->ms tmr (pref *current-event* :eventrecord.when)))
         (t (tick->ms tmr (#_tickcount)))))
@@ -401,10 +403,8 @@ Else returns sound latency in ms."))
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; bookkeeping
 
-(unless (fboundp 'pm-get-time)
-  (if (fboundp 'get-time)
-    (defun pm-get-time () (get-time))   ; for ACT-R 6
-    (defun pm-get-time () nil)))
+(unless (fboundp 'mp-time)
+  (defun mp-time () nil))
 
 
 (provide :timer)
