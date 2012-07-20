@@ -133,7 +133,7 @@
     (setf (snd-alis self) *pool*))
   (when (preload self)
     (dolist (name (preload self) nil)
-      (get-resource-val name (snd-alis self)))))
+      (get-resource-val name 'sound (snd-alis self)))))
 
 ;;; RELEASE-PLAYER      [Method]
 ;;; Date        : 97.01.21
@@ -175,7 +175,7 @@
 
 #+:clozure
 (defmethod play-snd ((player snd-player) snd-name &optional async)
-  (let ((snd (get-resource-val snd-name (snd-alis player))))
+  (let ((snd (get-resource-val snd-name 'sound (snd-alis player))))
     (#/play snd)
     (unless async
       (process-wait

@@ -152,7 +152,7 @@
 (defclass action-view-mixin (easygui::action-view-mixin) ())
 
 (defclass dialog-item (view view-text-mixin action-view-mixin)
-  ()
+  ((easygui::dialog-item-enabled-p :initarg :enabled-p))
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
 
@@ -244,7 +244,7 @@
 (defmethod initialize-instance :after ((view icon-dialog-item) &key)
   (when (slot-boundp view 'icon)
     (#/setImage: (easygui:cocoa-ref view)
-     (get-resource-val (icon->pict-id (icon view))))))
+     (get-resource-val (icon->pict-id (icon view)) 'image))))
 
 (defclass image-view-mixin ()
   ((pict-id :reader pict-id :initarg :pict-id)
@@ -252,7 +252,7 @@
 
 (defmethod (setf pict-id) (pict-id (view image-view-mixin))
   (unwind-protect (setf (slot-value view 'pict-id) pict-id)
-    (#/setImage: (easygui:cocoa-ref (image-view view)) (get-resource-val pict-id))))
+    (#/setImage: (easygui:cocoa-ref (image-view view)) (get-resource-val pict-id 'image))))
 
 (defmethod initialize-instance :after ((view image-view-mixin) &key)
   (let ((image-view (make-instance 'back-image-view
@@ -261,7 +261,7 @@
     (setf (image-view view) image-view)
     (add-subviews view image-view)
     (when (slot-boundp view 'pict-id)
-      (#/setImage: (easygui:cocoa-ref image-view) (get-resource-val (pict-id view))))))
+      (#/setImage: (easygui:cocoa-ref image-view) (get-resource-val (pict-id view) 'image)))))
 
 ; Place all images in the background (behind all other views). Do this by
 ; specializing on the add-1-subview method in the easygui package. And call
@@ -473,7 +473,10 @@
   (destructuring-bind (h v) (canonicalize-point h v)
     (#/setBoundsOrigin: (cocoa-ref view) (ns:make-ns-point h v))))
 
-(defmethod invalidate-view ((view simple-view))
+; Note that this is MCL's arglist spec. The erase-p isn't needed for CCL,
+; but it should be kept here so that MCL code calling invalidate-view still works.
+(defmethod invalidate-view ((view simple-view) &optional erase-p)
+  (declare (ignore erase-p))
   (easygui:invalidate-view view))
 
 (defun canonicalize-point (x y)
@@ -821,8 +824,9 @@
     (#/fillRect: ns:ns-bezier-path rect)))
 
 (defmethod fill-rect ((view simple-view) pattern left &optional top right bottom)
-  (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
-    (fill-ns-rect rect pattern)))
+  (with-fallback-focused-view view
+    (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
+      (fill-ns-rect rect pattern))))
 
 (defmethod paint-rect ((view simple-view) left &optional top right bottom)
   (with-fallback-focused-view view

@@ -28,6 +28,7 @@
 
 (defclass resource ()
   ((val :accessor val :initarg :val)
+   (type :accessor type :initarg :type)
    (alloc-fn :accessor alloc-fn :initarg :alloc-fn)))
 
 (defmacro when-bound ((name instance))
@@ -57,21 +58,38 @@
   (alloc-resource obj)
   (val obj))
 
-(defun get-resource (id &optional (pool *pool*))
-  (multiple-value-bind (resource present-p) (gethash id pool)
-    (unless present-p
-      (error "resource with id ~a not present in pool ~a~%" id pool))
-    resource))
+(defun get-resource (id &optional type (pool *pool*))
+  (let ((possible-types
+          (if type 
+            (list type)
+            (list 'image 'sound)))
+        out)
+    (dolist (type possible-types)
+      (multiple-value-bind (resource present-p) (gethash (get-key id type) pool)
+        (when present-p
+          (push resource out))))
+    (if out
+      (if (eq (length out) 1)
+        (first out)
+        (error "multiple resources with id ~a present in pool ~a~%" id pool))
+      (error "resource with id ~a not present in pool ~a~%" id pool))))
 
-(defun get-resource-val (id &optional (pool *pool*))
-  (get-val (get-resource id pool)))
+(defun get-resource-val (id &optional type (pool *pool*))
+  (get-val (get-resource id type pool)))
 
 (defun get-id (resource &optional (pool *pool*))
   (declare (ignore resource pool))
   (error "write this when needed"))
 
+(defun get-key (id type)
+  (format nil "~a.~a" id type))
+
 (defun add-resource (resource id &optional (pool *pool*))
-  (setf (gethash id pool) resource))
+  (multiple-value-bind (cur-resource present-p) (gethash (get-key id (type resource)) pool)
+    (when present-p
+      (error "attempting to add resource ~a with id ~a that is already present in pool ~a~% as ~a"
+             resource id pool cur-resource)))
+  (setf (gethash (get-key id (type resource)) pool) resource))
 
 (defun remove-resource (resource &optional (pool *pool*))
   (declare (ignore resource pool))
@@ -80,6 +98,7 @@
 (defmethod create-resource ((type (eql 'image)) path)
   (make-instance 
     'resource
+    :type type
     :alloc-fn
     (lambda ()
       (#/initWithContentsOfFile: 
@@ -89,6 +108,7 @@
 (defmethod create-resource ((type (eql 'sound)) path)
   (make-instance
     'resource
+    :type type
     :alloc-fn
     (lambda ()
       (#/initWithContentsOfFile:byReference:
