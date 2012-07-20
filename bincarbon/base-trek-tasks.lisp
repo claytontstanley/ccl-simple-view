@@ -12,7 +12,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 
 ;;; Filename    : base-trek-tasks.lisp
-;;; Version     : r4
+;;; Version     : r5
 ;;; 
 ;;; Description : Base classes for Conn (or ship's course), phaser, and 
 ;;;             : transporter tasks.
@@ -81,7 +81,7 @@
 ;;;; Ships' course class definition
 ;;;; ---------------------------------------------------------------------- ;;;;
 
-(defclass ships-course-window (procedure-window #+:clozure static-window)
+(defclass ships-course-window (procedure-window)
   ((draw-hack-p :accessor draw-hack-p :initarg :draw-hack-p :initform t) 
    (match-p :accessor match-p :initarg :match-p :initform (flip)))
   (:default-initargs
@@ -1074,16 +1074,6 @@
     (dialog-item-enable ted)
     (set-selection-range ted 0 1)))
 
-#|
-(inspect *exp*)
-(setf wind (task-window *experiment*))
-(view-named :frequency *wind*)
-(view-named :calibration *wind*)
-(inspect *)
-(dialog-item-disable *)
-(dialog-item-enable *)
-(curr-state *wind*)
-|#
 
 (defmethod check-freq ((wind transporter-window))
   (let ((freq (freq-val wind)))
@@ -1444,16 +1434,19 @@
   ()
   (:default-initargs
     :window-title "Jammer"
-    :state-vec #(:enter-calibration 
-                 :type :accept-calibration
-                 :scanner-on :active-scan :lock-signal :scanner-off
-                 :transporter-power :desynchronize
+    :state-vec #(:tracker-on :modulator :fix-frequency :tracker-off
+                 :enter-calibration :type :accept-calibration
+                 :auxiliary-power :desynchronize
                  :shoot :desynchronize :main-control)
     :gui-vec #(nil nil (check-box-check . :accept-calibration)
                    (radio-button-push . :scanner-on) 
                    (radio-button-push . :active-scan)
                    (radio-button-push . :lock-signal)
-                   (radio-button-push . :scanner-off)                    
+                   (radio-button-push . :scanner-off)   
+                   (radio-button-push . :tracker-on)
+                   (radio-button-push . :modulator)
+                   (radio-button-push . :fix-frequency)
+                   (radio-button-push . :tracker-off)
                    (check-box-check . :transporter-power) nil nil nil nil)
     :pict-name "transporter-extra-buttons"
     :key-state :accept-calibration
@@ -1703,15 +1696,32 @@
   (dialog-item-disable (view-named :calibration wind))
   )
 
+;; new version
+(defmethod check-state-update ((wind jammer-window) state)
+  ;(print state)
+  (case state
+    (:tracker-on (status wind ""))
+    (:modulator (setf (scan-p wind) t))
+    (:fix-frequency (setf (scan-p wind) nil))
+    (:desynchronize (if (eq (state-num wind) 8)
+                      (begin-tracking wind)
+                      (unless (postcomp-p wind) (give-feedback wind)))) ;check
+    (:accept-calibration (check-freq wind)) ;check
+    (:shoot (cease-tracking wind)) ;check
+    (:main-control (finish-task wind)) ;check
+    ))
 
 
+
+;; old version
+#|
 (defmethod check-state-update ((wind jammer-window) state)
   ;(print state)
   (case state
     (:enter-calibration (progn  (status wind "") 
                                 (activate-freq-2 wind)))        ; mdb change
-    (:active-scan (setf (scan-p wind) t))
-    (:lock-signal (setf (scan-p wind) nil))
+    (:modulator (setf (scan-p wind) t))
+    (:fix-frequency (setf (scan-p wind) nil))
     (:desynchronize (if (eq (state-num wind) 8)
                       (begin-tracking wind)
                       (unless (postcomp-p wind) (give-feedback wind))))
@@ -1719,9 +1729,15 @@
     (:shoot (cease-tracking wind))
     (:main-control (finish-task wind))
     ))
+|#
 
 
 (defmethod activate-freq-2 ((wind jammer-window))
+  (let ((ted (view-named :calibration wind)))
+    (dialog-item-enable ted)
+    (set-selection-range ted 0 1)))
+
+(defmethod activate-calibration ((wind jammer-window))
   (let ((ted (view-named :calibration wind)))
     (dialog-item-enable ted)
     (set-selection-range ted 0 1)))
@@ -1776,8 +1792,8 @@
 
 (defmethod reset-display ((wind jammer-window))
   (check-box-uncheck (view-named :accept-calibration wind))
-  (check-box-uncheck (view-named :transporter-power wind))
-  (radio-button-push (view-named :scanner-off wind))
+  (check-box-uncheck (view-named :auxiliary-power wind))
+  (radio-button-push (view-named :tracker-off wind))
   (set-dialog-item-text (view-named :calibration wind) "0")
   (dotimes (i 4)
     (awhen (scan-marker wind (1+ i))
