@@ -3,9 +3,6 @@
 
 (setf *pool* (init-pool))
 
-(get-resource "phaser")
-  
-
 (defclass test-image (image-view-mixin view)
   ())
 

@@ -115,9 +115,6 @@
                 (window-null-event-handler win)
                 (sleep .2)))))))
 
-(defmethod window-null-event-handler :before ((win window))
-  (format t "window null for win ~a~%" win))
-
 (defmethod window-null-event-handler ((win window))
   ())
 
