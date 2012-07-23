@@ -185,18 +185,17 @@
                                :wind wind) t))
 
 
-
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; the WM tester class
 
 (defclass wm-tester ()
-  ((delay :accessor delay :initarg :delay :initform 3000)
+  ((delay :accessor delay :initarg :delay :initform (* 3 internal-time-units-per-second))
    (snd-lst :accessor snd-lst :initarg :snd-lst 
             :initform '("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" 
                         "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"))
    (probe-len :accessor probe-len :initarg :probe-len :initform nil)
    (last-time :accessor last-time :initarg :last-time 
-              :initform (+ (get-internal-real-time) 8000))
+              :initform (+ (get-internal-real-time) (* 8 internal-time-units-per-second)))
    (curr-stims :accessor curr-stims :initarg :curr-stims :initform nil)
    (snd-player :accessor snd-player :initarg :snd-player :initform nil)
    (results :accessor results :initarg :results :initform nil)
@@ -205,15 +204,12 @@
    (probe-depth :accessor probe-depth :initarg :probe-depth :initform 3)
    ))
 
-
 (defmethod initialize-instance :after ((wmt wm-tester) &key)
   (reset-probe wmt))
 
 (defmethod reset-time ((wmt wm-tester))
-  (setf (last-time wmt) (+ (get-internal-real-time) 4000)))
+  (setf (last-time wmt) (+ (get-internal-real-time) (* 4 internal-time-units-per-second))))
                       
-
-
 (defmethod do-wm-check ((wmt wm-tester) (wind window))
   (unless (< (- (get-internal-real-time) (last-time wmt))
              (delay wmt))
@@ -261,7 +257,7 @@
          (delta-score *sw* *wm-penalty)
          ))
      (push (list correct-p probe response finish start) (results wmt))
-     (reset-probe wmt 1000)
+     (reset-probe wmt (* 1 internal-time-units-per-second))
      ;(values (- finish start) correct-p)
      )))
 
@@ -389,6 +385,15 @@
   (setf (advance-p wind) t)
   (gui-check wind)                      ; r2 new
   (check-state-update wind (curr-state wind))
+  
+  ; I had to add this in so that the code below (curr-state.. in particular)
+  ; does not execute after the trial is finished, b/c at that point curr-state is undefined.
+  ; This may have worked under RMCL b/c return-from-modal-dialog caused the calling process
+  ; to immediately halt. With CCL, the calling process does not halt immediately, so the current
+  ; fix is to just let the calling process exit gracefully for CCL.
+  (when (eq (state-num wind) (1- (length (state-vec wind))))
+    (return-from advance-state (values)))
+  
   (when (advance-p wind)
     (incf (state-num wind)))
   (unless (training-p wind)
@@ -434,7 +439,7 @@
 (defmethod elapsed-secs ((wind procedure-window))
   (round (- (get-internal-real-time)
             (start-time wind))
-         1000))
+         internal-time-units-per-second))
 
 
 (defmethod check-wm ((wind procedure-window))

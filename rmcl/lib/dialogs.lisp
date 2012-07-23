@@ -10,7 +10,7 @@
   `(progn
      (guard ((null *ret*) "modal dialog system in inconsistent state; aborting"))
      (setf *ret* (cons :return (multiple-value-list ,form)))
-     (#/abortModal (#/sharedApplication ns:ns-application))
+     (#/stopModal (#/sharedApplication ns:ns-application))
      (values)))
 
 (defmethod modal-dialog ((dialog window) &optional (close-on-exit t))

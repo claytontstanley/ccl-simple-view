@@ -111,8 +111,12 @@
           (format nil "maintenance thread for win ~a" win)
           (lambda ()
             (while (wptr win)
-              (sleep .1)
-              (window-null-event-handler win))))))
+              (when (eq win (easygui::easygui-window-of (gui::front-window)))
+                (window-null-event-handler win)
+                (sleep .2)))))))
+
+(defmethod window-null-event-handler :before ((win window))
+  (format t "window null for win ~a~%" win))
 
 (defmethod window-null-event-handler ((win window))
   ())
@@ -993,22 +997,41 @@
 (defun event-dispatch ()
   ())
 
+(defun get-directory-with-fallback (directory)
+  (aif directory
+    it
+    (aif *load-truename*
+      (directory-namestring it))))
+
+
+
 (defun choose-file-dialog (&key directory mac-file-type button-string prompt file)
-  (gui::cocoa-choose-file-dialog :directory directory
-                                 :file-types mac-file-type
+  (gui::cocoa-choose-file-dialog :directory (get-directory-with-fallback directory)
+                                 :file-types (aif mac-file-type (os-type->extensions it))
                                  :file file
                                  :button-string button-string))
+
+(defun find-window (title &optional class)
+  (let ((title (format nil "~a" title)))
+    (do-array (cocoa-win (#/windows (#/sharedApplication ns:ns-application)))
+      (when (eq (class-name (class-of cocoa-win)) 'easygui::cocoa-window)
+        (let* ((wintitle (objc:lisp-string-from-nsstring (#/title cocoa-win)))
+               (clos-win (easygui::easygui-window-of cocoa-win))
+               (winclass (class-name (class-of clos-win)))
+               (prefix (subseq wintitle 0 (min (length wintitle) (length title)))))
+          (when (string-equal prefix title)
+            (when (or (not class) (eq class winclass))
+              (return-from find-window clos-win))))))))
+
+; FIXME: Write this
+(defun os-type->extensions (os-type)
+  ())
 
 (defun choose-new-file-dialog (&key directory prompt button-string)
   (gui::cocoa-choose-new-file-dialog :directory directory))
 
 (defun choose-directory-dialog (&key directory)
-  (let ((directory
-          (aif directory
-            it
-            (aif *load-truename*
-              (directory-namestring it)))))
-    (easygui:choose-directory-dialog :directory directory)))
+  (easygui:choose-directory-dialog :directory (get-directory-with-fallback directory)))
 
 ; ----------------------------------------------------------------------
 ; Manipulate the read table so that MCL's #@(a b) make-point shorthand works. 
