@@ -386,6 +386,19 @@
 (defmethod window-show ((win window))
   (easygui:window-show win))
 
+(defun find-window (title &optional class)
+  (let ((title (format nil "~a" title)))
+    (do-array (cocoa-win (#/windows (#/sharedApplication ns:ns-application)))
+      (when (eq (class-name (class-of cocoa-win)) 'easygui::cocoa-window)
+        (let* ((wintitle (objc:lisp-string-from-nsstring (#/title cocoa-win)))
+               (clos-win (easygui::easygui-window-of cocoa-win))
+               (winclass (class-name (class-of clos-win)))
+               (prefix (subseq wintitle 0 (min (length wintitle) (length title)))))
+          (when (string-equal prefix title)
+            (when (or (not class) (eq class winclass))
+              (return-from find-window clos-win)))))))
+  nil)
+
 ;FIXME: This looks very strange. Prob related to Phaser's floating window
 (defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))
   (window-select w))
@@ -1010,18 +1023,6 @@
                                  :file-types (aif mac-file-type (os-type->extensions it))
                                  :file file
                                  :button-string button-string))
-
-(defun find-window (title &optional class)
-  (let ((title (format nil "~a" title)))
-    (do-array (cocoa-win (#/windows (#/sharedApplication ns:ns-application)))
-      (when (eq (class-name (class-of cocoa-win)) 'easygui::cocoa-window)
-        (let* ((wintitle (objc:lisp-string-from-nsstring (#/title cocoa-win)))
-               (clos-win (easygui::easygui-window-of cocoa-win))
-               (winclass (class-name (class-of clos-win)))
-               (prefix (subseq wintitle 0 (min (length wintitle) (length title)))))
-          (when (string-equal prefix title)
-            (when (or (not class) (eq class winclass))
-              (return-from find-window clos-win))))))))
 
 ; FIXME: Write this
 (defun os-type->extensions (os-type)
