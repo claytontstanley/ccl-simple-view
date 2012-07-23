@@ -20,6 +20,7 @@
   (make-hash-table :test #'equalp))
 
 (defvar *pool* (init-pool))
+(defvar *resource-types* nil)
 
 (defun print-pool (&optional (pool *pool*))
   (maphash (lambda (key val)
@@ -62,8 +63,8 @@
   (let ((possible-types
           (if type 
             (list type)
-            (list 'image 'sound)))
-        out)
+            *resource-types*))
+        (out))
     (dolist (type possible-types)
       (multiple-value-bind (resource present-p) (gethash (get-key id type) pool)
         (when present-p
@@ -98,7 +99,6 @@
 (defmethod create-resource ((type (eql 'image)) path)
   (make-instance 
     'resource
-    :type type
     :alloc-fn
     (lambda ()
       (#/initWithContentsOfFile: 
@@ -108,13 +108,19 @@
 (defmethod create-resource ((type (eql 'sound)) path)
   (make-instance
     'resource
-    :type type
     :alloc-fn
     (lambda ()
       (#/initWithContentsOfFile:byReference:
        (#/alloc ns:ns-sound)
        (objc:make-nsstring path)
        nil))))
+
+(defmethod create-resource :around (type path)
+  (declare (ignore path))
+  (let ((res (call-next-method)))
+    (pushnew type *resource-types*)
+    (setf (type res) type)
+    res))
 
 ; I am requiring all objective-c/lisp functions to not ever use ns-arrays as inputs or outputs
 ; This slows down computation time b/c conversions have to be done within each function, but it
