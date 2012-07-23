@@ -19,30 +19,41 @@
 (defparameter *image-path*
   (format nil "~a~a/~a" (directory-namestring *load-truename*) "data" "voteboxbg.tiff"))
 
-(current-directory)
 (defparameter *image* (create-resource 'image *image-path*))
 
-(assert (not (slot-boundp *image* 'val)))
-
+(check (not (slot-boundp *image* 'val)))
+(add-resource *image* "voteboxbg")
+(check (not (slot-boundp *image* 'val)))
 
 (add-resource *image* "image")
 
-(assert (not (slot-boundp *image* 'val)))
+(setf *image-path*
+      (format nil "~a~a/~a" (directory-namestring *load-truename*) "data" "voteboxbg.aif"))
 
-(print-pool *pool*)
-(let ((res (get-resource-val "image")))
-  (assert (eq res (val *image*))))
+(add-resource (create-resource 'sound *image-path*) "voteboxbg")
 
-(assert (slot-boundp *image* 'val))
+(let ((res (get-resource-val "voteboxbg" 'image)))
+  (check (eq res (val *image*))))
 
-(print-pool *pool*)
-(print *pool*)
+(check (errors-p
+         (get-resource "voteboxbg")))
+
+(check (not (errors-p
+              (get-resource "voteboxbg" 'image))))
+
+(check (not (errors-p
+              (get-resource "image"))))
+
+(check (slot-boundp *image* 'val))
+
+(capture-output nil (print-pool *pool*))
+;(print *pool*)
 
 (add-subviews *win* *view*)
 
 (sleep 1)
 
-(setf (pict-id *view*) "image")
+(setf (pict-id *view*) "voteboxbg")
 
 
 
