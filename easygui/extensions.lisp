@@ -158,3 +158,20 @@
 (objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-field) the-event)
   (call-next-method the-event)
   (#/keyDown: (#/window cocoa-self) the-event))
+
+(defmethod easygui::cocoa-win-p ((win t))
+  nil)
+
+(defmethod easygui::cocoa-win-p ((win easygui::cocoa-window))
+  t)
+
+
+
+
+
+
+
+
+
+
+
