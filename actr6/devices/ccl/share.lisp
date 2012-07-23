@@ -111,10 +111,9 @@
           (format nil "maintenance thread for win ~a" win)
           (lambda ()
             (while (wptr win)
-              (let ((cocoa-win (gui::front-window)))
-                (when (easygui::cocoa-win-p cocoa-win)
-                  (when (eq win (easygui::easygui-window-of cocoa-win))
-                    (window-null-event-handler win))))
+              (awhen (get-front-window)
+                (when (eq win it)
+                  (window-null-event-handler win)))
               (sleep .2))))))
 
 (defmethod window-null-event-handler ((win window))
@@ -126,7 +125,14 @@
   ()
   (:default-initargs :contained-view-specifically 'static-contained-view)) 
 
-(defclass windoid (window) ())
+(defclass windoid (window)
+  ((easygui::level :initform 1)))
+
+(defmethod windoid-p ((win t))
+  nil)
+
+(defmethod windoid-p ((win windoid))
+  t)
 
 (defclass simple-overlay-view (easygui::drawing-overlay-view view easygui::drawing-view) 
   ()
@@ -398,9 +404,18 @@
               (return-from find-window clos-win)))))))
   nil)
 
+(defun get-front-window ()
+  (let ((wins (gui::windows)))
+    (setf wins (remove-if-not #'easygui::cocoa-win-p wins))
+    (setf wins (mapcar #'easygui::easygui-window-of wins))
+    (setf wins (remove-if #'windoid-p wins))
+    (car wins)))
+
 ;FIXME: This looks very strange. Prob related to Phaser's floating window
 (defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))
-  (window-select w))
+  nil)
+
+;(window-select w))
 
 (defmethod set-window-layer ((window window) new-layer &optional include-invisibles)
   'fixme)

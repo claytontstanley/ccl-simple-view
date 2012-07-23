@@ -3,7 +3,11 @@
 
 (setf *win* (make-instance 'window))
 
+(make-instance 'windoid)
+
 (inspect *win*)
+
+(#/level (cocoa-ref *win*))
 
 (move-to *win* 0 0)
 
