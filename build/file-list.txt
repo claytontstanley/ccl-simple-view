@@ -13,4 +13,5 @@ rmcl/lib/dialogs.lisp
 rmcl/lib/ccl-menus.lisp
 rmcl/examples/thermometer.lisp
 actr6/devices/ccl/device.lisp
+actr6/devices/ccl/device-extensions.lisp
 actr6/devices/ccl/uwi.lisp

@@ -487,6 +487,9 @@
 (defmethod radio-button-push ((item radio-button-dialog-item))
   (easygui:radio-button-select item))
 
+(defmethod radio-button-pushed-p ((item radio-button-dialog-item))
+  (easygui:radio-button-selected-p item))
+
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
 

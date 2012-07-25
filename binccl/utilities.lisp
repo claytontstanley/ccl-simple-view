@@ -49,9 +49,9 @@
    strings, returning two values: the list of strings and the number of
    lines read."
   (with-open-file (s path)
-    (loop for line = (read-line s nil nil)
-          while line
-          collect line into lines
+    (loop for cline = (read-line s nil nil)
+          while cline
+          collect cline into lines
           counting t into line-count
           finally (return (values lines line-count)))))
 

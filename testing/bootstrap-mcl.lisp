@@ -14,3 +14,7 @@
   #\# #\/
   (defun |#/-reader| (stream char arg)
     nil))
+
+(defclass editable-text-dialog-item (fred-dialog-item)
+  ((dialog-item-enabled-p :initarg :enabled-p)))
+

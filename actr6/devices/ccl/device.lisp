@@ -125,12 +125,13 @@
 (defgeneric get-sub-objects (view)
   (:documentation  "Grabbing the sub-objects of a view by default returns the subviews."))
 
-(defmethod get-sub-objects ((v view))
+(defmethod get-sub-objects ((v simple-view))
   (subviews v))
 
 
 
-(defmethod build-vis-locs-for ((self view) (vis-mod vision-module))
+(defmethod build-vis-locs-for ((self simple-view) (vis-mod vision-module))
+  (break)
   (let ((subs (get-sub-objects self))
         (outlis nil))
     (dolist (sub subs outlis)
@@ -146,8 +147,7 @@
                                  kind visual-object
                                  value unknown))))))
     (setf (chunk-visual-object f) self)))
-
-
+|#
 
 (defmethod build-vis-locs-for ((self editable-text-dialog-item)
                                   (vis-mod vision-module))
@@ -176,7 +176,6 @@
       (setf (chunk-visual-object x) self))
     feats))
 
-|#
 (defmethod build-vis-locs-for ((self button-dialog-item)
                                   (vis-mod vision-module))
   (let* ((btn-width (point-h (view-size self)))
@@ -228,24 +227,21 @@
     
     feats))
 
-#|
-|#
-
-
-#| Not adding these in at this point - only the basics which are shared
-   by acl/mcl/virtual
-
-(defmethod build-features-for ((self radio-button-dialog-item)
+(defmethod build-vis-locs-for ((self radio-button-dialog-item)
                                (vis-mod vision-module))
   (let* ((btn-height (point-v (view-size self)))
          (text (dialog-item-text self)))
     (cons
-     (make-instance 'oval-feature 
-       :x (+ 7 (point-h (view-position self))) :y (py (view-loc self))
-       :width 11 :height 11 :screen-obj self
-       :color (if (radio-button-pushed-p self)
-                'black
-                'light-gray))
+      (car (define-chunks-fct `((isa visual-location
+                                     screen-x ,(+ 7 (point-h (view-position self)))
+                                     screen-y ,(py (view-loc self))
+                                     kind oval
+                                     value oval
+                                     height 11
+                                     width 11
+                                     color ,(if (radio-button-pushed-p self)
+                                              'black
+                                              'light-gray)))))
      (unless (equal text "")
        (let* ((font-spec (view-font self))
               (start-y nil)
@@ -276,17 +272,21 @@
 ;;; Description : Very much like radio buttons, but if checked add an 
 ;;;             : "X" to the output.
 
-(defmethod build-features-for ((self check-box-dialog-item)
+(defmethod build-vis-locs-for ((self check-box-dialog-item)
                                   (vis-mod vision-module))
   (let ((btn-height (point-v (view-size self)))
         (text (dialog-item-text self))
         (feats nil))
     (setf feats
           (cons
-           (make-instance 'rect-feature 
-             :x (+ 8 (point-h (view-position self))) :y (py (view-loc self))
-             :width 11 :height 11 :color 'light-gray
-             :screen-obj self)
+            (car (define-chunks-fct `((isa visual-location
+                                           screen-x ,(+ 8 (point-h (view-position self)))
+                                           screen-y ,(py (view-loc self))
+                                           kind visual-object
+                                           value box
+                                           height 11
+                                           width 11
+                                           color light-gray))))
            (unless (equal text "")
              (let* ((font-spec (view-font self))
                     (start-y nil)
@@ -313,20 +313,16 @@
     (when (check-box-checked-p self)
       (setf feats
             (cons
-             (make-instance 'icon-feature
-               :x (+ 8 (point-h (view-position self)))
-               :y (py (view-loc self))
-               :kind 'visual-object
-               :value 'check
-               :screen-obj self
-               :height 11
-               :width 11)               
-             
+              (car (define-chunks-fct `((isa visual-location
+                                             screen-x ,(+ 8 (point-h (view-position self)))
+                                             screen-y ,(py (view-loc self))
+                                             kind visual-object
+                                             value check
+                                             height 11
+                                             width 11))))
              feats)))
     feats
     ))
-
-|#
 
 #|
 (defmethod button-p (obj)
@@ -420,13 +416,6 @@
 
 
 |#
-
-(defmethod view-loc ((self view))
-  (let ((pos (view-position self))
-        (size (view-size self)))
-    (vector (round (+ (point-h pos) (/ (point-h size) 2)))
-            (round (+ (point-v pos) (/ (point-v size) 2))))))
-
 
 (defmethod view-loc ((self simple-view))
   (let ((pos (view-position self))
