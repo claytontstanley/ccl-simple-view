@@ -1,3 +1,4 @@
+
 #+:clozure (defmethod build-vis-locs-for ((view image-view) (vm vision-module))
              (declare (ignore view vm))
              nil)
@@ -29,15 +30,16 @@
                                                      (+ ascent descent))) 2)))
             (dolist (item textlines (nreverse accum))
               (push
-                (build-string-feats vis-mod :text item
-                                    :start-x 
-                                    (+ (point-h (view-position self))
-                                       17)
-                                    :y-pos 
-                                    (+ start-y (round (+ ascent descent) 2))
-                                    :width-fct width-fct 
-                                    :height (min ascent btn-height)
-                                    :obj self)
+                (set-color-of-feats (system-color->symbol (part-color self :text))
+                                    (build-string-feats vis-mod :text item
+                                                        :start-x 
+                                                        (+ (point-h (view-position self))
+                                                           17)
+                                                        :y-pos 
+                                                        (+ start-y (round (+ ascent descent) 2))
+                                                        :width-fct width-fct 
+                                                        :height (min ascent btn-height)
+                                                        :obj self))
                 accum)
               (incf start-y (+ ascent descent)))))))))
 
@@ -72,15 +74,16 @@
                                                            (+ ascent descent))) 2)))
                   (dolist (item textlines (nreverse accum))
                     (push
-                      (build-string-feats vis-mod :text item
-                                          :start-x 
-                                          (+ (point-h (view-position self))
-                                             17)
-                                          :y-pos 
-                                          (+ start-y (round (+ ascent descent) 2))
-                                          :width-fct width-fct 
-                                          :height (min ascent btn-height)
-                                          :obj self)
+                      (set-color-of-feats (system-color->symbol (part-color self :text))
+                                          (build-string-feats vis-mod :text item
+                                                              :start-x 
+                                                              (+ (point-h (view-position self))
+                                                                 17)
+                                                              :y-pos 
+                                                              (+ start-y (round (+ ascent descent) 2))
+                                                              :width-fct width-fct 
+                                                              :height (min ascent btn-height)
+                                                              :obj self))
                       accum)
                     (incf start-y (+ ascent descent))))))))
     (when (check-box-checked-p self)
@@ -94,5 +97,4 @@
                                              height 11
                                              width 11))))
               feats)))
-    feats
-    ))
+    feats))

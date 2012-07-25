@@ -645,7 +645,7 @@
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (easygui:view-position view) local-pos))
 
-(defmethod part-color ((view easygui:static-text-view) (part (eql :text)))
+(defmethod part-color ((view view-text-mixin) (part (eql :text)))
   (declare (ignore part))
   (get-fore-color view))
 
