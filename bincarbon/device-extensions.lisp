@@ -1,6 +1,6 @@
-(defmethod build-vis-locs-for ((view image-view) (vm vision-module))
-  (declare (ignore view vm))
-  nil)
+#+:clozure (defmethod build-vis-locs-for ((view image-view) (vm vision-module))
+             (declare (ignore view vm))
+             nil)
 
 (defmethod build-vis-locs-for ((self radio-button-dialog-item)
                                (vis-mod vision-module))
