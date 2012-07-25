@@ -1,5 +1,5 @@
 
-#+:clozure (defmethod build-vis-locs-for ((view image-view) (vm vision-module))
+#+:clozure (defmethod build-vis-locs-for ((view back-image-view) (vm vision-module))
              (declare (ignore view vm))
              nil)
 
@@ -61,7 +61,9 @@
                                            value box
                                            height 11
                                            width 11
-                                           color light-gray))))
+                                           color ,(if (check-box-checked-p self)
+                                                    'blue
+                                                    'light-gray)))))
             (unless (equal text "")
               (let* ((font-spec (view-font self))
                      (start-y nil)

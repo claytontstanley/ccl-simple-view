@@ -2,6 +2,17 @@
   (dolist (feat feats feats)
     (set-chunk-slot-value-fct feat 'color color)))
 
+(defmethod build-vis-locs-for ((self dialog-item) (vis-mod vision-module))
+  (declare (ignore vis-mod))
+  (let ((f (car (define-chunks-fct `((isa visual-location
+                                 screen-x ,(px (view-loc self))
+                                 screen-y ,(py (view-loc self))
+                                 kind visual-object
+                                 color ,(system-color->symbol (part-color self :text))
+                                 value unknown))))))
+    (setf (chunk-visual-object f) self)
+    f))
+
 (defmethod build-vis-locs-for ((self editable-text-dialog-item) (vis-mod vision-module))
   (let* ((font-spec (view-font self))
          (text (dialog-item-text self))

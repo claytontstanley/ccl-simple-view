@@ -139,16 +139,6 @@
 
 
 
-(defmethod build-vis-locs-for ((self dialog-item) (vis-mod vision-module))
-  (declare (ignore vis-mod))
-  (let ((f (car (define-chunks-fct `((isa visual-location
-                                 screen-x ,(px (view-loc self))
-                                 screen-y ,(py (view-loc self))
-                                 kind visual-object
-                                 value unknown))))))
-    (setf (chunk-visual-object f) self)))
-
-
 
 #| Not adding these in at this point - only the basics which are shared
    by acl/mcl/virtual
