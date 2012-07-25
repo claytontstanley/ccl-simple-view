@@ -1,3 +1,4 @@
+bincarbon/device-extensions.lisp
 bincarbon/misc-lib.lisp
 bincarbon/timer.lisp
 submodules/tambo-diss/tamborello-dissertation-model/snd-player-actr.lisp
