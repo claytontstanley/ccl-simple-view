@@ -990,10 +990,13 @@
   (values (guard-!null-ptr (#/ascender font-spec))
           (abs (guard-!null-ptr (#/descender font-spec)))))
 
+(defun get-dict-for-font (font)
+  (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
+   font #$NSFontAttributeName 
+   ccl:+null-ptr+))
+
 (defun string-width (str font)
-  (let* ((dict (#/dictionaryWithObjectsAndKeys: ns:ns-mutable-dictionary
-                font #$NSFontAttributeName 
-                ccl:+null-ptr+))
+  (let* ((dict (get-dict-for-font font))
          (attr (#/initWithString:attributes: (#/alloc ns:ns-attributed-string)
                 (ccl::%make-nsstring str)
                 dict))

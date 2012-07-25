@@ -2,6 +2,7 @@ binccl/utilities.lisp
 submodules/lisp-dev/extras.lisp
 submodules/lisp-dev/lol-subset.lisp
 submodules/lisp-dev/extras-late.lisp
+submodules/lisp-dev/paip-subset.lisp
 easygui/patches.lisp
 easygui/extensions.lisp
 binccl/resources.lisp

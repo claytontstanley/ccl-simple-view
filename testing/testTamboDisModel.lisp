@@ -10,3 +10,5 @@
 
 (run-all-models :rt nil)
 
+(setf *experiment* nil)
+
