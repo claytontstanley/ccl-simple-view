@@ -96,6 +96,7 @@
                                              screen-y ,(py (view-loc self))
                                              kind visual-object
                                              value check
+                                             color black
                                              height 11
                                              width 11))))
               feats)))

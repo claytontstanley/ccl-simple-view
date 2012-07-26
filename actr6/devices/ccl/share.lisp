@@ -305,18 +305,18 @@
   ; instance, but within that instance, use the reference to the value before the value is actually updated. 
   ; This technique is actually wrapped up in a macro called alet in Hoyte's book, but I'm not using the macro here.
   (let ((obj))
-    (setf obj (apply #'make-instance 
-                     class
-                     :view-position position
-                     :view-size size
-                     :text text
-                     :action (if action 
-                               (lambda ()
-                                 (funcall action obj))
-                               nil)
-                     attributes))
+    (setf obj (apply #'make-instance class
+                     (nconc
+                       (list
+                         :view-position position
+                         :view-size size
+                         :text text)
+                       (if action
+                         (list
+                           :action (lambda ()
+                                     (funcall action obj))))
+                       attributes)))
     obj))
-
 
 ; ----------------------------------------------------------------------
 ; Building methods that allow CCL to understand basic MCL drawing commands

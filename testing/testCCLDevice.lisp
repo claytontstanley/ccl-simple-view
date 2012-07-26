@@ -134,6 +134,16 @@
 
 (set-selection-range (view-named :et *win*) 1 2)
 
+(setf *view* (make-instance 'radio-button-dialog-item
+                            :view-position (make-point 100 300)
+                            :view-nick-name :rb1))
+(add-visual-items-to-rpm-window *win* *view*)
+(setf *view* (make-instance 'radio-button-dialog-item
+                            :view-position (make-point 150 300)
+                            :view-nick-name :rb2))
+(add-visual-items-to-rpm-window *win* *view*)
+
+
 #|
 (cocoa-ref (view-named :et *win*))
 (#/isEnabled *)
