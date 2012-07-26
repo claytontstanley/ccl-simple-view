@@ -580,8 +580,8 @@
 ;;;             : event gets dealt with.
 
 (defmethod device-handle-keypress ((device window) key)
-  (view-key-event-handler device key)
-  (event-dispatch))
+  (declare (ignore device))
+  (keypress key))
 
 #|
 ;;; VIEW-KEY-EVENT-HANDLER      [Method]

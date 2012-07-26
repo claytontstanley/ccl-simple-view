@@ -692,12 +692,18 @@
 (defmethod view-mouse-position ((view simple-view))
   (easygui:view-mouse-position view :allow-negative-position-p t))
 
+(defmacro with-psn (&body body)
+  `(rlet ((psn #>ProcessSerialNumber))
+     (#_GetFrontProcess psn)
+     ,@body))
+
 (defun create-mouse-event (event pos)
   (#_CGEventCreateMouseEvent
    ccl:+null-ptr+
    event
    pos
    0))
+
 
 (defun left-mouse-up (pos)
   (#_CGEventPost
@@ -715,6 +721,33 @@
     (left-mouse-up pos)))
 
 ; Handling keyboard interaction
+
+(defun create-keyboard-event (event key)
+  (let ((key (format nil "~a" key)))
+    (guard ((eq (length key) 1) "key: ~a is not a single character; not supporting command/control key events" key) ())
+    (let ((ret (#_CGEventCreateKeyboardEvent
+                ccl:+null-ptr+
+                0
+                event)))
+      (#_CGEventKeyboardSetUnicodeString
+       ret
+       (length key)
+       (#/cStringUsingEncoding: (objc:make-nsstring key) #$NSUTF8StringEncoding))
+      ret)))
+
+(defun keypress-down (key)
+  (#_CGEventPost
+   #$kCGHIDEventTap
+   (create-keyboard-event #$YES key)))
+
+(defun keypress-up (key)
+  (#_CGEventPost
+   #$kCGHIDEventTap
+   (create-keyboard-event #$NO key)))
+
+(defun keypress (key)
+  (keypress-down key)
+  (keypress-up key))
 
 (defmethod easygui::view-key-event-handler ((device window) key)
   (view-key-event-handler device key))
