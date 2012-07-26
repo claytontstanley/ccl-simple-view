@@ -19,7 +19,7 @@
 (defun init-pool ()
   (make-hash-table :test #'equalp))
 
-(defvar *pool* (init-pool))
+(defparameter *pool* (init-pool))
 (defvar *resource-types* nil)
 
 (defun print-pool (&optional (pool *pool*))

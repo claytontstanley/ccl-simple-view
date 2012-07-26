@@ -131,7 +131,7 @@
 
 
 (defmethod build-vis-locs-for ((self simple-view) (vis-mod vision-module))
-  (break)
+  ;(break)
   (let ((subs (get-sub-objects self))
         (outlis nil))
     (dolist (sub subs outlis)

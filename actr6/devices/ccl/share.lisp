@@ -68,7 +68,7 @@
                            (parse-mcl-initarg :view-font view-font)))
           (back-color-lst (if back-color
                             (parse-mcl-initarg :back-color back-color))))
-      (apply #'call-next-method view (append view-font-lst back-color-lst args)))
+      (apply #'call-next-method view (nconc view-font-lst back-color-lst args)))
     (call-next-method)))
 
 #|
@@ -1004,7 +1004,7 @@
         ; FIXME; Parse these style and transfer mode values
         (keyword ())
         (list (setf color (color-lst->color atom)))))
-    (append
+    (nconc
       (list :view-font (convert-font name pt))
       (if color
         (list :fore-color color)))))

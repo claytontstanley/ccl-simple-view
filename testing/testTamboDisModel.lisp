@@ -3,10 +3,6 @@
 
 ;(break)
 
-#+:clozure (setf *pool* (init-pool))
-
-#+:clozure (setf *ar-pool* (ccl::create-autorelease-pool))
-
 ; FIXME: Does MCL need CFBundle.lisp to run Phaser?
 (provide :cfbundle)
 
