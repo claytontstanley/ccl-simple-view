@@ -416,8 +416,6 @@
 (defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))
   nil)
 
-;(window-select w))
-
 (defmethod set-window-layer ((window window) new-layer &optional include-invisibles)
   'fixme)
 
@@ -638,6 +636,8 @@
     (#/isVisible
      (guard-!null-ptr
        (easygui::cocoa-ref view)))))
+
+; FIXME: return value of call-next-method isn't being relayed; investigate this.
 
 (defmethod easygui::window-may-close :around ((win window))
   (when (call-next-method)
