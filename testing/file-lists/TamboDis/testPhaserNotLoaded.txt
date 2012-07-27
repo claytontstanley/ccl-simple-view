@@ -3,3 +3,7 @@ submodules/actr6
 submodules/tambo-diss/tambo-diss-expt/resources
 submodules/tambo-diss/tambo-diss-expt/fonts
 testing/file-lists/TamboDis/testPhaser.txt
+submodules/tambo-diss/tambo-diss-expt/X84-0 instructions.txt
+submodules/tambo-diss/tambo-diss-expt/X84-1 instructions.txt
+submodules/tambo-diss/tambo-diss-expt/X84-2 instructions.txt
+submodules/tambo-diss/tambo-diss-expt/X84-3 instructions.txt
