@@ -163,13 +163,11 @@
   nil)
 
 (defmethod easygui::cocoa-win-p ((win easygui::cocoa-window))
-  t)
-
-
-
-
-
-
+  (cond ((slot-boundp win 'easygui::easygui-window)
+         t)
+        (t
+         (format t "not yet a cocoa win ~a" win)
+         nil)))
 
 
 

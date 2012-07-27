@@ -405,11 +405,12 @@
   nil)
 
 (defun get-front-window ()
-  (let ((wins (gui::windows)))
-    (setf wins (remove-if-not #'easygui::cocoa-win-p wins))
-    (setf wins (mapcar #'easygui::easygui-window-of wins))
-    (setf wins (remove-if #'windoid-p wins))
-    (car wins)))
+  (objc:with-autorelease-pool
+    (let ((wins (gui::windows)))
+      (setf wins (remove-if-not #'easygui::cocoa-win-p wins))
+      (setf wins (mapcar #'easygui::easygui-window-of wins))
+      (setf wins (remove-if #'windoid-p wins))
+      (car wins))))
 
 ;FIXME: This looks very strange. Prob related to Phaser's floating window
 (defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))

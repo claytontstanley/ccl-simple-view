@@ -6,6 +6,7 @@ zip-%:
 
 
 file-list-all : fl = Votebox VoteboxKristen Phaser Tutorials
+file-list-tambo: fl = Phaser TamboDis TamboDisModel
 file-list-% : fl = $*
 
 
