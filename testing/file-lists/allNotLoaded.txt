@@ -2,3 +2,4 @@ testing/bootstrap.lisp
 testing/utilities.lisp
 binccl/utilities.lisp
 build/ccl-simple-view.lisp
+testing/file-lists/all.txt
