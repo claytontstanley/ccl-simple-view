@@ -8,6 +8,8 @@
 
 (load-file-list "file-lists" "Phaser" "testPhaser.txt")
 
+(begin-experiment)
+
 ;(get-string-from-user "hello")
 ;
 ;(setf *ret* (list 5 4))
