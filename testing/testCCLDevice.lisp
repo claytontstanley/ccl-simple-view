@@ -33,7 +33,7 @@
 (defparameter *view* nil)
 (defparameter *win-title* "exp window")
 
-(assert (null (open-rpm-window? *win*)))
+(check (null (open-rpm-window? *win*)))
 
 (setf *win* (make-rpm-window 
               :visible t
@@ -47,10 +47,10 @@
 (view-mouse-position *win*)
 
 (select-rpm-window *win*)
-(assert (string-equal
+(check (string-equal
           (rpm-window-title *win*)
           *win-title*))
-(assert (open-rpm-window? *win*))
+(check (open-rpm-window? *win*))
 (sleep .5)
 
 ;:action (lambda (obj) (print "hello"))))
@@ -90,7 +90,7 @@
 (setf *view* (make-instance 'check-box-dialog-item
                             :view-position (make-point 20 20)))
 (add-visual-items-to-rpm-window *win* *view*)
-(assert (> (point-h (view-size *view*))
+(check (> (point-h (view-size *view*))
            0))
 
 (setf *view* (make-line-for-rpm-window
@@ -178,4 +178,4 @@
 
 ;(close-rpm-window *win*)
 
-;(assert (null (open-rpm-window? *win*)))
+;(check (null (open-rpm-window? *win*)))

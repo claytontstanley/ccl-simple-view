@@ -230,11 +230,9 @@
 
 (defclass back-image-view (image-view) ())
 
-; FIXME: what's this view-text hack?
-
 (defclass icon-dialog-item (clickable-image-view dialog-item view)
   ((icon :reader icon :initarg :icon)
-   (easygui::view-text :accessor easygui::view-text :initarg :view-text)))
+   (easygui::view-text :initarg :view-text)))
 
 #|(defun convert-icon (icon)
     (guard-!null-ptr
@@ -447,7 +445,7 @@
 (defmethod initialize-instance :after ((view view-text-mixin) &key)
   (set-text-justification view (text-justification view)))
 
-(defmethod set-dialog-item-text ((view easygui::view-text-mixin) text)
+(defmethod set-dialog-item-text ((view view-text-mixin) text)
   (setf (easygui:view-text view) text))
 
 (defmethod set-selection-range ((view view-text-mixin) &optional position cursorpos)
@@ -637,11 +635,10 @@
      (guard-!null-ptr
        (easygui::cocoa-ref view)))))
 
-; FIXME: return value of call-next-method isn't being relayed; investigate this.
-
 (defmethod easygui::window-may-close :around ((win window))
-  (when (call-next-method)
-    (slot-makunbound win 'easygui::ref)))
+  (awhen (call-next-method)
+    (unwind-protect it
+      (slot-makunbound win 'easygui::ref))))
 
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (easygui:view-position view) local-pos))
