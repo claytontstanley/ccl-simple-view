@@ -22,7 +22,8 @@
 ;;;		  so that the file can be loaded from a base/standard CCL core file.
 ;;;		  
 ;;;		  The file was built on _DATE_ using GNU Make and Bash.
-;;;               Editing was done with vim+slimv, and slimv was used to auto indent the lisp file.
+;;;               Editing was done with vim+slimv, and lisp code was auto indented using
+;;;               vim+slimv's auto-indention algorithm.
 ;;;
 ;;;		  Git commit hash associated with build: _GITID_
 ;;;
