@@ -169,7 +169,16 @@
          (format t "not yet a cocoa win ~a" win)
          nil)))
 
-
-
-
-
+; Extending this method; patching it so that the view-size slot is initialized after 
+; the view is drawn, if it wasn't already.
+(defmethod easygui::add-1-subview :around ((view easygui::simple-view) (super-view easygui::simple-view))
+  "Correctly initialize view positions"
+  (call-next-method)
+  (with-slots (easygui::position easygui::size easygui::frame-inited-p) view
+    (unless (slot-boundp view 'easygui::size)
+      (let ((frame (#/frame (cocoa-ref view))))
+        (setf (slot-value view 'easygui::size)
+              (easygui:point (ns:ns-rect-width frame)
+                             (ns:ns-rect-height frame)))))
+    (easygui::set-needs-display view t)
+    (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t))))
