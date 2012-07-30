@@ -105,6 +105,13 @@
     :view-size (make-point 200 200)
     :contained-view-specifically 'contained-view))
 
+; Give each window a maintenance thread. In that thread,
+; periodically check if the window is the frontmost window.
+; If it is, call window-null-event-handler on the window. 
+
+; I took a sample of the refresh rate of MCL's
+; calls to window-null-event-handler, and it
+; was around 100ms. So using that rate here.
 (defmethod initialize-instance :after ((win window) &key)
   (setf (maintenance-thread win)
         (process-run-function 
@@ -114,7 +121,7 @@
               (awhen (get-front-window)
                 (when (eq win it)
                   (window-null-event-handler win)))
-              (sleep .2))))))
+              (sleep .1))))))
 
 (defmethod window-null-event-handler ((win window))
   ())
