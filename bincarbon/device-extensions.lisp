@@ -101,3 +101,24 @@
                                              width 11))))
               feats)))
     feats))
+
+(defmethod build-vis-locs-for ((self thermometer) (vm vision-module))
+  (let* ((val (thermometer-value self))
+         (maxval (max-value self))
+         (pos (view-position self))
+         (dim (view-size self))
+         (ypos (+ (point-v pos) (round (* (point-v dim)
+                                           (- 1 (/ val maxval))))))
+         )
+    ;; only generate a feature this when the value is greater than zero
+    (when (> val 0)
+      (list
+        (car (define-chunks-fct `((isa visual-location
+                                       screen-x ,(px (view-loc self))
+                                       screen-y ,ypos
+                                       width ,(point-h dim)
+                                       height ,(- (+ (point-v pos) (point-v dim)) ypos)
+                                       kind line
+                                       value line
+                                       color ,(get-fore-color self)
+                                       ))))))))
