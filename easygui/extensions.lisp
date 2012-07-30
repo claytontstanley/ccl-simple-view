@@ -2,7 +2,7 @@
   (require :cocoa)
   (require :easygui))
 
-(defun easygui::eg-point-from-ns-point (point)
+(defun easygui::point-from-ns-point (point)
   (easygui::point 
     (ns:ns-point-x point)
     (ns:ns-point-y point)))
@@ -171,15 +171,12 @@
 ; the view is drawn, if it wasn't already.
 (defmethod easygui::add-1-subview :around ((view easygui::simple-view) (super-view easygui::simple-view))
   "Correctly initialize view positions"
-  (call-next-method)
-  (with-slots (easygui::position easygui::size easygui::frame-inited-p) view
-    (unless (slot-boundp view 'easygui::size)
-      (let ((frame (#/frame (cocoa-ref view))))
-        (setf (slot-value view 'easygui::size)
-              (easygui:point (ns:ns-rect-width frame)
-                             (ns:ns-rect-height frame)))))
-    (easygui::set-needs-display view t)
-    (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t))))
-
-(defun easygui::point-from-ns-point (ns-point)
-  (easygui:point (ns:ns-point-x ns-point) (ns:ns-point-y ns-point)))
+  (unwind-protect (call-next-method)
+    (with-slots (easygui::position easygui::size easygui::frame-inited-p) view
+      (unless (slot-boundp view 'easygui::size)
+        (let ((frame (#/frame (cocoa-ref view))))
+          (setf (slot-value view 'easygui::size)
+                (easygui:point (ns:ns-rect-width frame)
+                               (ns:ns-rect-height frame)))))
+      (easygui::set-needs-display view t)
+      (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t)))))

@@ -484,7 +484,7 @@
          (ns-converted-point (#/convertPoint:fromView: (#/superview cocoa-self)
                               ns-point
                               nil))
-         (where (easygui::eg-point-from-ns-point ns-converted-point)))
+         (where (easygui::point-from-ns-point ns-converted-point)))
     (when (eq (view-nick-name self) (curr-state (view-window self)))
       (call-next-method the-event))
     (handle-click self (point-string (subtract-points where
