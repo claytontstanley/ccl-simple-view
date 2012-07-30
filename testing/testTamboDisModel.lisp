@@ -4,7 +4,7 @@
 #+:clozure (setf *pool* (init-pool))
 
 ;(trace (proc-display :before :backtrace))
-(trace proc-display)
+;(trace proc-display)
 
 ; FIXME: Does MCL need CFBundle.lisp to run Phaser?
 (provide :cfbundle)
@@ -15,6 +15,4 @@
 ;(run-a-model 0 :rt nil) 
 
 (setf *experiment* nil)
-
-
 

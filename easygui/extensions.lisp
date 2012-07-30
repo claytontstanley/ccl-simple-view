@@ -128,17 +128,15 @@
 ; This section is the additional code required to have a simple-view object behave mostly like a drawing-view type object, 
 ; but without inheriting from drawing-view. Sort of a workaround to avoid the drawing-view mouse-tracking methods, since those aren't mixins (yet).
 
-(defmethod easygui::link-cocoa-view ((cocoa-view ns:ns-view) view)
+(defmethod easygui::link-cocoa-view ((cocoa-view t) view)
   (declare (ignore view))
   (values))
 
-(defmethod easygui::link-cocoa-view ((cocoa-view ns:ns-window) view)
-  (declare (ignore view))
-  (values))
-
-(defmethod easygui::link-cocoa-view ((cocoa-view easygui::cocoa-drawing-view) view)
-  (setf (slot-value cocoa-view 'easygui::flipped) (slot-value view 'easygui::flipped))
+(defmethod easygui::link-cocoa-view ((cocoa-view easygui::cocoa-extension-mixin) view)
   (setf (slot-value cocoa-view 'easygui::easygui-view) view))
+
+(defmethod easygui::link-cocoa-view :after ((cocoa-view easygui::cocoa-drawing-view) view)
+  (setf (slot-value cocoa-view 'easygui::flipped) (slot-value view 'easygui::flipped)))
 
 (defmethod easygui::initialize-view :after ((view easygui::simple-view))
   (easygui::link-cocoa-view (easygui:cocoa-ref view) view))
@@ -182,3 +180,6 @@
                              (ns:ns-rect-height frame)))))
     (easygui::set-needs-display view t)
     (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t))))
+
+(defun easygui::point-from-ns-point (ns-point)
+  (easygui:point (ns:ns-point-x ns-point) (ns:ns-point-y ns-point)))
