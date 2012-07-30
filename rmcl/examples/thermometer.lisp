@@ -6,7 +6,7 @@
   ((direction :reader direction :initarg :direction :initform :vertical)
    (pattern :initarg :pattern)
    (thermometer-value :reader thermometer-value :initarg :thermometer-value :initform 0)
-   (max-value :reader max-value :initarg :max-value :initform 5))
+   (max-value :reader max-value :initarg :max-value :initform 100))
   (:default-initargs
     :specifically 'cocoa-level-indicator
     :fore-color (color-symbol->system-color 'black)))
@@ -41,16 +41,17 @@
                                                              (ns:ns-rect-y bounds)
                                                              (ns:ns-rect-width bounds)
                                                              (ns:ns-rect-height bounds))
-      (with-fore-color (get-fore-color view)
-        (frame-rect view point-x point-y (+ point-x width) (+ point-y height)))
-      (let ((fraction-full (/ (thermometer-value view)
-                              (max-value view))))
+      (with-focused-view view
         (with-fore-color (get-fore-color view)
-          (paint-rect view
-                      point-x
-                      point-y
-                      (+ point-x (* width fraction-full))
-                      (+ point-y height)))))))
+          (frame-rect view point-x point-y (+ point-x width) (+ point-y height)))
+        (let ((fraction-full (/ (thermometer-value view)
+                                (max-value view))))
+          (with-fore-color (get-fore-color view)
+            (paint-rect view
+                        point-x
+                        point-y
+                        (+ point-x (* width fraction-full))
+                        (+ point-y height))))))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :thermometer))
