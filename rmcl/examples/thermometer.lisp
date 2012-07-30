@@ -1,4 +1,4 @@
-(defclass cocoa-level-indicator (easygui::cocoa-extension-mixin ns:ns-level-indicator)
+(defclass cocoa-thermometer (easygui::cocoa-extension-mixin ns:ns-level-indicator)
   ()
   (:metaclass ns:+ns-object))
 
@@ -8,7 +8,7 @@
    (thermometer-value :reader thermometer-value :initarg :thermometer-value :initform 0)
    (max-value :reader max-value :initarg :max-value :initform 100))
   (:default-initargs
-    :specifically 'cocoa-level-indicator
+    :specifically 'cocoa-thermometer
     :fore-color (color-symbol->system-color 'black)))
 
 (defmethod (setf direction) (direction (self thermometer))
@@ -34,7 +34,11 @@
   (setf (thermometer-value view) (thermometer-value view))
   (setf (max-value view) (max-value view)))
 
-(objc:defmethod (#/drawRect: :void) ((self cocoa-level-indicator) (rect :<NSR>ect))
+; I couldn't figure out how to change the color of the NSLevelIndicator object, so
+; instead of forcing a default Cocoa object to be drawn how I want, just extend the
+; class and use a custom drawing method for the thermometer.
+
+(objc:defmethod (#/drawRect: :void) ((self cocoa-thermometer) (rect :<NSR>ect))
   (let ((view (easygui::easygui-view-of self))
         (bounds (#/bounds self)))
     (destructuring-bind (point-x point-y width height) (list (ns:ns-rect-x bounds)
@@ -46,6 +50,10 @@
           (frame-rect view point-x point-y (+ point-x width) (+ point-y height)))
         (let ((fraction-full (/ (thermometer-value view)
                                 (max-value view))))
+          ; Due to how the NSLevelIndicator is drawn, width of the cocoa object will always be the
+          ; dimension of the value of the thermometer, so no case statement is necesary here to figure
+          ; out if the thermometer is being displayed horizontally or vertically. This is a nicety from having
+          ; #/bounds and #/frame attributes for Cocoa objects.
           (with-fore-color (get-fore-color view)
             (paint-rect view
                         point-x
