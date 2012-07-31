@@ -112,16 +112,17 @@
 ; I took a sample of the refresh rate of MCL's
 ; calls to window-null-event-handler, and it
 ; was around 100ms. So using that rate here.
-(defmethod initialize-instance :after ((win window) &key)
-  (setf (maintenance-thread win)
-        (process-run-function 
-          (format nil "maintenance thread for win ~a" win)
-          (lambda ()
-            (while (wptr win)
-              (awhen (get-front-window)
-                (when (eq win it)
-                  (window-null-event-handler win)))
-              (sleep .1))))))
+(defmethod initialize-instance :around ((win window) &key)
+  (unwind-protect (call-next-method)
+    (setf (maintenance-thread win)
+          (process-run-function 
+            (format nil "maintenance thread for win ~a" win)
+            (lambda ()
+              (while (wptr win)
+                (awhen (get-front-window)
+                  (when (eq win it)
+                    (window-null-event-handler win)))
+                (sleep .1)))))))
 
 (defmethod window-null-event-handler ((win window))
   ())
