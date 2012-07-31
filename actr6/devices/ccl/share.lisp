@@ -99,6 +99,8 @@
    (window-type :initarg :window-type)
    (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)
    (maintenance-thread :accessor maintenance-thread)
+   (initialized-p :accessor initialized-p :initform nil)
+   (window-null-event-cnt :accessor window-null-event-cnt :initform 0)
    (easygui::background :initform (color-symbol->system-color 'white)))
   (:default-initargs 
     :view-position (make-point 200 200)
@@ -118,14 +120,27 @@
           (process-run-function 
             (format nil "maintenance thread for win ~a" win)
             (lambda ()
-              (while (wptr win)
-                (awhen (get-front-window)
-                  (when (eq win it)
-                    (window-null-event-handler win)))
+              (setf (initialized-p win) t)
+              (while (initialized-p win)
+                (when (aand (get-front-window) (eq win it))
+                  (guard ((eq (window-null-event-cnt win) 0) "maintenance thread for win ~a in unknown state~%") ())
+                  (incf (window-null-event-cnt win))
+                  (window-null-event-handler win)
+                  (decf (window-null-event-cnt win)))
                 (sleep .1)))))))
 
 (defmethod window-null-event-handler ((win window))
   ())
+
+(objc:defmethod (#/close :void) ((self easygui::cocoa-window))
+  (let ((win (easygui::easygui-window-of self)))
+    (setf (initialized-p win) nil)
+    (process-wait
+      (format nil "waiting for null-event-handlers to finish for ~a~%" win)
+      (lambda () (eq (window-null-event-cnt win) 0)))
+    (slot-makunbound win 'easygui::ref)
+    (format t "closing ~a~%" self)
+    (call-next-method)))
 
 (defclass static-contained-view (static-view-mixin contained-view) ())
 
@@ -416,6 +431,7 @@
       (setf wins (remove-if-not #'easygui::cocoa-win-p wins))
       (setf wins (mapcar #'easygui::easygui-window-of wins))
       (setf wins (remove-if #'windoid-p wins))
+      (setf wins (remove-if-not #'initialized-p wins))
       (car wins))))
 
 ;FIXME: This looks very strange. Prob related to Phaser's floating window
@@ -642,11 +658,6 @@
     (#/isVisible
      (guard-!null-ptr
        (easygui::cocoa-ref view)))))
-
-(defmethod easygui::window-may-close :around ((win window))
-  (awhen (call-next-method)
-    (unwind-protect it
-      (slot-makunbound win 'easygui::ref))))
 
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (easygui:view-position view) local-pos))
