@@ -16,6 +16,10 @@
   `(guard (it1 "nil returned when evaling form ~a" ',body)
      (progn ,@body)))
 
+(defmacro guard-nil (&body body)
+  `(guard ((null it1) "~a returned when evaling form ~a; expected nil" it1 ',body)
+     (progn ,@body)))
+
 ; ----------------------------------------------------------------------
 ; Building class definitions to match MCL's GUI class heirarchy
 ;
@@ -100,8 +104,9 @@
    (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)
    (maintenance-thread :accessor maintenance-thread)
    (initialized-p :accessor initialized-p :initform nil)
-   (window-null-event-cnt :accessor window-null-event-cnt :initform 0)
-   (easygui::background :initform (color-symbol->system-color 'white)))
+   (easygui::background :initform (color-symbol->system-color 'white))
+   (close-requested-p :accessor close-requested-p :initform nil)
+   (sema :accessor sema :initform (make-semaphore)))
   (:default-initargs 
     :view-position (make-point 200 200)
     :view-size (make-point 200 200)
@@ -121,26 +126,39 @@
             (format nil "maintenance thread for win ~a" win)
             (lambda ()
               (setf (initialized-p win) t)
-              (while (initialized-p win)
-                (when (aand (get-front-window) (eq win it))
-                  (guard ((eq (window-null-event-cnt win) 0) "maintenance thread for win ~a in unknown state~%") ())
-                  (incf (window-null-event-cnt win))
-                  (window-null-event-handler win)
-                  (decf (window-null-event-cnt win)))
+              (while (wptr win)
+                (cond ((close-requested-p win)
+                       (sv-log "closing ~a on thread ~a~%" win *current-process*)
+                       (easygui:perform-close win)
+                       (slot-makunbound win 'easygui::ref)
+                       (signal-semaphore (sema win)))
+                      ((aand (get-front-window) (eq win it))
+                       (window-null-event-handler win)))
                 (sleep .1)))))))
+
+(defparameter *window-null-event-handler-lock* (make-lock "window-null-event-handler-lock")) 
 
 (defmethod window-null-event-handler ((win window))
   ())
 
-(objc:defmethod (#/close :void) ((self easygui::cocoa-window))
-  (let ((win (easygui::easygui-window-of self)))
-    (setf (initialized-p win) nil)
-    (process-wait
-      (format nil "waiting for null-event-handlers to finish for ~a~%" win)
-      (lambda () (eq (window-null-event-cnt win) 0)))
-    (slot-makunbound win 'easygui::ref)
-    (format t "closing ~a~%" self)
-    (call-next-method)))
+(defmethod window-null-event-handler :around ((win window))
+  (cond ((try-lock *window-null-event-handler-lock*)
+         (unwind-protect (call-next-method)
+           (release-lock *window-null-event-handler-lock*)))
+        (t
+         (sv-log "not calling null-event-handler for win ~a b/c another null-event-handler is active~%" win))))
+
+(defmethod window-close ((win window))
+  (guard ((wptr win) "Window ~a is already closed" win) ())
+  (guard-nil (close-requested-p win))
+  (setf (close-requested-p win) t)
+  (sv-log "requesting to close win ~a on thread ~a~%" win *current-process*)
+  (let ((ctime (get-internal-real-time)))
+    (timed-wait-on-semaphore (sema win) .5)
+    (sv-log "waited for ~a ms before win ~a was closed by maintenance thread~%"
+            (coerce (* (/ (- (get-internal-real-time) ctime) internal-time-units-per-second)
+                       1000) 'double-float)
+            win)))
 
 (defclass static-contained-view (static-view-mixin contained-view) ())
 
@@ -400,7 +418,7 @@
   (acond ((easygui:view-named name view)
           it)
          (t
-           (format t "no subview with view-nick-name ~a found in ~a" name view)
+           (sv-log "no subview with view-nick-name ~a found in ~a" name view)
            nil)))
 
 (defmethod view-nick-name ((view simple-view))
@@ -440,10 +458,6 @@
 
 (defmethod set-window-layer ((window window) new-layer &optional include-invisibles)
   'fixme)
-
-(defmethod window-close ((win window))
-  (guard ((wptr win) "Window ~a is already closed" win) ())
-  (easygui:perform-close win))
 
 (defmethod window-title ((view window))
   ;TODO: Maybe use easygui:view-text method here?

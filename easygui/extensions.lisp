@@ -164,7 +164,7 @@
   (cond ((slot-boundp win 'easygui::easygui-window)
          t)
         (t
-         (format t "not yet a cocoa win ~a" win)
+         (sv-log "not yet a cocoa win ~a" win)
          nil)))
 
 ; Extending this method; patching it so that the view-size slot is initialized after 
