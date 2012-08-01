@@ -109,7 +109,7 @@
 
 ;;;; utilites for managing resources. 
 
-#+digitool
+#+:digitool
 (defmacro without-res-load (&body body)
   `(unwind-protect
      (progn

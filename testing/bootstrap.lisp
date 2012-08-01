@@ -18,7 +18,7 @@
 
 #-:act-r-6.0 (load-as-lst ".." "submodules" "actr6" "load-act-r-6.lisp")
 
-#+clozure
+#+:clozure
 (cond ((member "swank-repl" *modules* :test #'string-equal)
        (load-file-list ".." "build" "file-list.txt"))
       (t
@@ -26,5 +26,5 @@
 
 (load-file-list "file-lists" "all.txt")
 
-#+digitool (load-as-lst "bootstrap-mcl.lisp")
+#+:digitool (load-as-lst "bootstrap-mcl.lisp")
 

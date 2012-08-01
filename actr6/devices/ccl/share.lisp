@@ -20,6 +20,10 @@
   `(guard ((null it1) "~a returned when evaling form ~a; expected nil" it1 ',body)
      (progn ,@body)))
 
+(defmacro guard-t-or-nil (&body body)
+  `(guard ((or (eq it1 nil) (eq it1 t)) "~a returned when evaling form ~a: exptected t or nil" it1 ',body)
+     (progn ,@body)))
+
 ; ----------------------------------------------------------------------
 ; Building class definitions to match MCL's GUI class heirarchy
 ;
@@ -130,11 +134,15 @@
                 (cond ((close-requested-p win)
                        (sv-log "closing ~a on thread ~a~%" win *current-process*)
                        (easygui:perform-close win)
-                       (slot-makunbound win 'easygui::ref)
                        (signal-semaphore (sema win)))
                       ((aand (get-front-window) (eq win it))
                        (window-null-event-handler win)))
                 (sleep .1)))))))
+
+(objc:defmethod (#/close :void) ((self easygui::cocoa-window))
+  (let ((win (easygui::easygui-window-of self)))
+    (call-next-method)
+    (slot-makunbound win 'easygui::ref)))
 
 (defparameter *window-null-event-handler-lock* (make-lock "window-null-event-handler-lock")) 
 
@@ -149,7 +157,9 @@
          (sv-log "not calling null-event-handler for win ~a b/c another null-event-handler is active~%" win))))
 
 (defmethod window-close ((win window))
-  (guard ((wptr win) "Window ~a is already closed" win) ())
+  (unless (wptr win)
+    (sv-log "Attempting to close window ~a which is already closed" win)
+    (return-from window-close nil))
   (guard-nil (close-requested-p win))
   (setf (close-requested-p win) t)
   (sv-log "requesting to close win ~a on thread ~a~%" win *current-process*)
@@ -1118,6 +1128,46 @@
 (defun choose-directory-dialog (&key directory)
   (easygui:choose-directory-dialog :directory (get-directory-with-fallback directory)))
 
+
+(defun osx-p ()
+  t)
+
+(labels ((gen-dict-for-immutable-attr (bool)
+           (#/dictionaryWithObject:forKey: ns:ns-dictionary
+            (#/numberWithBool: ns:ns-number bool)
+            #$NSFileImmutable))
+         (set-immutable-attr (path bool)
+           (#/setAttributes:ofItemAtPath:error: (#/defaultManager ns:ns-file-manager)
+            (gen-dict-for-immutable-attr bool)
+            (objc:make-nsstring path)
+            ccl:+null-ptr+)))
+  (defun file-locked-p (path)
+    (let ((dict (guard-!null-ptr 
+                  (#/attributesOfItemAtPath:error: (#/defaultManager ns:ns-file-manager)
+                   (objc:make-nsstring path)
+                   ccl:+null-ptr+))))
+      (guard-t-or-nil
+        (#/boolValue
+         (#/objectForKey: dict (objc:make-nsstring "NSFileImmutable"))))))
+  (defun lock-file (path)
+    (unless (file-locked-p path)
+      (guard-!nil
+        (set-immutable-attr path #$YES))))
+  (defun unlock-file (path)
+    (when (file-locked-p path)
+      (guard-!nil
+        (set-immutable-attr path #$NO)))))
+
+; FIXME: Write this
+(defun set-mac-file-creator (path mac-file-creator)
+  (declare (ignore path mac-file-creator))
+  t)
+
+; FIXME: And maybe write this
+(defun set-mac-file-type (path mac-file-type)
+  (declare (ignore path mac-file-type))
+  t)
+
 ; ----------------------------------------------------------------------
 ; Manipulate the read table so that MCL's #@(a b) make-point shorthand works. 
 ;
@@ -1161,14 +1211,14 @@
   (defvar *load-external-function-orig* #'ccl::load-external-function)
   (with-continue 
     (defun ccl::load-external-function (sym query)
-      (let* ((fun-names (list "showmenubar" "hidemenubar" "getcursor" "showcursor" "ShowCursor" "HideCursor"
+      (let* ((fun-names (list "showmenubar" "hidemenubar" "getcursor" "showcursor" "ShowCursor" "hidecursor" "HideCursor"
                               "paintrect" "framerect" "drawstring"))
              (the-package (find-package :X86-Darwin64))
              (fun-syms (mapcar (lambda (name)
                                  (intern name the-package))
                                fun-names)))
         (if (member sym fun-syms)
-          (return-from ccl::load-external-function sym)
+          sym
           (funcall *load-external-function-orig* sym query))))))
 
 ; Use the same approach to define foreign constants that MCL uses that no longer exist for CCL
@@ -1183,10 +1233,16 @@
                                  (intern name the-package))
                                con-names)))
         (if (member sym con-syms)
-          (return-from ccl::load-os-constant sym)
+          sym
           (funcall *load-os-constant-orig* sym query))))))
 
 ; All of the functions being natively defined are here
+
+(defun X86-Darwin64::|showmenubar| ()
+  t)
+
+(defun X86-Darwin64::|hidemenubar| ()
+  t)
 
 (defun X86-Darwin64::|getcursor| (num)
   num)
@@ -1194,13 +1250,13 @@
 (defun X86-Darwin64::|showcursor| ()
   t)
 
+(defun X86-Darwin64::|ShowCursor| ()
+  t)
+
 (defun X86-Darwin64::|hidecursor| ()
   t)
 
-(defun X86-Darwin64::|hidemenubar| ()
-  t)
-
-(defun X86-Darwin64::|showmenubar| ()
+(defun X86-Darwin64::|HideCursor| ()
   t)
 
 (defun X86-Darwin64::|paintrect| (rect)

@@ -63,7 +63,13 @@
   "Opens the provided URL with the OS's specified helper application."
   (sys:open-url string)) 
 
-
+#+:clozure
+(defun launch-url (string)
+  (guard-!nil
+    (guard-!null-ptr
+      (#/openURL: (#/sharedWorkspace ns:ns-workspace)
+       (#/URLWithString: ns:ns-url 
+        (objc:make-nsstring string))))))
 
 #|
 (defun open-url (url-string)
