@@ -3,3 +3,4 @@ submodules/actr6
 submodules/X83-Frank-Trek-11/Experiment/resources
 submodules/X83-Frank-Trek-11/Experiment/fonts
 testing/file-lists/Phaser/testPhaser.txt
+submodules/X83-Frank-Trek-11/Experiment/X83 instructions.txt

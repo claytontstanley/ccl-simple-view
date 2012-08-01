@@ -1104,13 +1104,14 @@
 (defun event-dispatch ()
   ())
 
+(defparameter *current-dialog-directory* nil)
+
 (defun get-directory-with-fallback (directory)
-  (aif directory
-    it
-    (aif *load-truename*
-      (directory-namestring it))))
-
-
+  (setf *current-dialog-directory*
+        (acond (directory it)
+               (*current-dialog-directory* it)
+               (*load-truename* (directory-namestring it))
+               (t nil))))
 
 (defun choose-file-dialog (&key directory mac-file-type button-string prompt file)
   (gui::cocoa-choose-file-dialog :directory (get-directory-with-fallback directory)
@@ -1123,7 +1124,7 @@
   ())
 
 (defun choose-new-file-dialog (&key directory prompt button-string)
-  (gui::cocoa-choose-new-file-dialog :directory directory))
+  (gui::cocoa-choose-new-file-dialog :directory (get-directory-with-fallback directory)))
 
 (defun choose-directory-dialog (&key directory)
   (easygui:choose-directory-dialog :directory (get-directory-with-fallback directory)))
