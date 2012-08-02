@@ -1,7 +1,6 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 #-:ccl-simple-view (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-#+:clozure (setf *pool* (init-pool))
 
 ;(trace (proc-display :before :backtrace))
 ;(trace proc-display)

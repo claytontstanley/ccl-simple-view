@@ -87,9 +87,10 @@
 
 (defun add-resource (resource id &optional (pool *pool*))
   (multiple-value-bind (cur-resource present-p) (gethash (get-key id (type resource)) pool)
+    (declare (ignore cur-resource))
     (when present-p
-      (error "attempting to add resource ~a with id ~a that is already present in pool ~a~% as ~a"
-             resource id pool cur-resource)))
+      (sv-log "adding resource with key ~a and overwriting resource with same key that is already present~%"
+              (get-key id (type resource)))))
   (setf (gethash (get-key id (type resource)) pool) resource))
 
 (defun remove-resource (resource &optional (pool *pool*))
