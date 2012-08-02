@@ -19,3 +19,8 @@ exclude-list = ^bincarbon*|^testing|^actr6/devices/ccl/device.lisp|^rmcl/lib/ccl
 
 reformat:
 	git ls-files | grep '.lisp$$' | egrep -v '${exclude-list}' | xargs -n 1 -o -I {} bash -ic "ai {} || true"
+
+# This is way experimental, but it did work for me. 
+convertToWriteRepo:
+	cd .git; find . -type f -name config -exec perl -pi -e 's|git://cstanley.no-ip.biz|ssh://raid\@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git|' '{}' \;
+
