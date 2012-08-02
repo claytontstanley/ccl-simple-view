@@ -1,27 +1,27 @@
 [submodule "submodules/actr6"]
 	path = submodules/actr6
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/actr6
+	url = git://cstanley.no-ip.biz/actr6
 [submodule "submodules/ccl"]
 	path = submodules/ccl
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/ccl
+	url = git://cstanley.no-ip.biz/ccl
 [submodule "submodules/rmcl"]
 	path = submodules/rmcl
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/rmcl.git
+	url = git://cstanley.no-ip.biz/rmcl.git
 [submodule "submodules/lisp-dev"]
 	path = submodules/lisp-dev
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/lisp-dev
+	url = git://cstanley.no-ip.biz/lisp-dev
 [submodule "submodules/ACT-R-VoteBox-Models"]
 	path = submodules/ACT-R-VoteBox-Models
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/ACT-R-VoteBox-Models
+	url = git://cstanley.no-ip.biz/ACT-R-VoteBox-Models
 [submodule "submodules/X83-Frank-Trek-11"]
 	path = submodules/X83-Frank-Trek-11
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/X83-Frank-Trek-11
+	url = git://cstanley.no-ip.biz/X83-Frank-Trek-11
 [submodule "submodules/kristenVotebox"]
 	path = submodules/kristenVotebox
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/kristenVotebox
+	url = git://cstanley.no-ip.biz/kristenVotebox
 [submodule "submodules/nextGen"]
 	path = submodules/nextGen
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/nextGen
+	url = git://cstanley.no-ip.biz/nextGen
 [submodule "submodules/tambo-diss"]
 	path = submodules/tambo-diss
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/tambo-diss
+	url = git://cstanley.no-ip.biz/tambo-diss
