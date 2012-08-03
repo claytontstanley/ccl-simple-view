@@ -45,6 +45,8 @@
 #+(and :clean-actr (not :packaged-actr) :ALLEGRO-IDE) (in-package :cg-user)
 #-(or (not :clean-actr) :packaged-actr :ALLEGRO-IDE) (in-package :cl-user)
 
+(require-compiled "CCL-SIMPLE-VIEW" "ACT-R6:support;ccl-simple-view")
+
 ;;; RPM-REAL-WINDOW  [Class]
 ;;; Description : This is the UWI's window class to produce an MCL.
 ;;;             : It inherits from the MCL dialog class (a real window) and

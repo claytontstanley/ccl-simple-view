@@ -20,9 +20,10 @@
 
 #+:clozure
 (cond ((member "swank-repl" *modules* :test #'string-equal)
-       (load-file-list ".." "build" "file-list.txt"))
-      (t
-       (load-as-lst ".." "build" "ccl-simple-view.lisp")))
+       (load-file-list ".." "build" "file-list.txt")
+       (load-file-list ".." "build" "file-list-device.txt")
+       (load-file-list ".." "build" "file-list-uwi.txt"))
+      (t nil))
 
 (load-file-list "file-lists" "all.txt")
 

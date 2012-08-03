@@ -1,1 +1,1 @@
-(pushnew :ccl-simple-view *features*)
+(provide "CCL-SIMPLE-VIEW")

@@ -18,7 +18,7 @@ binaryFileLst = ade adp bat chm cmd com cpl exe hta ins isp jse lib mde msc msp 
 binaryFileStr = ${binaryFileLst:%= -o -name '*.%'}
 
 unit: clean-actr-compiled-files
-	make -C ../build ccl-simple-view
+	make -C ../build all
 	${ccl} ${initString} ${testString} ${cclQuit}
 
 # FIXME: Should I do anything different for CI tests compared to unit tests.

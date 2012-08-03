@@ -91,6 +91,8 @@
 #+(and :clean-actr (not :packaged-actr) :allegro-ide) (in-package :cg-user)
 #-(or (not :clean-actr) :packaged-actr :allegro-ide) (in-package :cl-user)
 
+(require-compiled "CCL-SIMPLE-VIEW" "ACT-R6:support;ccl-simple-view")
+
 #|(defparameter *crosshair-cursor* 
   (#_getcursor #$crosscursor) "Crosshair cursor")|#
 
