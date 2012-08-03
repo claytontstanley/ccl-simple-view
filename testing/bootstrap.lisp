@@ -25,6 +25,8 @@
        (load-file-list ".." "build" "file-list-uwi.txt"))
       (t nil))
 
+(setf *pool* (init-pool))
+
 (load-file-list "file-lists" "all.txt")
 
 #+:digitool (load-as-lst "bootstrap-mcl.lisp")

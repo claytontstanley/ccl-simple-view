@@ -1,8 +1,6 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-(setf *pool* (init-pool))
-
 (defclass test-image (image-view-mixin view)
   ())
 
