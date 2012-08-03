@@ -26,11 +26,13 @@
 *v*
 (#/bounds (cocoa-ref *v*))
 (origin *v*)
+
 (set-origin *v* 10 10)
 
 (setf *win* (view-window (first *svs*)))
-
+internal-time-units-per-second
 (read-line)
+(get-xplane "call")
 (open-stream)
 (simulate-xplane 1 200)
 
