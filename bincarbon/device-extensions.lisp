@@ -1,4 +1,6 @@
 
+(require :thermometer)
+
 #+:clozure (defmethod build-vis-locs-for ((view back-image-view) (vm vision-module))
              (declare (ignore view vm))
              nil)
