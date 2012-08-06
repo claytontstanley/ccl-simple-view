@@ -63,6 +63,9 @@
 ;;; 00.09.17 mdb
 ;;;             : Tweaked it so that it won't prompt for a resource file if
 ;;;             : you don't need one.
+;;; 2012.08.06 cts
+;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
+;;;               backwards compatibility with RMCL
 ;;; 
 ;;; Bugs        : None known yet, but it's still early.
 ;;; 

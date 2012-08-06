@@ -35,6 +35,9 @@
 ;;; 2003.04.21 mdb [r2]
 ;;;             : Small mod so that the draw code can be called more
 ;;;             : directly. 
+;;; 2012.08.06 cts
+;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
+;;;               backwards compatibility with RMCL
 ;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

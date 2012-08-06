@@ -20,6 +20,9 @@
 ;;; Todo        : 
 ;;; 
 ;;; ----- History -----
+;;; 2012.08.06 cts
+;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
+;;;               backwards compatibility with RMCL
 ;;; 2008.01.18 mdb
 ;;;             : Added support for LispWorks, which was way easy.
 ;;; 03.10.14 Mike Byrne

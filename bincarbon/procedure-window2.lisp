@@ -21,6 +21,9 @@
 ;;; Todo        : 
 ;;; 
 ;;; ----- History -----
+;;; 2012.08.06 cts
+;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
+;;;               backwards compatibility with RMCL
 ;;; 2008.03.20 fpt [r6]
 ;;;		: Added another slot to proc-action class, info2, to handle
 ;;;		subtask-order information from X84.

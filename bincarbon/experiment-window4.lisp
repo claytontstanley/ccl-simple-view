@@ -61,7 +61,9 @@
 ;;;             : #@(300 250)) that it in turn supplies to message-dialog.
 ;;; 2007.06.06 mdb [r7]
 ;;;             : Added WRITE-READABLE method for pathnames.   
-;;; 
+;;; 2012.08.06 cts
+;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
+;;;               backwards compatibility with RMCL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require :timer)

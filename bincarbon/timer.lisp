@@ -37,6 +37,9 @@
 ;;;		: ACT-R 6 dropped pm-get-time for mp-time, so I updated
 ;;;		current-time and the appropriate unless bound function
 ;;;		to reflect this change.
+;;; 2012.08.06 cts
+;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
+;;;               backwards compatibility with RMCL
 ;;;		
 ;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -22,6 +22,9 @@
 ;;; Todo        : 
 ;;; 
 ;;; ----- History -----
+;;; 2012.08.06 cts
+;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
+;;;               backwards compatibility with RMCL
 ;;; 2007.07.09 fpt [r5]
 ;;;		: added torpedo-window subclass of the phaser-window and
 ;;;		jammer-window subclass of the transporter-window to avoid
