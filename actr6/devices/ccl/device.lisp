@@ -986,8 +986,11 @@
                         :unsigned-fullword))
     ))
 
-
-
+#+:clozure
+(defmethod device-move-cursor-to ((device window) (xyloc vector))
+  (setf xyloc (local-to-global device (vpt2p xyloc)))
+  (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
+                                                 (point-v xyloc))))
 
 #|
 This library is free software; you can redistribute it and/or

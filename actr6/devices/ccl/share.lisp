@@ -725,11 +725,6 @@
   (awhen (view-container device) 
     (view-click-event-handler it position)))
 
-(defmethod device-move-cursor-to ((device window) (xyloc vector))
-  (setf xyloc (local-to-global device (vpt2p xyloc)))
-  (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
-                                                 (point-v xyloc))))
-
 (defmethod view-mouse-position ((view simple-view))
   (easygui:view-mouse-position view :allow-negative-position-p t))
 
