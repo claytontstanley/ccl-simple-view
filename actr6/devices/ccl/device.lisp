@@ -22,16 +22,6 @@
 ;;; Bugs        : 
 ;;; 
 ;;; --- History ---
-;;; 2012.08.07  cts
-;;;             : Tweaked original MCL device.lisp code, and used it to build a
-;;;               device for CCL that leverages ccl-simple-view.lisp.
-;;;               Note that for any code that is left in this file and is
-;;;               commented out, I did not fully understand exactly what is
-;;;               was meant for. But all tests are passing without adding the
-;;;               code back in. So I'm keeping it commented out. If someone
-;;;               fully understands how these pieces should
-;;;               work, and sees that the code isn't needed, feel free to
-;;;               remove. Or if it is needed, please add it back in.
 ;;; 01.09.21 mdb [b2]
 ;;;             : Fixed an infinte recursion bug in APPROACH-WIDTH.
 ;;; 2002.04.16 mdb [b6]
@@ -95,6 +85,16 @@
 ;;;             : * Using model-generated-action instead of *actr-enabled-p*
 ;;;             :   in view-key-event-handler  for editable-text-dialog-items
 ;;;             :   to determine when to hack the output.
+;;; 2012.08.07 cts
+;;;             : Tweaked original MCL device.lisp code, and used it to build a
+;;;               device for CCL that leverages ccl-simple-view.lisp.
+;;;               Note that for any code that is left in this file and is
+;;;               commented out, I did not fully understand exactly what is
+;;;               was meant for. But all tests are passing without adding the
+;;;               code back in. So I'm keeping it commented out. If someone
+;;;               fully understands how these pieces should
+;;;               work, and sees that the code isn't needed, feel free to
+;;;               remove. Or if it is needed, please add it back in.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
