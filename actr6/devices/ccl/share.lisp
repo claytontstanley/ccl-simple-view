@@ -1207,6 +1207,9 @@
 (defun set-cursor (cursor)
   cursor)
 
+(defun get-cursor (num)
+  num)
+
 (defun beep ()
   (#_NSBeep))
 
@@ -1281,7 +1284,7 @@
   (hide-menubar))
 
 (defun X86-Darwin64::|getcursor| (num)
-  num)
+  (get-cursor num))
 
 (defun X86-Darwin64::|showcursor| ()
   (show-cursor))
