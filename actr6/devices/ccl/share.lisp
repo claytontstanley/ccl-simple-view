@@ -1254,26 +1254,46 @@
 
 ; All of the functions being natively defined are here
 
+(defun hide-cursor ()
+  (#_CGDisplayHideCursor
+   (#_CGMainDisplayID)))
+
+(defun show-cursor ()
+  (#_CGDisplayShowCursor
+   (#_CGMainDisplayID)))
+
+; FIXME: I've seen these menubar functions crash Cocoa. Figure out why they are unreliable.
+
+(defun hide-menubar ()
+  (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
+   (logior
+     #$NSApplicationPresentationHideDock
+     #$NSApplicationPresentationHideMenuBar)))
+
+(defun show-menubar ()
+  (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
+   #$NSApplicationPresentationDefault))
+
 (defun X86-Darwin64::|showmenubar| ()
-  t)
+  (show-menubar))
 
 (defun X86-Darwin64::|hidemenubar| ()
-  t)
+  (hide-menubar))
 
 (defun X86-Darwin64::|getcursor| (num)
   num)
 
 (defun X86-Darwin64::|showcursor| ()
-  t)
+  (show-cursor))
 
 (defun X86-Darwin64::|ShowCursor| ()
-  t)
+  (show-cursor))
 
 (defun X86-Darwin64::|hidecursor| ()
-  t)
+  (hide-cursor))
 
 (defun X86-Darwin64::|HideCursor| ()
-  t)
+  (hide-cursor))
 
 (defun X86-Darwin64::|paintrect| (rect)
   (fill-ns-rect rect))
