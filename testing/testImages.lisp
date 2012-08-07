@@ -44,8 +44,8 @@
 
 (check (slot-boundp *image* 'val))
 
-(capture-output nil (print-pool *pool*))
-;(print *pool*)
+(capture-output nil (print-pool *resource-pool*))
+;(print *resource-pool*)
 
 (add-subviews *win* *view*)
 

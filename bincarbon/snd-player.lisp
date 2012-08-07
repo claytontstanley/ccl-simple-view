@@ -133,7 +133,7 @@
 (defmethod initialize-instance :after ((self snd-player) &key)
   (unless (and (slot-boundp self 'snd-alis) (not (null (snd-alis self))))
     ; Cross over to resources.lisp and grab the default resource pool
-    (setf (snd-alis self) *pool*))
+    (setf (snd-alis self) *resource-pool*))
   (when (preload self)
     (dolist (name (preload self) nil)
       (get-resource-val name 'sound (snd-alis self)))))

@@ -19,10 +19,10 @@
 (defun init-pool ()
   (make-hash-table :test #'equalp))
 
-(defparameter *pool* (init-pool))
+(defparameter *resource-pool* (init-pool))
 (defvar *resource-types* nil)
 
-(defun print-pool (&optional (pool *pool*))
+(defun print-pool (&optional (pool *resource-pool*))
   (maphash (lambda (key val)
              (format t "~a->~a~%" key val))
            pool))
@@ -48,7 +48,7 @@
     (setf (val obj) (funcall (alloc-fn obj))))
   obj)
 
-(defun alloc-resources (&optional (pool *pool*))
+(defun alloc-resources (&optional (pool *resource-pool*))
   (maphash 
     (lambda (key val)
       (declare (ignore key))
@@ -59,7 +59,7 @@
   (alloc-resource obj)
   (val obj))
 
-(defun get-resource (id &optional type (pool *pool*))
+(defun get-resource (id &optional type (pool *resource-pool*))
   (let ((possible-types
           (if type 
             (list type)
@@ -75,17 +75,17 @@
         (error "multiple resources with id ~a present in pool ~a~%" id pool))
       (error "resource with id ~a not present in pool ~a~%" id pool))))
 
-(defun get-resource-val (id &optional type (pool *pool*))
+(defun get-resource-val (id &optional type (pool *resource-pool*))
   (get-val (get-resource id type pool)))
 
-(defun get-id (resource &optional (pool *pool*))
+(defun get-id (resource &optional (pool *resource-pool*))
   (declare (ignore resource pool))
   (error "write this when needed"))
 
 (defun get-key (id type)
   (format nil "~a.~a" id type))
 
-(defun add-resource (resource id &optional (pool *pool*))
+(defun add-resource (resource id &optional (pool *resource-pool*))
   (multiple-value-bind (cur-resource present-p) (gethash (get-key id (type resource)) pool)
     (declare (ignore cur-resource))
     (when present-p
@@ -93,7 +93,7 @@
               (get-key id (type resource)))))
   (setf (gethash (get-key id (type resource)) pool) resource))
 
-(defun remove-resource (resource &optional (pool *pool*))
+(defun remove-resource (resource &optional (pool *resource-pool*))
   (declare (ignore resource pool))
   (error "write this when needed"))
 
@@ -196,7 +196,7 @@
 ; Section for test code:
 #| 
 (let ((dir (choose-directory-dialog)))
-  (setf *pool* (init-pool))
+  (setf *resource-pool* (init-pool))
   (open-resource-file (directory-namestring dir))
   (print-pool)
   (get-resource-val "voteboxbg"))

@@ -25,7 +25,7 @@
        (load-file-list ".." "build" "file-list-uwi.txt"))
       (t nil))
 
-#+:clozure (setf *pool* (init-pool))
+#+:clozure (setf *resource-pool* (init-pool))
 
 (load-file-list "file-lists" "all.txt")
 
