@@ -583,7 +583,8 @@
 (defmethod device-handle-keypress ((device window) key)
   (declare (ignore device))
   (keypress key)
-  (sleep .2))
+  (time
+    (event-dispatch)))
 
 #|
 ;;; VIEW-KEY-EVENT-HANDLER      [Method]
@@ -610,7 +611,8 @@
 (defmethod device-handle-click ((device window))
   (left-mouse-click
     (local-to-global device (view-mouse-position device)))
-  (sleep .2))
+  (time
+    (event-dispatch)))
 
 #|
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]

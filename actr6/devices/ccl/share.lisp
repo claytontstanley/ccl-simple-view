@@ -1095,9 +1095,22 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :quickdraw))
 
-; nothing has broken yet with this one...
+; To implement event-dispatch for Clozure, send a dummy function over to
+; the main Cocoa thread to be evaluated, and block until that function is 
+; processed. This guarantees that all current event code in the Cocoa run loop
+; has been processed before event-dispatch returns.
+;
+; Note that I had to tweak the queue-for-event-process function. The dummy function
+; needs to 'not' go to the start of the queue, (and it goes to the front when called
+; within the call-in-event-process function), so I'm dynamically shadowing that function
+; here. Fun-orig is an anaphor that points to the default queue-for-event-process function.
+
 (defun event-dispatch ()
-  ())
+  (with-shadow (gui::queue-for-event-process
+                 (lambda (f &key at-start)
+                   (declare (ignore at-start))
+                   (funcall fun-orig f :at-start nil)))
+    (gui::call-in-event-process (lambda () ()))))
 
 (defparameter *current-dialog-directory* nil)
 
