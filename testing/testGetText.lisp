@@ -5,6 +5,6 @@
 
 (print *str*)
 
-(print *ret*)
+(print *modal-dialog-ret*)
 
 

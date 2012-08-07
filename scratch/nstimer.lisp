@@ -14,10 +14,10 @@
                         ccl:+null-ptr+
                         t)))
 (#/fireDate *timer*)
-*ret*
+*modal-dialog-ret*
 *timer*
 (objc:defmethod (#/aintenanceForWindows: :void) ((self easygui::cocoa-window) timer)
-  (setf *ret* 5)
+  (setf *modal-dialog-ret* 5)
   ())
 (#/addTimer:forMode: 
  (#/currentRunLoop ns:ns-run-loop)

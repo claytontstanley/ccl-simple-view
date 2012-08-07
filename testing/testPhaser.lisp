@@ -11,7 +11,7 @@
 
 ;(get-string-from-user "hello")
 ;
-;(setf *ret* (list 5 4))
+;(setf *modal-dialog-ret* (list 5 4))
 ;
 #|
 (make-instance 'main-control-window)
@@ -37,12 +37,12 @@
 
 (do-button *experiment* (current-btn *experiment*))
 (current-trial *experiment*)
-(print *ret*)
+(print *modal-dialog-ret*)
 
-(setf *ret* (list 1 1 1 1))
+(setf *modal-dialog-ret* (list 1 1 1 1))
 
 (xcond *experiment*)
 
-(setf *ret* (list 1 2 3))
+(setf *modal-dialog-ret* (list 1 2 3))
 
 |#

@@ -11,6 +11,6 @@
 (begin-experiment)
 
 ;(all-processes)
-;(setf *ret* nil)
-;*ret*
+;(setf *modal-dialog-ret* nil)
+;*modal-dialog-ret*
 ;

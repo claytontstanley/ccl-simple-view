@@ -37,8 +37,8 @@
 (check (eq *t* 5))
 
 #|
-*ret*
+*modal-dialog-ret*
 *t*
-(setf *ret* nil)
+(setf *modal-dialog-ret* nil)
 (return-from-modal-dialog 5)
 |#
