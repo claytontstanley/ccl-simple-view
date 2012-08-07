@@ -39,6 +39,9 @@
 ;;; 2007.07.13 Dan
 ;;;             : * Added the color keyword to make-button-for-rpm-window
 ;;;             :   though it's not actually used at this point.
+;;; 2012.08.07  cts
+;;;             : Tweaked original MCL uwi.lisp code, and used it to build a
+;;;               uwi.lisp for CCL that leverages ccl-simple-view.lisp.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
