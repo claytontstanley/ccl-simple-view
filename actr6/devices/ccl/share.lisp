@@ -751,10 +751,14 @@
    0
    (create-mouse-event #$NSLeftMouseDown pos)))
 
+; It takes roughly 1 ms for an event to hit the application's run loop, so sleep for 50x 
+; longer than this, to make extra extra sure that the event has hit the run loop before returning.
+
 (defun left-mouse-click (pos)
   (let ((pos (easygui::ns-point-from-point pos)))
     (left-mouse-down pos)
-    (left-mouse-up pos)))
+    (left-mouse-up pos)
+    (sleep .05)))
 
 ; Handling keyboard interaction
 
@@ -781,9 +785,12 @@
    #$kCGHIDEventTap
    (create-keyboard-event #$NO key)))
 
+; Same sleep time here.
+
 (defun keypress (key)
   (keypress-down key)
-  (keypress-up key))
+  (keypress-up key)
+  (sleep .05))
 
 (defmethod easygui::view-key-event-handler ((device window) key)
   (view-key-event-handler device key))
