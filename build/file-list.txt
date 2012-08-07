@@ -2,8 +2,6 @@ binccl/utilities.lisp
 submodules/lisp-dev/extras.lisp
 submodules/lisp-dev/lol-subset.lisp
 submodules/lisp-dev/extras-late.lisp
-submodules/lisp-dev/paip-subset.lisp
-submodules/lisp-dev/Lisp-Unit-Testing-Framework/unitTestFramework.lisp
 binccl/logger.lisp
 easygui/patches.lisp
 easygui/extensions.lisp
