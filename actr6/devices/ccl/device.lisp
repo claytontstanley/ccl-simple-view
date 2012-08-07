@@ -22,6 +22,16 @@
 ;;; Bugs        : 
 ;;; 
 ;;; --- History ---
+;;; 2012.08.07  cts
+;;;             : Tweaked original MCL device.lisp code, and used it to build a
+;;;               device for CCL that leverages ccl-simple-view.lisp.
+;;;               Note that for any code that is left in this file and is
+;;;               commented out, I did not fully understand exactly what is
+;;;               was meant for. But all tests are passing without adding the
+;;;               code back in. So I'm keeping it commented out. If someone
+;;;               fully understands how these pieces should
+;;;               work, and sees that the code isn't needed, feel free to
+;;;               remove. Or if it is needed, please add it back in.
 ;;; 01.09.21 mdb [b2]
 ;;;             : Fixed an infinte recursion bug in APPROACH-WIDTH.
 ;;; 2002.04.16 mdb [b6]
@@ -140,104 +150,6 @@
 
 
 
-
-#| Not adding these in at this point - only the basics which are shared
-   by acl/mcl/virtual
-
-(defmethod build-features-for ((self radio-button-dialog-item)
-                               (vis-mod vision-module))
-  (let* ((btn-height (point-v (view-size self)))
-         (text (dialog-item-text self)))
-    (cons
-     (make-instance 'oval-feature 
-       :x (+ 7 (point-h (view-position self))) :y (py (view-loc self))
-       :width 11 :height 11 :screen-obj self
-       :color (if (radio-button-pushed-p self)
-                'black
-                'light-gray))
-     (unless (equal text "")
-       (let* ((font-spec (view-font self))
-              (start-y nil)
-              (accum nil)
-              (textlines (string-to-lines text))
-              (width-fct #'(lambda (str) (string-width str font-spec))))
-         (multiple-value-bind (ascent descent) (font-info font-spec)
-           (setf start-y (+ (point-v (view-position self))
-                            (round (- btn-height (* (length textlines)
-                                                    (+ ascent descent))) 2)))
-           (dolist (item textlines (nreverse accum))
-             (push
-              (build-string-feats vis-mod :text item
-                                  :start-x 
-                                  (+ (point-h (view-position self))
-                                     17)
-                                  :y-pos 
-                                  (+ start-y (round (+ ascent descent) 2))
-                                  :width-fct width-fct 
-                                  :height (min ascent btn-height)
-                                  :obj self)
-              accum)
-             (incf start-y (+ ascent descent)))))))))
-
-
-;;; BUILD-FEATURES-FOR      [Method]
-;;; Date        : 02.04.16
-;;; Description : Very much like radio buttons, but if checked add an 
-;;;             : "X" to the output.
-
-(defmethod build-features-for ((self check-box-dialog-item)
-                                  (vis-mod vision-module))
-  (let ((btn-height (point-v (view-size self)))
-        (text (dialog-item-text self))
-        (feats nil))
-    (setf feats
-          (cons
-           (make-instance 'rect-feature 
-             :x (+ 8 (point-h (view-position self))) :y (py (view-loc self))
-             :width 11 :height 11 :color 'light-gray
-             :screen-obj self)
-           (unless (equal text "")
-             (let* ((font-spec (view-font self))
-                    (start-y nil)
-                    (accum nil)
-                    (textlines (string-to-lines text))
-                    (width-fct #'(lambda (str) (string-width str font-spec))))
-               (multiple-value-bind (ascent descent) (font-info font-spec)
-                 (setf start-y (+ (point-v (view-position self))
-                                  (round (- btn-height (* (length textlines)
-                                                          (+ ascent descent))) 2)))
-                 (dolist (item textlines (nreverse accum))
-                   (push
-                    (build-string-feats vis-mod :text item
-                                        :start-x 
-                                        (+ (point-h (view-position self))
-                                           17)
-                                        :y-pos 
-                                        (+ start-y (round (+ ascent descent) 2))
-                                        :width-fct width-fct 
-                                        :height (min ascent btn-height)
-                                        :obj self)
-                    accum)
-                   (incf start-y (+ ascent descent))))))))
-    (when (check-box-checked-p self)
-      (setf feats
-            (cons
-             (make-instance 'icon-feature
-               :x (+ 8 (point-h (view-position self)))
-               :y (py (view-loc self))
-               :kind 'visual-object
-               :value 'check
-               :screen-obj self
-               :height 11
-               :width 11)               
-             
-             feats)))
-    feats
-    ))
-
-|#
-
-
 (defmethod button-p (obj)
   (declare (ignore obj))
   nil)
@@ -288,15 +200,6 @@
        (#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))
        (#.#$tejustright (+ 1 left-x (- (width self) text-width))))))
  
-#|(defmethod text-just ((self static-text-dialog-item))
-   (if (null (slot-value self 'ccl::text-justification))
-     #.#$tejustleft
-     (or (cdr (assq (slot-value self 'ccl::text-justification)
-                        '((:left . #.#$tejustleft)
-                          (:center . #.#$tejustcenter)
-                          (:right . #.#$tejustright))))
-             (require-type (slot-value self 'ccl::text-justification) 'fixnum))))|#
-
 #|
 
 (defmethod cursor-to-vis-loc ((the-window window))
@@ -347,92 +250,6 @@
     (get-mouse-coordinates (current-device))
     (error "!! Can't find location of ~S" self)))
 
-#|
-(defmethod width ((self simple-view))
-  (point-h (view-size self)))
-
-
-(defmethod height ((self simple-view))
-  (point-v (view-size self)))
-|#
-#|
-
-
-;;;; ---------------------------------------------------------------------- ;;;;;;;
-;;;; The view based line drawing classes and methods
-;;;; ---------------------------------------------------------------------- ;;;;;;;
-
-;;; LINER      [Class]
-;;; Description : The base class for the view based lines.  
-;;;             : All it adds to a simple-view is a color slot that defaults
-;;;             : to black.
-
-(defclass liner (simple-view)
-  ((color :accessor color :initarg :color :initform *black-color*)))
-
-;;; POINT-IN-CLICK-REGION-P      [Method]
-;;; Description : Override this method so that lines don't handle mouse clicks.
-
-(defmethod point-in-click-region-p ((self liner) where)
-  (declare (ignore where))
-  nil)
-
-
-;;; TD-LINER      [Class]
-;;; Description : A view that represents a line which is drawn top-down 
-;;;             : i.e. from the view-position (upper-left) to the 
-;;;             : [view-size - (1,1)] (lower-right) in the container window
-
-(defclass td-liner (liner)
-  ())
-
-;;;  A view that represents a line which is drawn bottom-up i.e. from the
-;;;  view's lower-left to the view's upper-right in the container window.
-
-;;; BU-LINER      [Class]
-;;; Description : A view that represents a line which is drawn bottom-up 
-;;;             : i.e. from the view's lower-left to the view's upper-rignt
-;;;             : in the container window
-
-(defclass bu-liner (liner)
-  ())
-
-;;; VIEW-DRAW-CONTENTS [Method]
-;;; Description : Draw a top-down line on it's container window.
-
-(defmethod view-draw-contents ((lnr td-liner))
-  "Draws the line on the view-container window using the color specified
-   and restoring the previous draw color and pen position"
-  (let* ((parent (view-container lnr))
-         (old-point (pen-position parent))
-         (old-color (get-fore-color parent))
-         (other-end (add-points (view-size lnr) (view-position lnr))))
-    (set-fore-color parent (color lnr))
-    (move-to parent (view-position lnr))
-    (line-to parent (make-point (1- (point-h other-end))
-                                (1- (point-v other-end))))
-    (set-fore-color parent old-color)
-    (move-to parent old-point)))
-
-;;; VIEW-DRAW-CONTENTS [Method]
-;;; Description : Draw a bottom-up line on it's container window.
-
-(defmethod view-draw-contents ((lnr bu-liner))
-  "Draws the line on the view-container window using the color specified
-   and restoring the previous draw color and pen position"
-  (let* ((parent (view-container lnr))
-         (old-point (pen-position parent))
-         (old-color (get-fore-color parent)))
-    (set-fore-color parent (color lnr))
-    (move-to parent (make-point (point-h (view-position lnr))
-                                (1- (point-v (add-points (view-position lnr) (view-size lnr))))))
-    (line-to parent (make-point (1- (point-h (add-points (view-size lnr) (view-position lnr))))
-                                (point-v (view-position lnr))))
-    (set-fore-color parent old-color)
-    (move-to parent old-point)))
-
-
-|#
 
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : A td-liner is just a line-feature located "at" it's mid-point.
@@ -585,25 +402,7 @@
   (keypress key)
   (event-dispatch))
 
-#|
-;;; VIEW-KEY-EVENT-HANDLER      [Method]
-;;; Description : ACT-R couldn't actually type into editiable text dialog
-;;;             : items because the default method required that 
-;;;             : *current-event* be bound, which of course it wouldn't be.
-;;;             : So hack around it.
 
-(defmethod view-key-event-handler ((view editable-text-dialog-item) 
-                                       (char character))
-  (if (not (model-generated-action))
-    (call-next-method)
-    (progn
-      (cond ((graphic-char-p char) (ed-insert-char view char))
-            ((char= char #\backspace) (ed-rubout-char view))
-            )
-      (view-draw-contents view)))
-  )
-
-|#
 ;;; DEVICE-HANDLE-CLICK      [Method]
 ;;; Description : Again, just call the base MCL method and dispatch.
 
@@ -612,7 +411,6 @@
     (local-to-global device (view-mouse-position device)))
   (event-dispatch))
 
-#|
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
 ;;; Date        : 97.02.18 [revised 98.10.29]
 ;;; Description : Since moving the mouse is considered a Bad Thing by 
@@ -624,41 +422,13 @@
 ;;;             : changes from -1 to 255 when this happens) by the OS.  Then 
 ;;;             : make sure it's been registered by MCL with UPDATE-CURSOR.
 
-#-ccl-4.3.1
 (defmethod device-move-cursor-to ((device window) (xyloc vector))
-  (let ((absloc (local-to-global device (px xyloc) (py xyloc))))
-    (without-interrupts
-     (ccl::%put-point (%int-to-ptr #$mtemp) absloc)
-     (ccl::%put-point (%int-to-ptr #$rawmouse) absloc)
-     (%put-word (%int-to-ptr #$crsrnew) -1))
-    (while (eql (%get-signed-word (%int-to-ptr #$crsrnew)) -1))
-    (update-cursor)
-    (while (not (vpt= xyloc (p2vpt (view-mouse-position device))))
-      (event-dispatch))))
+  (setf xyloc (local-to-global device (vpt2p xyloc)))
+  (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
+                                                 (point-v xyloc)))
+  (event-dispatch))
 
-#+(and :ccl-4.3.1 (not :ccl-5.0))
-(defmethod device-move-cursor-to ((device window) (xyloc vector))
-  (let ((absloc (local-to-global device (px xyloc) (py xyloc))))
-    (without-interrupts
-     ;(ccl::%put-point (%int-to-ptr #$MTemp) absloc)
-     (#_lmsetmousetemp absloc)
-     ;(ccl::%put-point (%int-to-ptr #$RawMouse) absloc)
-     (#_lmsetrawmouselocation absloc)
-     ;(%put-word (%int-to-ptr #$CrsrNew) -1)
-     (#_lmsetcursornew -1)
-     )
-    ;(while (eql (%get-signed-word (%int-to-ptr #$CrsrNew)) -1))
-    (while (eql (#_lmgetcursornew) -1))
-    (update-cursor)
-    (while (not (vpt= xyloc (p2vpt (view-mouse-position device))))
-      (event-dispatch))))
-
-
-(unless (fboundp 'speech-available-p)
-  (defun speech-available-p () nil))
-
-
-
+#|
 ;;; DEVICE-SPEAK-STRING      [Method]
 ;;; Description : If the Mac Speech Manager is installed, actually speak the
 ;;;             : string.
@@ -700,135 +470,6 @@
 |#
 
 
-#|
-
-(defmethod populate-loc-to-key-array ((ar array))
-  "Sets all the keys in the array that need to be set"
-  ;; function key row
-  (setf (aref ar 0 0) #\esc)
-  (setf (aref ar 2 0) #\2061)
-  (setf (aref ar 3 0) #\2062)
-  (setf (aref ar 4 0) #\2063)
-  (setf (aref ar 5 0) #\2064)
-  (setf (aref ar 7 0) #\2065)
-  (setf (aref ar 8 0) #\2066)
-  (setf (aref ar 9 0) #\2067)
-  (setf (aref ar 10 0) #\2070)
-  (setf (aref ar 12 0) #\2071)
-  (setf (aref ar 13 0) #\2101)
-  (setf (aref ar 14 0) #\2102)
-  (setf (aref ar 15 0) #\2103)
-  (setf (aref ar 17 0) #\2014)
-  (setf (aref ar 18 0) #\2015)
-  (setf (aref ar 19 0) #\2016)
-  ;; numeric key row
-  (setf (aref ar 0 2) #\tab)
-  (setf (aref ar 1 2) #\1)
-  (setf (aref ar 2 2) #\2)
-  (setf (aref ar 3 2) #\3)
-  (setf (aref ar 4 2) #\4)
-  (setf (aref ar 5 2) #\5)
-  (setf (aref ar 6 2) #\6)
-  (setf (aref ar 7 2) #\7)
-  (setf (aref ar 8 2) #\8)
-  (setf (aref ar 9 2) #\9)
-  (setf (aref ar 10 2) #\0)
-  (setf (aref ar 11 2) #\-)
-  (setf (aref ar 12 2) #\=)
-  (setf (aref ar 13 2) #\delete)
-  (setf (aref ar 15 2) #\help)
-  (setf (aref ar 16 2) #\home)
-  (setf (aref ar 17 2) #\pageup)
-  (setf (aref ar 19 2) #\esc)
-  (setf (aref ar 20 2) #\=)
-  (setf (aref ar 21 2) #\/)
-  (setf (aref ar 22 2) #\*)
-  ;; qwerty row
-  (setf (aref ar 0 3) #\tab)
-  (setf (aref ar 1 3) #\q)
-  (setf (aref ar 2 3) #\w)
-  (setf (aref ar 3 3) #\e)
-  (setf (aref ar 4 3) #\r)
-  (setf (aref ar 5 3) #\t)
-  (setf (aref ar 6 3) #\y)
-  (setf (aref ar 7 3) #\u)
-  (setf (aref ar 8 3) #\i)
-  (setf (aref ar 9 3) #\o)
-  (setf (aref ar 10 3) #\p)
-  (setf (aref ar 11 3) #\[)
-  (setf (aref ar 12 3) #\])
-  (setf (aref ar 13 3) #\\)
-  (setf (aref ar 15 3) #\del)
-  (setf (aref ar 16 3) #\end)
-  (setf (aref ar 17 3) #\page)
-  (setf (aref ar 19 3) #\7)
-  (setf (aref ar 20 3) #\8)
-  (setf (aref ar 21 3) #\9)
-  (setf (aref ar 22 3) #\-)
-  ;; ASDF row
-  (setf (aref ar 0 4) 'caps-lock)
-  (setf (aref ar 1 4) #\a)
-  (setf (aref ar 2 4) #\s)
-  (setf (aref ar 3 4) #\d)
-  (setf (aref ar 4 4) #\f)
-  (setf (aref ar 5 4) #\g)
-  (setf (aref ar 6 4) #\h)
-  (setf (aref ar 7 4) #\j)
-  (setf (aref ar 8 4) #\k)
-  (setf (aref ar 9 4) #\l)
-  (setf (aref ar 10 4) #\;)
-  (setf (aref ar 11 4) #\')
-  (setf (aref ar 12 4) #\newline)
-  (setf (aref ar 13 4) #\newline)
-  (setf (aref ar 19 4) #\4)
-  (setf (aref ar 20 4) #\5)
-  (setf (aref ar 21 4) #\6)
-  (setf (aref ar 22 4) #\+)
-  ;; Z row
-  (setf (aref ar 0 5) 'shift)
-  (setf (aref ar 1 5) #\z)
-  (setf (aref ar 2 5) #\x)
-  (setf (aref ar 3 5) #\c)
-  (setf (aref ar 4 5) #\v)
-  (setf (aref ar 5 5) #\b)
-  (setf (aref ar 6 5) #\n)
-  (setf (aref ar 7 5) #\m)
-  (setf (aref ar 8 5) #\,)
-  (setf (aref ar 9 5) #\.)
-  (setf (aref ar 10 5) #\/)
-  (setf (aref ar 11 5) 'shift)
-  (setf (aref ar 12 5) 'shift)
-  (setf (aref ar 16 5) #\uparrow)
-  (setf (aref ar 19 5) #\1)
-  (setf (aref ar 20 5) #\2)
-  (setf (aref ar 21 5) #\3)
-  (setf (aref ar 22 5) #\enter)
-  ;; space bar row
-  (setf (aref ar 0 6) 'control)
-  (setf (aref ar 1 6) 'option)
-  (setf (aref ar 2 6) 'command)
-  (setf (aref ar 3 6) #\space)
-  (setf (aref ar 4 6) #\space)
-  (setf (aref ar 5 6) #\space)
-  (setf (aref ar 6 6) #\space)
-  (setf (aref ar 7 6) #\space)
-  (setf (aref ar 8 6) #\space)
-  (setf (aref ar 9 6) #\space)
-  (setf (aref ar 10 6) #\space)
-  (setf (aref ar 11 6) 'command)
-  (setf (aref ar 12 6) 'option)
-  (setf (aref ar 13 6) 'control)
-  (setf (aref ar 15 6) #\backarrow)
-  (setf (aref ar 16 6) #\downarrow)
-  (setf (aref ar 17 6) #\forwardarrow)
-  (setf (aref ar 19 6) #\0)
-  (setf (aref ar 20 6) #\0)
-  (setf (aref ar 21 6) #\.)
-  (setf (aref ar 22 6) #\enter)
-  ar)
-
-|#
-
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; RPM overlay and Focus ring stuff
 
@@ -852,7 +493,6 @@
 (defmethod update-me ((olay rpm-overlay) (wind window) (xyloc vector))
   (set-view-position olay (add-points (offset olay) (vpt2p xyloc)))
   (unless (equal (view-window olay) wind) (add-subviews wind olay))
-  (event-dispatch)
   (when (wptr (view-window olay)) (view-draw-contents olay)))
 
 
@@ -915,81 +555,6 @@
 (eval-when (load eval)
   (setf *attn-tracker* (make-instance 'focus-ring)))
 
-;;;; ---------------------------------------------------------------------- ;;;;
-;;;; color text stuff
-
-#|
-(defun system-color->symbol (color)
-  "Given an MCL color code, return a symbol representing that color.  Unknown colors get mapped to COLOR-RRRRR-GGGGG-BBBBB."
-  (if (null color)
-    'black
-    (case color
-      (#.*black-color* 'black)
-      (#.*green-color* 'green)
-      (#.*red-color* 'red)
-      (#.*blue-color* 'blue)
-      (#.*brown-color* 'brown)
-      (#.*purple-color* 'purple)
-      (#.*pink-color* 'pink)
-      (#.*orange-color* 'orange)
-      (#.*dark-gray-color* 'dark-gray)
-      (#.*light-blue-color* 'light-blue)
-      (#.*white-color* 'white)
-      (#.*light-gray-color* 'light-gray)
-      (#.*dark-green-color* 'dark-green)
-      (#.*tan-color* 'tan)
-      (#.*yellow-color* 'yellow)
-      (otherwise (intern (format nil "COLOR-~5,'0d-~5,'0d-~5,'0d" 
-                                 (color-red color) 
-                                 (color-green color) 
-                                 (color-blue color)))))))
-
-|#
-
-;;;; ---------------------------------------------------------------------- ;;;;
-;;;; handling mouse movement under MCL 5.0 and OS X.
-
-#+(and :ccl-5.0 (not :ccl-5.2))
-(when (osx-p)
-(progn
-
-(defparameter *warp* (lookup-function-in-framework 
-                       "CGWarpMouseCursorPosition"))
-
-(defmethod device-move-cursor-to ((device window) (xyloc vector))
-  (when (and device (wptr device)) (window-select device))
-  (setf xyloc (local-to-global device (vpt2p xyloc)))
-  (ccl::ppc-ff-call *warp* 
-                    :single-float (coerce (point-h xyloc) 'short-float)
-                    :single-float (coerce (point-v xyloc) 'short-float)
-                    :unsigned-fullword)
-  )))
-
-
-;;; under MCL 5.2, can't use CFBundle, but there are alternate ways to 
-;;; deal with framework calls, so use that.
-
-#+ccl-5.2
-(when (osx-p)
-  (progn
-    (defparameter *warp* (ccl::lookup-function-in-bundle 
-                          "CGWarpMouseCursorPosition"
-                          (ccl::load-framework-bundle "ApplicationServices.framework")))
-
-    (defmethod device-move-cursor-to ((device window) (xyloc vector))
-      (when (and device (wptr device)) (window-select device))
-      (setf xyloc (local-to-global device (vpt2p xyloc)))
-      (ccl::ppc-ff-call *warp* 
-                        :single-float (coerce (point-h xyloc) 'short-float)
-                        :single-float (coerce (point-v xyloc) 'short-float)
-                        :unsigned-fullword))
-    ))
-
-#+:clozure
-(defmethod device-move-cursor-to ((device window) (xyloc vector))
-  (setf xyloc (local-to-global device (vpt2p xyloc)))
-  (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
-                                                 (point-v xyloc))))
 
 #|
 This library is free software; you can redistribute it and/or
