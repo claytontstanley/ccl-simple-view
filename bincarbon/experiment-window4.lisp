@@ -71,6 +71,7 @@
 (require :misc-lib)
 (require :seq-math)
 (require :launch-url)
+(require :menubar-hide)
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; globals, macros, & setup

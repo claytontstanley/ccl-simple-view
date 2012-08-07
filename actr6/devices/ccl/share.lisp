@@ -1265,17 +1265,19 @@
   (#_CGDisplayShowCursor
    (#_CGMainDisplayID)))
 
-; FIXME: I've seen these menubar functions crash Cocoa. Figure out why they are unreliable.
+; Running on main gui thread is required for the menubar functions. Otherwise Cocoa crashes fairly often when these are called.
 
 (defun hide-menubar ()
-  (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
-   (logior
-     #$NSApplicationPresentationHideDock
-     #$NSApplicationPresentationHideMenuBar)))
+  (easygui::running-on-main-thread ()
+    (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
+     (logior
+       #$NSApplicationPresentationHideDock
+       #$NSApplicationPresentationHideMenuBar))))
 
 (defun show-menubar ()
-  (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
-   #$NSApplicationPresentationDefault))
+  (easygui::running-on-main-thread ()
+    (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
+     #$NSApplicationPresentationDefault)))
 
 (defun X86-Darwin64::|showmenubar| ()
   (show-menubar))

@@ -7,9 +7,9 @@ submodules/tambo-diss/tamborello-dissertation-model/procedure-window2-actr.lisp
 submodules/tambo-diss/tamborello-dissertation-model/base-trek-tasks-actr.lisp
 bincarbon/seq-math.lisp
 bincarbon/launch-url.lisp
+bincarbon/menubar-hide.lisp
 submodules/tambo-diss/tamborello-dissertation-model/experiment-window4-actr.lisp
 bincarbon/blinker.lisp
-bincarbon/menubar-hide.lisp
 submodules/tambo-diss/tamborello-dissertation-model/X84-actr.lisp
 submodules/tambo-diss/tamborello-dissertation-model/devices.lisp
 submodules/tambo-diss/tamborello-dissertation-model/tamborello-dissertation-model.lisp
