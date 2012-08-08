@@ -1185,26 +1185,6 @@
   (declare (ignore path mac-file-type))
   t)
 
-; ----------------------------------------------------------------------
-; Manipulate the read table so that MCL's #@(a b) make-point shorthand works. 
-;
-; CCL does not support this by default, and the objective-c bridge has its own use for the
-; #@ macro character, so note that no easygui/objective-c code should be loaded/read
-; after this read-table mod is made. If this needs to be done, restore the readtable first
-; ----------------------------------------------------------------------
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defvar *nonhacked-readtable* (copy-readtable))
-  ; Code grabbed from RMCL, since MCL is now open-sourced (yay!)
-  ; For reading #@(h v) as points.
-  (set-dispatch-macro-character 
-    #\# #\@
-    (defun |#@-reader| (stream char arg)
-      (declare (ignore arg char))
-      (let ((list (read stream t nil t)))
-        (unless *read-suppress*
-          `(make-point ,@list))))))
-
 (defparameter *current-cursor* (#/currentCursor ns:ns-cursor))
 
 (defun set-cursor (cursor)
@@ -1226,8 +1206,50 @@
    (get-resource-val id 'image)
    (#/hotSpot *arrow-cursor*)))
 
+(defun hide-cursor ()
+  (#_CGDisplayHideCursor
+   (#_CGMainDisplayID)))
+
+(defun show-cursor ()
+  (#_CGDisplayShowCursor
+   (#_CGMainDisplayID)))
+
+; Running on main gui thread is required for the menubar functions. Otherwise Cocoa crashes fairly often when these are called.
+
+(defun hide-menubar ()
+  (easygui::running-on-main-thread ()
+    (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
+     (logior
+       #$NSApplicationPresentationHideDock
+       #$NSApplicationPresentationHideMenuBar))))
+
+(defun show-menubar ()
+  (easygui::running-on-main-thread ()
+    (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
+     #$NSApplicationPresentationDefault)))
+
 (defun beep ()
   (#_NSBeep))
+
+; ----------------------------------------------------------------------
+; Manipulate the read table so that MCL's #@(a b) make-point shorthand works. 
+;
+; CCL does not support this by default, and the objective-c bridge has its own use for the
+; #@ macro character, so note that no easygui/objective-c code should be loaded/read
+; after this read-table mod is made. If this needs to be done, restore the readtable first
+; ----------------------------------------------------------------------
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *nonhacked-readtable* (copy-readtable))
+  ; Code grabbed from RMCL, since MCL is now open-sourced (yay!)
+  ; For reading #@(h v) as points.
+  (set-dispatch-macro-character 
+    #\# #\@
+    (defun |#@-reader| (stream char arg)
+      (declare (ignore arg char))
+      (let ((list (read stream t nil t)))
+        (unless *read-suppress*
+          `(make-point ,@list))))))
 
 ; ----------------------------------------------------------------------
 ; Manipulate reader functionality so that references to foreign functions that no longer exist can
@@ -1273,36 +1295,14 @@
 
 ; All of the functions being natively defined are here
 
-(defun hide-cursor ()
-  (#_CGDisplayHideCursor
-   (#_CGMainDisplayID)))
-
-(defun show-cursor ()
-  (#_CGDisplayShowCursor
-   (#_CGMainDisplayID)))
-
-; Running on main gui thread is required for the menubar functions. Otherwise Cocoa crashes fairly often when these are called.
-
-(defun hide-menubar ()
-  (easygui::running-on-main-thread ()
-    (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
-     (logior
-       #$NSApplicationPresentationHideDock
-       #$NSApplicationPresentationHideMenuBar))))
-
-(defun show-menubar ()
-  (easygui::running-on-main-thread ()
-    (#/setPresentationOptions: (#/sharedApplication ns:ns-application)
-     #$NSApplicationPresentationDefault)))
-
 (defun X86-Darwin64::|showmenubar| ()
   (show-menubar))
 
 (defun X86-Darwin64::|hidemenubar| ()
   (hide-menubar))
 
-(defun X86-Darwin64::|getcursor| (num)
-  (get-cursor num))
+(defun X86-Darwin64::|getcursor| (id)
+  (get-cursor id))
 
 (defun X86-Darwin64::|showcursor| ()
   (show-cursor))
