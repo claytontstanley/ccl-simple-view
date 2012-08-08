@@ -390,8 +390,9 @@
 (ccl::register-character-name "DownArrow" #\U+F701)
 (ccl::register-character-name "BackArrow" #\U+F702)
 (ccl::register-character-name "ForwardArrow" #\U+F703)
-(defparameter *arrow-cursor* 'arrow-cursor-fixme)
+(defparameter *arrow-cursor* (#/arrowCursor ns:ns-cursor))
 (defparameter *black-pattern* 'black-pattern-fixme)
+
 
 (defun make-point (x y)
   (easygui::point x y :allow-negative-p t))
@@ -1204,11 +1205,26 @@
         (unless *read-suppress*
           `(make-point ,@list))))))
 
-(defun set-cursor (cursor)
-  cursor)
+(defparameter *current-cursor* (#/currentCursor ns:ns-cursor))
 
-(defun get-cursor (num)
-  num)
+(defun set-cursor (cursor)
+  (awhen (get-front-window)
+    (unwind-protect (setf *current-cursor* cursor)
+      (sv-log "setting cursor for window ~a to ~a" it cursor)
+      (#/invalidateCursorRectsForView: (cocoa-ref it)
+       (cocoa-ref (content-view it))))))
+
+(objc:defmethod (#/resetCursorRects :void) ((self easygui::cocoa-contained-view))
+  (sv-log "called resetCursorRects for ~a" self)
+  (call-next-method)
+  (#/addCursorRect:cursor: self
+   (#/bounds self)
+   *current-cursor*))
+
+(defun get-cursor (id)
+  (#/initWithImage:hotSpot: (#/alloc ns:ns-cursor)
+   (get-resource-val id 'image)
+   (#/hotSpot *arrow-cursor*)))
 
 (defun beep ()
   (#_NSBeep))

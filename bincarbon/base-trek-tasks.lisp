@@ -739,7 +739,7 @@
   (:default-initargs
     :view-size #@(33 33)
     :view-position #@(400 100)
-    :icon 501
+    :icon "Target"
     :view-nick-name :shoot
     ))
 
