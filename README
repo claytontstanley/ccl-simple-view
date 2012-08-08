@@ -1,3 +1,17 @@
+The purpose of this code is to enable Clozure Common Lisp to read in GUI source code written for Macintosh Common Lisp. This enables task environments written in MCL (e.g., Phaser, Votebox, NextGen) to work with CCL with minimal code modifications. 
+
+Currently, three files are generated during the build to achieve this purpose:
+[1] ccl-simple-view.lisp > submodules/actr6/support
+[2] device.lisp > submodules/actr6/devices/ccl/device.lisp
+[3] uwi.lisp > submodules/actr6/devices/ccl/uwi.lisp
+
+[1] provides the language layer for CCL, so that CCL can read in MCL gui source code. You'll see a subset of Digitool's GUI specification implemented for CCL in this file.
+[2] and [3] provide the ACT-R device for CCL, so that models that interacted with the task environments written for MCL can now work with CCL. These files are essentially copies of the analogous files for MCL, except at the top they require [1], so that the MCL language layer is available in CCL before the rest of the code is read in.
+
+ccl-simple-view.lisp is a concatenation of many smaller .lisp files in this repo. This was done because I find it easier / more productive to work with many smaller files during development, but it's easier / more straightfoward to provide a single file that does a single purpose to the user. 
+
+ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozure's Objective C bridge and Apple's Cocoa framework. The majority of the structure of this file is written in CLOS style, and is built on top of Clozure's provided 'easygui' package. 
+
 
 Directory Structure:
 
@@ -5,95 +19,16 @@ Directory Structure:
 ├── Makefile
 ├── README
 ├── actr6
-│   └── devices
 ├── bincarbon
-│   ├── CFBundle.lisp
-│   ├── base-trek-tasks.lisp
-│   ├── blinker.lisp
-│   ├── device-extensions.lisp
-│   ├── device-patches-mcl.lisp
-│   ├── experiment-window4.lisp
-│   ├── launch-url.lisp
-│   ├── menubar-hide.lisp
-│   ├── misc-lib.lisp
-│   ├── pict-svm.lisp
-│   ├── procedure-window2.lisp
-│   ├── seq-math.lisp
-│   ├── snd-player.lisp
-│   └── timer.lisp
 ├── binccl
-│   ├── logger.lisp
-│   ├── mcl-ccl-colors.lisp
-│   ├── resources.lisp
-│   └── utilities.lisp
 ├── build
-│   ├── Makefile
-│   ├── file-list-device.txt
-│   ├── file-list-uwi.txt
-│   ├── file-list.txt
-│   ├── outFileHeader.lisp
-│   ├── post-code.lisp
-│   └── post-file-list.txt
 ├── docs
-│   ├── Getting\ Started\ with\ MCL.pdf
-│   ├── InterfaceBuilderWithCCLTutorial.pdf
-│   └── Macintosh\ Common\ Lisp\ Ref.pdf
 ├── easygui
-│   ├── extensions.lisp
-│   └── patches.lisp
 ├── rmcl
-│   ├── examples
-│   ├── level-1
-│   └── lib
 ├── scratch
-│   ├── colors.lisp
-│   ├── dialog-item.lisp
-│   ├── ffi.lisp
-│   ├── image.lisp
-│   ├── it-example1.lisp
-│   ├── keyboard.lisp
-│   ├── mouse.lisp
-│   ├── nstimer.lisp
-│   ├── scratch.lisp
-│   └── threads.lisp
 ├── submodules
-│   ├── ACT-R-VoteBox-Models
-│   ├── X83-Frank-Trek-11
-│   ├── actr6
-│   ├── ccl
-│   ├── kristenVotebox
-│   ├── lisp-dev
-│   ├── nextGen
-│   ├── rmcl
-│   └── tambo-diss
 ├── testing
-│   ├── Makefile
-│   ├── bootstrap-mcl.lisp
-│   ├── bootstrap.lisp
-│   ├── ccl -> ../submodules/ccl/dx86cl64
-│   ├── data
-│   ├── file-lists
-│   ├── testCCLDevice.lisp
-│   ├── testDrawing.lisp
-│   ├── testFormat.lisp
-│   ├── testGetText.lisp
-│   ├── testIcons.lisp
-│   ├── testImages.lisp
-│   ├── testLevelIndicator.lisp
-│   ├── testModalDialog.lisp
-│   ├── testNextGen.lisp
-│   ├── testPhaser.lisp
-│   ├── testPolygon.lisp
-│   ├── testSound.lisp
-│   ├── testTamboDis.lisp
-│   ├── testTamboDisModel.lisp
-│   ├── testTutorials.lisp
-│   ├── testVotebox.lisp
-│   ├── testVoteboxKristen.lisp
-│   ├── testWindow.lisp
-│   └── utilities.lisp -> ../binccl/utilities.lisp
 └── tools
-    └── merge-and-verify-driver
 
 
 actr6:		All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. 
@@ -135,13 +70,6 @@ testing:	Source code for testing the ccl code
 tools:		Various shell scripts and tools used to manage the repo
 		-merge-and-verify-driver. Used by git when I want to do a merge by hand.
 	
-Main files:	
-
-actr6/devices/ccl/share.lisp: Implements basic MCL GUI interface in CCL. Leverages CCL's easygui package so that a Cocoa window can be used in CCL.
-actr6/devices/ccl/uwi.lisp: CCL's implementation of the RPM interface. Note that this file is identical to MCL's file
-actr6/devices/ccl/device.lisp: CCL's implementation of the RPM interface. Only slight changes to this file compared to MCL's file. I'm trying to keep these to a minimum.
-
-
 To run a test:
 		-Mount RedGiant volume	
 		-Navigate to the Projects/mcl-migration folder on RedGiant
