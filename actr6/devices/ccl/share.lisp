@@ -1201,10 +1201,23 @@
    (#/bounds self)
    *current-cursor*))
 
-(defun get-cursor (id)
-  (#/initWithImage:hotSpot: (#/alloc ns:ns-cursor)
-   (get-resource-val id 'image)
-   (#/hotSpot *arrow-cursor*)))
+(defmethod create-resource ((type (eql 'cursor)) id)
+  (make-instance
+    'resource
+    :alloc-fn
+    (lambda ()
+      (#/initWithImage:hotSpot: (#/alloc ns:ns-cursor)
+       (get-resource-val id 'image)
+       (#/hotSpot *arrow-cursor*)))))
+
+(defmethod get-cursor :before (id)
+  (unless (resource-present-p id 'cursor)
+    (add-resource
+      (create-resource 'cursor id)
+      id)))
+
+(defmethod get-cursor (id)
+  (get-resource-val id 'cursor))
 
 (defun hide-cursor ()
   (#_CGDisplayHideCursor

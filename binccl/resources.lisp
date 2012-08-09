@@ -27,6 +27,10 @@
              (format t "~a->~a~%" key val))
            pool))
 
+(defun get-pool-as-lst (&optional (pool *resource-pool*))
+  (loop for value being the hash-values of pool using (hash-key key)
+        collect (cons key value)))
+
 (defclass resource ()
   ((val :accessor val :initarg :val)
    (type :accessor type :initarg :type)
@@ -59,7 +63,7 @@
   (alloc-resource obj)
   (val obj))
 
-(defun get-resource (id &optional type (pool *resource-pool*))
+(defun resource-present-p (id &optional type (pool *resource-pool*))
   (let ((possible-types
           (if type 
             (list type)
@@ -69,11 +73,16 @@
       (multiple-value-bind (resource present-p) (gethash (get-key id type) pool)
         (when present-p
           (push resource out))))
-    (if out
-      (if (eq (length out) 1)
-        (first out)
+    (when out
+      (unless (eq (length out) 1)
         (error "multiple resources with id ~a present in pool ~a~%" id pool))
-      (error "resource with id ~a not present in pool ~a~%" id pool))))
+      (values t (first out)))))
+  
+(defun get-resource (id &optional type (pool *resource-pool*))
+  (multiple-value-bind (present-p resource) (resource-present-p id type pool)
+    (unless present-p
+      (error "resource with id ~a not present in pool ~a~%" id pool))
+    resource))
 
 (defun get-resource-val (id &optional type (pool *resource-pool*))
   (get-val (get-resource id type pool)))
@@ -86,11 +95,9 @@
   (format nil "~a.~a" id type))
 
 (defun add-resource (resource id &optional (pool *resource-pool*))
-  (multiple-value-bind (cur-resource present-p) (gethash (get-key id (type resource)) pool)
-    (declare (ignore cur-resource))
-    (when present-p
-      (sv-log "adding resource with key ~a and overwriting resource with same key that is already present~%"
-              (get-key id (type resource)))))
+  (when (resource-present-p resource id pool)
+    (sv-log "adding resource with key ~a and overwriting resource with same key that is already present~%"
+            (get-key id (type resource))))
   (setf (gethash (get-key id (type resource)) pool) resource))
 
 (defun remove-resource (resource &optional (pool *resource-pool*))
