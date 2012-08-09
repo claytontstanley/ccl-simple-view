@@ -17,16 +17,16 @@
 *modal-dialog-ret*
 *timer*
 (objc:defmethod (#/aintenanceForWindows: :void) ((self easygui::cocoa-window) timer)
-  (setf *modal-dialog-ret* 5)
-  ())
+                (setf *modal-dialog-ret* 5)
+                ())
 (#/addTimer:forMode: 
  (#/currentRunLoop ns:ns-run-loop)
  *timer*
  #$NSDefaultRunLoopMode)
 (#/run *)
 (#/currentMode *)
- (#/currentRunLoop ns:ns-run-loop)
- (#/mainRunLoop ns:ns-run-loop)
+(#/currentRunLoop ns:ns-run-loop)
+(#/mainRunLoop ns:ns-run-loop)
 (#/aintenanceForWindows: *t* *timer*)
 (all-processes)
 |#

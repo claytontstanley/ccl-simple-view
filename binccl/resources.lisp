@@ -77,7 +77,7 @@
       (unless (eq (length out) 1)
         (error "multiple resources with id ~a present in pool ~a~%" id pool))
       (values t (first out)))))
-  
+
 (defun get-resource (id &optional type (pool *resource-pool*))
   (multiple-value-bind (present-p resource) (resource-present-p id type pool)
     (unless present-p

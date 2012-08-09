@@ -104,7 +104,7 @@
 (require-compiled "CCL-SIMPLE-VIEW" "ACT-R6:support;ccl-simple-view")
 
 #|(defparameter *crosshair-cursor* 
-  (#_getcursor #$crosscursor) "Crosshair cursor")|#
+    (#_getcursor #$crosscursor) "Crosshair cursor")|#
 
 (defvar *attn-tracker* nil "Holds the view for the focus ring.")
 ;(defparameter *last-update* (get-internal-real-time))
@@ -123,16 +123,16 @@
 
 (defmethod build-vis-locs-for ((self window) (vis-mod vision-module))
   (let ((base-ls (flatten
-                    (mapcar #'(lambda (obj) (build-vis-locs-for obj vis-mod))
-                            (get-sub-objects self)))))
-   ; (dolist (feat base-ls)
-   ;   (fill-default-dimensions feat))
+                   (mapcar #'(lambda (obj) (build-vis-locs-for obj vis-mod))
+                           (get-sub-objects self)))))
+    ; (dolist (feat base-ls)
+    ;   (fill-default-dimensions feat))
     base-ls))
 
 (defmethod vis-loc-to-obj ((device window) loc)
   (case (chunk-slot-value-fct loc 'kind)
     (cursor
-       (fill-default-vis-obj-slots (car (define-chunks (isa cursor))) loc))))
+      (fill-default-vis-obj-slots (car (define-chunks (isa cursor))) loc))))
 
 (defgeneric get-sub-objects (view)
   (:documentation  "Grabbing the sub-objects of a view by default returns the subviews."))
@@ -168,38 +168,38 @@
              (textlines (string-to-lines text))
              (width-fct #'(lambda (str) (string-width str font-spec)))
              (color (system-color->symbol (aif (part-color self :text)
-                                           it
-                                           *black-color*))))
+                                            it
+                                            *black-color*))))
         (multiple-value-bind (ascent descent) (font-info font-spec)
           (setf start-y (point-v (view-position self)))
           (dolist (item textlines)
             (push
-             (build-string-feats vis-mod :text item
-                                 :start-x (xstart self)                               
-                                 :y-pos 
-                                 (+ start-y (round (+ ascent descent) 2))
-                                 :width-fct width-fct 
-                                 :height ascent
-                                 :obj self)
-             accum)
+              (build-string-feats vis-mod :text item
+                                  :start-x (xstart self)                               
+                                  :y-pos 
+                                  (+ start-y (round (+ ascent descent) 2))
+                                  :width-fct width-fct 
+                                  :height ascent
+                                  :obj self)
+              accum)
             (incf start-y (+ ascent descent))))
-        
+
         (setf accum (flatten (nreverse accum)))
         (dolist (x accum accum)
           (set-chunk-slot-value-fct x 'color color)
           (setf (chunk-visual-object x) self))))))
 
 (defmethod xstart ((self static-text-dialog-item))
-   (let ((left-x (point-h (view-position self)))
-         (text-width (string-width (dialog-item-text self)
-                                     (view-font self)))
-         (text-justification (text-just self))
-         )
-     (ecase text-justification
-       (#.#$tejustleft (1+ left-x))
-       (#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))
-       (#.#$tejustright (+ 1 left-x (- (width self) text-width))))))
- 
+  (let ((left-x (point-h (view-position self)))
+        (text-width (string-width (dialog-item-text self)
+                                  (view-font self)))
+        (text-justification (text-just self))
+        )
+    (ecase text-justification
+      (#.#$tejustleft (1+ left-x))
+      (#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))
+      (#.#$tejustright (+ 1 left-x (- (width self) text-width))))))
+
 #|
 
 (defmethod cursor-to-vis-loc ((the-window window))
@@ -207,8 +207,8 @@
         (shape (window-cursor the-window)))
     (when (cursor-in-window-p the-window)
       (car (define-chunks-fct `((isa visual-location kind cursor 
-                                   screen-x ,(point-h pos)
-                                   screen-y ,(point-v pos)
+                                     screen-x ,(point-h pos)
+                                     screen-y ,(point-v pos)
                                      value ,(case shape
                                               (*i-beam-cursor* 'i-beam)
                                               (*crosshair-cursor* 'crosshair)
@@ -216,16 +216,16 @@
                                               (otherwise 'pointer)))))))))
 
 (defgeneric cursor-in-window-p (wind)
-  (:documentation  "Returns T if the cursor is over <wind>, NIL otherwise."))
+            (:documentation  "Returns T if the cursor is over <wind>, NIL otherwise."))
 
 (defmethod cursor-in-window-p ((tw window))
   (when (window-shown-p tw)
     (rlet ((the-rect rect))
-      (points-to-rect (view-position tw)
-                      (add-points (view-position tw) (view-size tw))
-                      the-rect)
-      (point-in-rect-p the-rect 
-                       (local-to-global tw (view-mouse-position tw))))))
+          (points-to-rect (view-position tw)
+                          (add-points (view-position tw) (view-size tw))
+                          the-rect)
+          (point-in-rect-p the-rect 
+                           (local-to-global tw (view-mouse-position tw))))))
 
 
 |#
@@ -267,20 +267,20 @@
                                            screen-y ,(loc-avg (point-v start-pt) (point-v end-pt))
                                            width ,(abs (- (point-h start-pt) (point-h end-pt)))
                                            height ,(abs (- (point-v start-pt) (point-v end-pt)))))))))
-    
+
     (setf (chunk-visual-object f) lnr)
     f))
 
 #|(defmethod vis-loc-to-obj ((lnr td-liner) loc)
-  (let ((start-pt (view-position lnr))
-        (end-pt (subtract-points (add-points (view-position lnr) (view-size lnr)) 
-                                 (make-point 1 1)))
-        (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
-    (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
-    (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
-    (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
-    (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-    v-o))|#
+    (let ((start-pt (view-position lnr))
+          (end-pt (subtract-points (add-points (view-position lnr) (view-size lnr)) 
+                                   (make-point 1 1)))
+          (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
+      (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
+      (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
+      (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
+      (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
+      v-o))|#
 
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : A bu-liner is just a line-feature located "at" it's mid-point.
@@ -299,21 +299,21 @@
                                            screen-y ,(loc-avg (point-v start-pt) (point-v end-pt))
                                            width ,(abs (- (point-h start-pt) (point-h end-pt)))
                                            height ,(abs (- (point-v start-pt) (point-v end-pt)))))))))
-    
+
     (setf (chunk-visual-object f) lnr)
     f))
 
 #|(defmethod vis-loc-to-obj ((lnr bu-liner) loc)
-  (let ((start-pt (add-points (view-position lnr)
-                               (make-point 0 (1- (point-v (view-size lnr))))))
-        (end-pt (add-points (view-position lnr) 
-                             (make-point (1- (point-h (view-size lnr))) 0)))
-        (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
-    (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
-    (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
-    (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
-    (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-    v-o))|#
+    (let ((start-pt (add-points (view-position lnr)
+                                (make-point 0 (1- (point-v (view-size lnr))))))
+          (end-pt (add-points (view-position lnr) 
+                              (make-point (1- (point-h (view-size lnr))) 0)))
+          (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
+      (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
+      (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
+      (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
+      (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
+      v-o))|#
 
 
 #|
@@ -325,8 +325,8 @@
 
 (defun rpm-view-line (wind start-pt end-pt &optional (color *black-color*))
   "Adds a view in the specified window which draws a line from the start-pt to the end-pt
-   using the optional color specified (defaulting to black).  This view will add features 
-   to the icon on PM-PROC-DISPLAY."
+  using the optional color specified (defaulting to black).  This view will add features 
+  to the icon on PM-PROC-DISPLAY."
   (let* ((gx (> (point-h end-pt) (point-h start-pt)))
          (gy (> (point-v end-pt) (point-v start-pt)))
          (vs (subtract-points start-pt end-pt)))
@@ -334,24 +334,24 @@
                          (+ 1 (abs (point-v vs)))))
     (add-subviews wind (cond ((and gx gy)
                               (make-instance 'td-liner
-                                :color color
-                                :view-position start-pt 
-                                :view-size vs))
+                                             :color color
+                                             :view-position start-pt 
+                                             :view-size vs))
                              ((and (not gx) (not gy))
                               (make-instance 'td-liner
-                                :color color
-                                :view-position end-pt 
-                                :view-size vs))
+                                             :color color
+                                             :view-position end-pt 
+                                             :view-size vs))
                              ((and gx (not gy))
                               (make-instance 'bu-liner
-                                :color color
-                                :view-position (make-point (point-h start-pt) (point-v end-pt))
-                                :view-size vs))
+                                             :color color
+                                             :view-position (make-point (point-h start-pt) (point-v end-pt))
+                                             :view-size vs))
                              (t
-                              (make-instance 'bu-liner
-                                :color color
-                                :view-position (make-point (point-h end-pt) (point-v start-pt))
-                                :view-size vs))))))
+                               (make-instance 'bu-liner
+                                              :color color
+                                              :view-position (make-point (point-h end-pt) (point-v start-pt))
+                                              :view-size vs))))))
 
 |#
 
@@ -464,7 +464,7 @@
 
 #|
 (defmethod do-update :after ((mstr-proc master-process) current-time 
-                               &key (real-wait nil))
+                                                        &key (real-wait nil))
   (declare (ignore current-time real-wait))
   (event-dispatch))
 |#

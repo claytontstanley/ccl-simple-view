@@ -1120,7 +1120,7 @@
                  (lambda (f &key at-start)
                    (declare (ignore at-start))
                    (funcall fun-orig f :at-start nil)))
-    (gui::call-in-event-process (lambda () ()))))
+               (gui::call-in-event-process (lambda () ()))))
 
 (defparameter *current-dialog-directory* nil)
 
