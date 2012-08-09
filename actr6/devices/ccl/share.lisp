@@ -610,7 +610,7 @@
 ; This one uses Doug Hoyte's defmacro! and ,g!... syntax to easily handle unwanted variable capture. 
 (defmacro! with-graphics-context (&body body)
   "Any changes to the graphics environment by body, will be valid only in body"
-  `(let ((,g!context (#/currentContext ns::ns-graphics-context)))
+  `(let ((,g!context (#/currentContext ns:ns-graphics-context)))
      (unwind-protect (progn 
                        (#/saveGraphicsState ,g!context)
                        ,@body)
@@ -1077,7 +1077,7 @@
 (defun string-width (str font)
   (let* ((dict (get-dict-for-font font))
          (attr (#/initWithString:attributes: (#/alloc ns:ns-attributed-string)
-                (ccl::%make-nsstring str)
+                (objc:make-nsstring str)
                 dict))
          (size (#/size attr)))
     (ns:ns-size-width size)))
