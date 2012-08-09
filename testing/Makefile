@@ -19,7 +19,7 @@ binaryFileStr = ${binaryFileLst:%= -o -name '*.%'}
 
 unit: clean-actr-compiled-files
 	make -C ../build all
-	${ccl} ${initString} ${testString} ${cclQuit}
+	${ccl} -e '(require :cocoa)' ${initString} ${testString} ${cclQuit}
 
 # FIXME: Should I do anything different for CI tests compared to unit tests.
 # All of the tests are pretty-much regression CI tests anyways. Don't really have unit tests (yet) for this repo
