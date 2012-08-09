@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/MacPorts 2012_1) (format=pdflatex 2012.8.8)  9 AUG 2012 10:29
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/MacPorts 2012_1) (format=pdflatex 2012.8.8)  9 AUG 2012 11:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -219,11 +219,11 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 62.
+(Font)              <12> on input line 61.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 62.
+(Font)              <8> on input line 61.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 62.
+(Font)              <6> on input line 61.
 
 [1
 
@@ -232,37 +232,39 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 \openout3 = `README.toc'.
 
 
-[1] [2] <./Pictures/placeholder.png, id=16, 281.05pt x 170.6375pt>
-File: ./Pictures/placeholder.png Graphic file (type png)
+[1]
+Overfull \hbox (24.45712pt too wide) in paragraph at lines 107--108
+[]\OT1/cmr/m/n/12 ccl-simple-view.lisp im-ple-ments Dig-i-tool's GUI spec-i-fi-
+ca-tion by levarag-ing CLozure's
+ []
 
-<use ./Pictures/placeholder.png>
-Package pdftex.def Info: ./Pictures/placeholder.png used on input line 114.
-(pdftex.def)             Requested size: 209.12683pt x 126.97015pt.
- [3 <./Pictures/placeholder.png>]
-<./Pictures/fish.png, id=20, 211.79124pt x 158.5925pt>
-File: ./Pictures/fish.png Graphic file (type png)
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 117.
 
-<use ./Pictures/fish.png>
-Package pdftex.def Info: ./Pictures/fish.png used on input line 148.
-(pdftex.def)             Requested size: 158.93843pt x 119.01907pt.
- [4 <./Pictures/fish.png>] [5] [6] (./README.aux) ) 
+(/opt/local/share/texmf-texlive-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 117.
+ [2] [3] [4]
+[5] (./README.aux) ) 
 Here is how much of TeX's memory you used:
  2291 strings out of 493488
- 32686 string characters out of 3140906
- 184754 words of memory out of 3000000
- 5580 multiletter control sequences out of 15000+200000
- 10398 words of font info for 36 fonts, out of 3000000 for 9000
+ 32670 string characters out of 3140906
+ 184746 words of memory out of 3000000
+ 5581 multiletter control sequences out of 15000+200000
+ 10097 words of font info for 35 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
- 37i,5n,23p,232b,259s stack positions out of 5000i,500n,10000p,200000b,50000s
-</opt/local/share/texmf-texl
-ive-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></opt/local/share/texmf-texl
-ive-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></opt/local/share/texmf-tex
-live-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></opt/local/share/texmf-texl
-ive-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on README.pdf (7 pages, 77819 bytes).
+ 37i,4n,23p,409b,244s stack positions out of 5000i,500n,10000p,200000b,50000s
+</opt/local/share/texmf-texlive-dist/fonts/type1/public/ams
+fonts/cm/cmbx12.pfb></opt/local/share/texmf-texlive-dist/fonts/type1/public/ams
+fonts/cm/cmcsc10.pfb></opt/local/share/texmf-texlive-dist/fonts/type1/public/am
+sfonts/cm/cmr12.pfb></opt/local/share/texmf-texlive-dist/fonts/type1/public/ams
+fonts/cm/cmsy10.pfb></opt/local/share/texmf-texlive-dist/fonts/type1/public/ams
+fonts/cm/cmti12.pfb>
+Output written on README.pdf (6 pages, 71649 bytes).
 PDF statistics:
- 47 PDF objects out of 1000 (max. 8388607)
- 30 compressed objects within 1 object stream
+ 43 PDF objects out of 1000 (max. 8388607)
+ 29 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

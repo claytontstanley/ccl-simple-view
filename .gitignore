@@ -1,3 +1,4 @@
 .DS_Store
 *.lisp.swp
+*.tex.swp
 *.dx64fsl

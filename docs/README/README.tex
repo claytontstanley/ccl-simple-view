@@ -46,25 +46,24 @@
 
 \center % Center everything on the page
 
-\textsc{\LARGE University Name}\\[1.5cm] % Name of your university/college
-\textsc{\Large Major Heading}\\[0.5cm] % Major heading such as course name
-\textsc{\large Minor Heading}\\[0.5cm] % Minor heading such as course title
+\textsc{\LARGE Rice University}\\[1.5cm] % Name of your university/college
+\textsc{\Large Department of Psychology}\\[0.5cm] % Major heading such as course name
 
 \HRule \\[0.4cm]
-{ \huge \bfseries Title}\\[0.4cm] % Title of your document
+{ \huge \bfseries Lab Transition From MCL to Clozure Common Lisp}\\[0.4cm] % Title of your document
 \HRule \\[1.5cm]
 
 \begin{minipage}{0.4\textwidth}
 \begin{flushleft} \large
 \emph{Author:}\\
-John \textsc{Smith} % Your name
+Clayton Stanley % Your name
 \end{flushleft}
 \end{minipage}
 ~
 \begin{minipage}{0.4\textwidth}
 \begin{flushright} \large
 \emph{Supervisor:} \\
-Dr. James \textsc{Smith} % Supervisor's Name
+Dr. Mike Byrne % Supervisor's Name
 \end{flushright}
 \end{minipage}\\[4cm]
 
@@ -90,83 +89,91 @@ Dr. James \textsc{Smith} % Supervisor's Name
 
 \section{Introduction} % Major section
 
-Example citation \cite{Figueredo:2009dg}.
+The purpose of this code is to enable Clozure Common Lisp to read in GUI source code written for Macintosh Common Lisp. This enables task environments written in MCL (e.g., Phaser, Votebox, NextGen) to work with CCL with minimal code modifications. 
 
-%------------------------------------------------
+Currently, three files are generated during the build to achieve this purpose:
+\begin{enumerate}
+\item ccl-simple-view.lisp: submodules/actr6/support
+\item device.lisp: submodules/actr6/devices/ccl/device.lisp
+\item uwi.lisp: submodules/actr6/devices/ccl/uwi.lisp
+\end{enumerate}
 
-\subsection{Subsection 1} % Sub-section
+1. provides the language layer for CCL, so that CCL can read in MCL gui source code. You'll see a subset of Digitool's GUI specification implemented for CCL in this file.
 
-\lipsum[1] % Dummy text
+2. and 3. provide the ACT-R device for CCL, so that models that interacted with the task environments written for MCL can now work with CCL. These files are essentially copies of the analogous files for MCL, except at the top they require 1., so that the MCL language layer is available in CCL before the rest of the code is read in.
 
-%------------------------------------------------
+ccl-simple-view.lisp is a concatenation of many smaller .lisp files in this repo. This was done because I find it easier / more productive to work with many smaller files during development, but it's easier / more straightfoward to provide a single file that does a single purpose to the user. 
 
-\subsection{Subsection 2} % Sub-section
-
-\lipsum[2] % Dummy text
-
-%------------------------------------------------
-
-\subsubsection{Subsubsection 1} % Sub-sub-section
-
-\lipsum[3] % Dummy text
-
-\begin{figure}[H] % Example image
-\center{\includegraphics[width=0.5\linewidth]{placeholder}}
-\caption{Example image.}
-\label{fig:speciation}
-\end{figure}
-
-%------------------------------------------------
-
-\subsubsection{Subsubsection 2} % Sub-sub-section
-
-\lipsum[4] % Dummy text
+ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozure's Objective C bridge and Apple's Cocoa framework. The majority of the structure of this file is written in CLOS style, and is built on top of Clozure's provided 'easygui' package. 
 
 %----------------------------------------------------------------------------------------
 %	MAJOR SECTION 1
 %----------------------------------------------------------------------------------------
 
-\section{Content Section} % Major section
+\section{Directory Structure} % Major section
 
-\lipsum[5] % Dummy text
+\begin{itemize}
 
-%------------------------------------------------
+\item actr6: All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. Note the share.lisp file lives here for now, which contains the MCL GUI interface for CCL
 
-\subsection{Subsection 1} % Sub-section
+\item bincarbon: All original MCL bincarbon code. Just a few files have minor tweaks to work with CCL. Timer is broken on CCL currently though. Other files, like CFBundle.lisp don't work at all on CCL, but aren't necessary on CCL. The main goal for this folder is to document all changes to bincarbon files when migrating to CCL, while maintaining backwards compatibility with MCL.
 
-\subsubsection{Subsubsection 1} % Sub-sub-section
+\item binccl: CCL-specific utility files. Contains a CCL implementation of an interface for managing resource files (e.g., sounds, images)
 
-\lipsum[6] % Dummy text
+\item build: Code to generate a single source file from current code in the repo.
 
-%------------------------------------------------
+\item docs: Archived documentation and reference manuals found online.
 
-\subsubsection{Subsubsection 2} % Sub-sub-section
+\item easygui: Any .lisp extensions to CCL's easygui package. Contains a few bug fixes, and an extension which provides a Cocoa view that does not respond to mouse activity	
+\item rmcl: Any lisp code from RMCL that was either directly copied to this distro (some of the digitool GUI code could be bootstrapped after the CCL interface was defined) or rewritten for this distro (e.g., thermometer.lisp, the modal dialog implementation)
 
-\lipsum[6] % Dummy text
-\begin{wrapfigure}{l}{0.4\textwidth} % Inline image example
-  \begin{center}
-    \includegraphics[width=0.38\textwidth]{fish}
-  \end{center}
-  \caption{Fish}
-\end{wrapfigure}
-\lipsum[7-8] % Dummy text
+\item scratch: Stray lisp code, experimental, etc. None of this is loaded for any of the tests
 
-%------------------------------------------------
+\item submodules: Source code for actr and ccl
+	\begin{itemize}
+	\item actr is newest version (as of Jun 2012). All code is same except that loader files (loader.lisp) are inside each of the tutorial folders
+	\item ccl is newest version (as of Jun 2012). Original image. Used to reference ccl src and run basic ccl core file
+	\item lisp-dev is a git repo for building a custom ccl core that I use during development. I'm using some of the src for the utilities in the GUI code, so the builds here grab some of that src.
+	\item rmcl is the newest version; no changes; used to reference rmcl src, and run rmcl for each of the tests.
+	\end{itemize}
 
-\subsubsection{Subsubsection 3} % Sub-sub-section
+\item testing: Source code for testing the ccl code
+	\begin{itemize}
+	\item testCCLDevice.lisp: Used to test basic functionality of building a Cocoa display by writing lisp code that meets the uwi.lisp interface spec
+	\item testTutorials.lisp: Runs ACT-R through all tutorials; checks that ACT-R can 'see' CCL's Cocoa device
+	\item testImages.lisp: Tests that the CCL resources.lisp file correctly manages images
+	\item testVotebox.lisp: Tests to run Votebox on CCL
+	\item testPhaser.lisp: Tests to run Phaser on CCL
+	\end{itemize}
 
-\begin{description} % Numbered list example
+\item tools: Various shell scripts and tools used to manage the repo
+	\begin{itemize}
+	\item merge-and-verify-driver. Used by git when I want to do a merge by hand.
+	\end{itemize}
 
-\item[First] \hfill \\
-\lipsum[9] % Dummy text
+\end{itemize}
 
-\item[Second] \hfill \\
-\lipsum[10] % Dummy text
+\section{To Run A Test}
 
-\item[Third] \hfill \\
-\lipsum[11] % Dummy text
+\begin{itemize}
+\item Mount RedGiant volume	
+\item Navigate to the Projects/mcl-migration folder on RedGiant
+\item Either access the data in the folder over the network (preferred), or copy the folder locally if you want to access it w/o internet.
+\item Download Clozure CL from the App Store and install if you don't have it yet.
+\item Launch Clozure CL
+\item Use the Cocoa listener to load one of the test files.
+\end{itemize}
 
-\end{description} 
+e.g.: Launch Clozure CL, and then load Votebox in ./testing/testVotebox.lisp
+
+\subsection{Notes about the Tests}
+
+	Each test loads a bootstrap file, and then any necessary files to run that particular test.
+		The bootstrap file (bootstrap.lisp) loads up ccl-simple-view and any shared lisp code that is needed to run a test file (particularly the unit test framework). 
+		The necessary files to run the test are defined in ./testing/file-lists/[testName]/[testName].txt. If you wanted to bootstrap the test code manually, load each lisp file in the order in that file.
+
+
+
 
 %----------------------------------------------------------------------------------------
 %	MAJOR SECTION X - TEMPLATE - UNCOMMENT AND FILL IN
