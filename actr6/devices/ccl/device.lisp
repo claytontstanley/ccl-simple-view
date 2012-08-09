@@ -495,6 +495,8 @@
   (unless (equal (view-window olay) wind) (add-subviews wind olay))
   (when (wptr (view-window olay)) (view-draw-contents olay)))
 
+(defmethod update-me ((olay rpm-overlay) (wind window) (xyloc (eql nil)))
+  (sv-log "calling update-me with nil xyloc"))
 
 ;;; BUILD-FEATURES-FOR      [Method]
 ;;; Description : We don't want icon features for the focus ring, and since 

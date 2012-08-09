@@ -7,7 +7,7 @@
                      file))
   (funcall fun)
   (when close-window-p
-    (close-rpm-window *library-experiment-window*)))
+    (close-exp-window)))
 
 (defun do-tutorial (tutorial)
   (let ((path-to-loader
