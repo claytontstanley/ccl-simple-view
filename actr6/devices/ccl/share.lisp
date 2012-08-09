@@ -1189,9 +1189,9 @@
 
 (defparameter *current-cursor* *arrow-cursor*)
 
-(defun set-cursor (cursor)
-  (awhen (get-front-window)
-    (unwind-protect (setf *current-cursor* cursor)
+(defmethod set-cursor ((cursor ns:ns-cursor))
+  (unwind-protect (setf *current-cursor* cursor)
+    (awhen (get-front-window)
       (sv-log "setting cursor for window ~a to ~a" it cursor)
       (#/invalidateCursorRectsForView: (cocoa-ref it)
        (cocoa-ref (content-view it))))))

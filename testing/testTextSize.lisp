@@ -30,4 +30,3 @@ Review your choices"
 
 (inspect *tv*)
 
-(#/font (cocoa-ref *tv*))

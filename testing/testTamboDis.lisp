@@ -10,7 +10,6 @@
 (load-file-list "file-lists" "TamboDis" "testPhaser.txt")
 (begin-experiment)
 
-(make-instance 'window)
 
 (all-processes)
 ;(setf *modal-dialog-ret* nil)
