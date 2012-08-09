@@ -1187,7 +1187,7 @@
   (declare (ignore path mac-file-type))
   t)
 
-(defparameter *current-cursor* (#/currentCursor ns:ns-cursor))
+(defparameter *current-cursor* *arrow-cursor*)
 
 (defun set-cursor (cursor)
   (awhen (get-front-window)
