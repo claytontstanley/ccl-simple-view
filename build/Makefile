@@ -43,4 +43,4 @@ deploy:
 	cd ${depdir}; git remote update; git rebase origin/master; git submodule update --init --recursive
 	cd ${depdir}; make -C build all
 	cd ${depdir}; make -C testing continuous-integration
-
+	cd ${depdir}; make -C docs/README
