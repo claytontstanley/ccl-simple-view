@@ -161,7 +161,9 @@
   (unless (wptr win)
     (sv-log "Attempting to close window ~a which is already closed" win)
     (return-from window-close nil))
-  (guard-nil (close-requested-p win))
+  (when (close-requested-p win)
+    (sv-log "Already requested for window ~a to be closed" win)
+    (return-from window-close nil))
   (setf (close-requested-p win) t)
   (signal-semaphore (sema-request-close win))
   (sv-log "requesting to close win ~a on thread ~a~%" win *current-process*)
@@ -412,22 +414,22 @@
 (defmethod point-string ((point easygui::eg-point))
   (format nil "#@(~a ~a)" (point-x point) (point-y point)))
 
-(defmethod add-subviews ((view view) &rest subviews)
+(defmethod add-subviews ((view simple-view) &rest subviews)
   (when subviews
     (apply #'easygui:add-subviews view subviews)))
 
-(defmethod remove-subviews ((view view) &rest subviews)
+(defmethod remove-subviews ((view simple-view) &rest subviews)
   (when subviews
     (apply #'easygui:remove-subviews view subviews)))
 
-(defmethod subviews ((view view) &optional subview-type)
+(defmethod subviews ((view simple-view) &optional subview-type)
   (declare (ignore subview-type))
   (easygui:view-subviews view))
 
-(defmethod view-subviews ((view view))
+(defmethod view-subviews ((view simple-view))
   (easygui:view-subviews view))
 
-(defmethod view-named (name (view view))
+(defmethod view-named (name (view simple-view))
   (acond ((easygui:view-named name view)
           it)
          (t
