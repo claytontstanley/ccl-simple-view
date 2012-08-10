@@ -106,7 +106,6 @@
 #|(defparameter *crosshair-cursor* 
     (#_getcursor #$crosscursor) "Crosshair cursor")|#
 
-(defvar *attn-tracker* nil "Holds the view for the focus ring.")
 ;(defparameter *last-update* (get-internal-real-time))
 
 (defun loc-avg (x y)
@@ -549,13 +548,15 @@
 ;;;             : ring.
 
 (defmethod device-update-attended-loc ((wind window) xyloc)
-  (update-me *attn-tracker* wind xyloc))
+  (unless (visual-fixation-marker)
+    (setf (visual-fixation-marker) (make-instance 'focus-ring)))
+  (update-me (visual-fixation-marker) wind xyloc))
 
 
-;;; make the fous ring
-
-(eval-when (load eval)
-  (setf *attn-tracker* (make-instance 'focus-ring)))
+(defmethod device-update-attended-loc ((wind window) (xyloc (eql nil)))
+  (when (visual-fixation-marker)
+    (awhen (view-window (visual-fixation-marker))
+      (remove-subviews it (visual-fixation-marker)))))
 
 
 #|
