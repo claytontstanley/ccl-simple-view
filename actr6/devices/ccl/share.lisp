@@ -1197,7 +1197,6 @@
        (cocoa-ref (content-view it))))))
 
 (objc:defmethod (#/resetCursorRects :void) ((self easygui::cocoa-contained-view))
-  (sv-log "called resetCursorRects for ~a" self)
   (call-next-method)
   (#/addCursorRect:cursor: self
    (#/bounds self)

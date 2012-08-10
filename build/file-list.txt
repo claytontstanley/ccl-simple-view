@@ -13,3 +13,4 @@ rmcl/lib/color.lisp
 rmcl/lib/dialogs.lisp
 rmcl/lib/ccl-menus.lisp
 rmcl/examples/thermometer.lisp
+build/post-code.lisp

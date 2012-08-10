@@ -15,7 +15,7 @@ outFiles = ccl-simple-view.lisp device.lisp uwi.lisp
 
 all: ${outFiles}
 
-ccl-simple-view.lisp : fileList = file-list.txt post-file-list.txt
+ccl-simple-view.lisp : fileList = file-list.txt
 device.lisp : fileList = file-list-device.txt
 uwi.lisp : fileList = file-list-uwi.txt
 
