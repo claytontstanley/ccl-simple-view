@@ -134,7 +134,10 @@
               (while (wptr win)
                 (cond ((close-requested-p win)
                        (sv-log "closing ~a on thread ~a~%" win *current-process*)
-                       (easygui:perform-close win)
+                       ; easygui's perform-close currently runs on current thread; maintenance thread does 
+                       ; not have an autorelease-pool set up; so explicitly create one for the close
+                       (easygui::with-autorelease-pool
+                         (easygui:perform-close win))
                        (signal-semaphore (sema-finished-close win)))
                       ((aand (get-front-window) (eq win it))
                        (window-null-event-handler win)))
