@@ -24,9 +24,65 @@ Review your choices"
                          :view-nick-name :tv2
                          :VIEW-FONT
                          '("Lucida Grande" 18 :SRCOR :PLAIN (:COLOR-INDEX 0))))))
-                         
+
+#|
+(view-named :tv *win*)
+
+(#/attributedStringValue (cocoa-ref *))
+
+(setf *as* *)
+
+(#/attribute:atIndex:effectiveRange: 
+ *as* 
+ #$NSParagraphStyleAttributeName
+ 0 
+ ccl:+null-ptr+ )
+
+(setf *mps* (#/mutableCopy *))
+
+(#/setTighteningFactorForTruncation:
+ *mps* 
+ .05)
+
+(#/setLineBreakMode:
+ *mps*
+ #$NSLineBreakByTruncatingTail)
+ ;#$NSLineBreakByCharWrapping)
+*mas*
+*mps*
+*as*
+(#/length *as*)
+(setf *mas* (#/mutableCopy *as*))
+*mas*
+(#/addAttribute:value:range:
+ *mas*
+ #$NSParagraphStyleAttributeName
+ *mps*
+ (ns:make-ns-range 0 (#/length *mas*)))
+
+
+(#/cell (cocoa-ref (view-named :tv *win*)))
+
+(#/setLineBreakMode: (#/cell (cocoa-ref (view-named :tv *win*)))
+ #$NSLineBreakByTruncatingTail)
+ 
+ 
+
+(#/setAttributedStringValue: (cocoa-ref (view-named :tv *win*))
+ *mas*)
+
+(invalidate-view (view-named :tv *win*))
+
+#$NSParagraphStyleAttributeName
+
+(#/tighteningFactorForTruncation (#/defaultParagraphStyle ns:ns-paragraph-style))
+ (#/defaultParagraphStyle ns:ns-paragraph-style)
+
+(#/setTighteningFactorForTruncation: 
+ ns:ns-paragraph-style
+ .5)
 
 (setf *tv* (view-named :tv *win*))
 
 (inspect *tv*)
-
+|#
