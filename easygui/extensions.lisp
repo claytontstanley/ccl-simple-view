@@ -155,7 +155,8 @@
 ; (not #/keyDown:) when typing in a text field, so that's why there's the discrepency here.
 (objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-field) the-event)
   (call-next-method the-event)
-  (#/keyDown: (#/window cocoa-self) the-event))
+  (#/keyDown: (#/window cocoa-self) the-event)
+  ) 
 
 (defmethod easygui::cocoa-win-p ((win t))
   nil)

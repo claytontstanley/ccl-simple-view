@@ -527,7 +527,7 @@
     (#/selectText: (cocoa-ref view)
      ccl:+null-ptr+)
     (#/setSelectedRange:
-     (#/fieldEditor:forObject: (cocoa-ref (view-window view))
+     (#/fieldEditor:forObject: (cocoa-ref (guard-!nil (view-window view)))
       #$YES 
       (cocoa-ref view))
      (ns:make-ns-range position (- cursorpos position)))))

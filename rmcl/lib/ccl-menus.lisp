@@ -94,14 +94,30 @@
                        (make-dialog-item 'editable-text-dialog-item
                                          (make-point (+ 6 message-len) (- (point-v size) 54 delta))
                                          (make-point (- (point-h size) delta message-len) 16)
-                                         initial-string))))
+                                         initial-string
+                                         nil
+                                         :view-nick-name :et))))
       (when message (add-subviews  dialog  message-item))
-
       (update-default-button dialog)
+      (let ((et (view-named :et dialog)))
+        (set-selection-range et 0 (length (dialog-item-text et))))
       (cond ((not modeless)         
               (modal-dialog dialog))
             (t (window-show dialog)
              dialog)))))
+
+#|
+(let ((string "hello")
+      (size #@(100 100)))
+  (message-dialog string :title "Message" :size size :position #@(300 250)))
+(#/defaultButtonCell (cocoa-ref *))
+(cocoa-ref (view-named :db **))
+(#/cell *)
+(inspect *)
+(setf *modal-dialog-ret* nil)
+(consp t)
+(get-string-from-user "hello" :initial-string "j")
+|#
 
 ; need close box if modal nil 
 (defun message-dialog (message &key (ok-text "OK")
@@ -140,7 +156,8 @@
                             ok-text
                             #'(lambda (item)
                                 (declare (ignore item))
-                                (return-from-modal-dialog t)))))))))
+                                (return-from-modal-dialog t))
+                            :view-nick-name :db)))))))
     (if modal
       (modal-dialog new-dialog)
       new-dialog)))
