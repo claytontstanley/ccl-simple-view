@@ -74,7 +74,7 @@
                          'default-button-dialog-item
                          (make-point (- (point-h size) 74)
                                      (- (point-v size) 20 delta))
-                         #@(62 20)
+                         #@(62 25)
                          ok-text
                          (if (not modeless)
                            #'(lambda (item)
@@ -83,7 +83,7 @@
                        (make-dialog-item 'button-dialog-item
                                          (make-point (- (point-h size) 154)
                                                      (- (point-v size) 20 delta))
-                                         #@(62 20)
+                                         #@(70 25)
                                          cancel-text
                                          (or cancel-function
                                              #'(lambda (item)
@@ -136,7 +136,7 @@
                     (list (make-dialog-item
                             'default-button-dialog-item
                             (subtract-points size #@(75 35))
-                            #@(62 20)
+                            #@(62 25)
                             ok-text
                             #'(lambda (item)
                                 (declare (ignore item))
