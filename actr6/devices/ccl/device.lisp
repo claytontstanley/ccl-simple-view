@@ -561,7 +561,7 @@
 
 (defmethod device-update-attended-loc ((wind window) (xyloc (eql nil)))
   (when (visual-fixation-marker)
-    (when (aand (view-window (visual-fixation-marker)) (eq it wind))
+    (when (aand (view-window (visual-fixation-marker)) (eq it wind) (wptr wind))
       (remove-subviews wind (visual-fixation-marker)))
     (setf (visual-fixation-marker) nil)))
 
