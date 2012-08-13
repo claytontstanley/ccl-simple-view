@@ -1,15 +1,24 @@
+
+TOP := $(shell pwd)
+
+zip-% : zipDir = .
+zip-actr6 : zipDir = submodules/actr6
+
 zip-%:
 	make -C testing clean-actr-compiled-files
 	make -C build all
 	rm -f $*.zip	
-	make -s file-list-$* | while read line; do zip --symlinks -r $*.zip "$$line"; done
+	cd ${zipDir}; make -C ${TOP} -s file-list-$* | while read line; do zip --symlinks -r $*.zip "$$line"; done
 
 
 file-list-all : fl = Votebox VoteboxKristen Phaser Tutorials
 file-list-tamborello: fl = Phaser TamboDis TamboDisModel
 file-list-% : fl = $*
 
-
+file-list-actr6:
+	echo "support/ccl-simple-view.lisp"
+	echo "devices/ccl/device.lisp"
+	echo "devices/ccl/uwi.lisp"
 
 file-list-%:
 	cat testing/file-lists/*.txt
