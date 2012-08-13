@@ -188,7 +188,7 @@
 ;;;             : parameters supplied.
 
 (defmethod make-button-for-rpm-window ((win rpm-real-window) &key (x 0) (y 0) 
-                                                             (text "Ok") (action nil) (height 18)  
+                                                             (text "Ok") (action nil) (height 25)
                                                              (width 60) (color 'gray))
   (make-dialog-item 'button-dialog-item
                     (make-point x y)
