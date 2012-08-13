@@ -236,7 +236,7 @@
                     (call-next-method))
     (awhen (text-truncation view)
       (#/setLineBreakMode: (#/cell (cocoa-ref view)) it))))
-    
+
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
 ; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.
 ; Most of the easygui package uses a global easygui::*view-class-to-ns-class-map* variable that contains mappings of lisp
