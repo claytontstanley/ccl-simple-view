@@ -24,8 +24,8 @@
   (clear-all))
 
 (do-agi-example "multiple-models-single-window.lisp")
-(do-agi-example "single-model-multiple-windows.lisp")
 (do-agi-example "multiple-models-multiple-windows.lisp")
+(do-agi-example "single-model-multiple-windows.lisp")
 
 ; This suite takes about 4 mins to run on CCL b/c of unit4:
 ;(mapc #'do-tutorial (list "unit1" "unit2" "unit3" "unit4"))

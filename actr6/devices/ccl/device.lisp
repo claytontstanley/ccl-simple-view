@@ -552,12 +552,18 @@
     (setf (visual-fixation-marker) (make-instance 'focus-ring)))
   (update-me (visual-fixation-marker) wind xyloc))
 
+; When called with nil xyloc, remove the current visual-fication-marker.
+; Note that this is called in cases where the current marker is not a subview in wind.
+; For instance, at the start of a model run after a previous model has been run,
+; the vis location marker might still be non-nil, but there is not a focus ring
+; on the current window (window for new model). In this case, just set the vis
+; location marker to nil.
 
 (defmethod device-update-attended-loc ((wind window) (xyloc (eql nil)))
   (when (visual-fixation-marker)
-    (awhen (view-window (visual-fixation-marker))
-      (remove-subviews it (visual-fixation-marker)))))
-
+    (when (aand (view-window (visual-fixation-marker)) (eq it wind))
+      (remove-subviews wind (visual-fixation-marker)))
+    (setf (visual-fixation-marker) nil)))
 
 #|
 This library is free software; you can redistribute it and/or
