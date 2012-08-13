@@ -138,18 +138,6 @@
 (defmethod easygui::link-cocoa-view :after ((cocoa-view easygui::cocoa-drawing-view) view)
   (setf (slot-value cocoa-view 'easygui::flipped) (slot-value view 'easygui::flipped)))
 
-(defun set-to-truncate (cocoa-view)
-  (#/setLineBreakMode: (#/cell cocoa-view)
-   #$NSLineBreakByTruncatingTail))
-
-(defmethod easygui::link-cocoa-view :after ((cocoa-view easygui::cocoa-text-field) view)
-  (declare (ignore view))
-  (set-to-truncate cocoa-view))
-
-(defmethod easygui::link-cocoa-view :after ((cocoa-view easygui::cocoa-button) view)
-  (declare (ignore view))
-  (set-to-truncate cocoa-view))
-
 (defmethod easygui::initialize-view :after ((view easygui::simple-view))
   (easygui::link-cocoa-view (easygui:cocoa-ref view) view))
 

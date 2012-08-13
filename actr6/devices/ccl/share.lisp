@@ -219,10 +219,24 @@
 (defclass action-view-mixin (easygui::action-view-mixin) ())
 
 (defclass dialog-item (view view-text-mixin action-view-mixin)
-  ((easygui::dialog-item-enabled-p :initarg :enabled-p))
+  ((easygui::dialog-item-enabled-p :initarg :enabled-p)
+   (text-truncation :initarg :text-truncation :reader text-truncation :initform #$NSLineBreakByTruncatingTail))
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
 
+(defun convert-text-truncation (val)
+  (etypecase val
+    (keyword (ecase val
+               (:end #$NSLineBreakByTruncatingTail)))
+    (integer val)))
+
+(defmethod initialize-instance :around ((view dialog-item) &rest args &key text-truncation)
+  (unwind-protect (if text-truncation
+                    (apply #'call-next-method view :text-truncation (convert-text-truncation text-truncation) args)
+                    (call-next-method))
+    (awhen (text-truncation view)
+      (#/setLineBreakMode: (#/cell (cocoa-ref view)) it))))
+    
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
 ; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.
 ; Most of the easygui package uses a global easygui::*view-class-to-ns-class-map* variable that contains mappings of lisp
@@ -244,7 +258,6 @@
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
   ((part-color-list :reader part-color-list :initarg :part-color-list)
    (bordered-p :reader bordered-p)
-   (text-truncation :initarg :text-truncation)
    (easygui::drawsbackground :initform nil))
   (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
 
