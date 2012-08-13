@@ -24,10 +24,10 @@ ccl-simple-view.lisp:
 	make -s file-list fileList="${fileList}" >> ${actrPath}/support/$@
 
 device.lisp uwi.lisp: deviceFolder
-	make -s file-list fileList="${fileList}" > ${actrPath}/devices/ccl/$@
+	make -s file-list fileList="${fileList}" > ${actrPath}/devices/ccl-cocoa/$@
 
 deviceFolder:
-	mkdir -p ${actrPath}/devices/ccl
+	mkdir -p ${actrPath}/devices/ccl-cocoa
 
 file-list:
 	cat ${fileList} | while read file; do \

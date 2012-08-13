@@ -17,8 +17,8 @@ file-list-% : fl = $*
 
 file-list-actr6:
 	echo "support/ccl-simple-view.lisp"
-	echo "devices/ccl/device.lisp"
-	echo "devices/ccl/uwi.lisp"
+	echo "devices/ccl-cocoa/device.lisp"
+	echo "devices/ccl-cocoa/uwi.lisp"
 
 file-list-%:
 	cat testing/file-lists/*.txt
