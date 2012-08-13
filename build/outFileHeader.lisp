@@ -15,8 +15,10 @@
 ;;; Version     : 1.0 
 ;;; 
 ;;; Description : Provides an interface for CCL that allows the implementation to
-;;;		  read in MCL GUI src code. Implemented the minimal MCL GUI interface
-;;;		  in CCL that is necessary to run MCL code in Mike's lab
+;;;               read in GUI source code written for Macintosh Common Lisp. 
+;;;               This enables task environments written in MCL (e.g., Phaser, 
+;;;               Votebox, NextGen from Mike's lab) to work with CCL with 
+;;;               minimal code modifications
 ;;;
 ;;;		  This file is a concatenation of all bootstrap and feature code
 ;;;		  so that the file can be loaded from a base/standard CCL core file.
@@ -37,6 +39,6 @@
 ;;; ----- History -----
 ;;; 2012.06.29 cts 
 ;;;             : Initial build that allows Votebox MCL GUI to be read in  and used by CCL
-
-
+;;; 2012.08.13 cts
+;;;             : Release build that works with Votebox, NextGen, and Phaser from Mike's lab
 
