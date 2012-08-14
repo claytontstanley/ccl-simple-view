@@ -1173,22 +1173,50 @@
                (*load-truename* (directory-namestring it))
                (t nil))))
 
+; It turns out that objc functions are defined in the symbol table. So in order to set the title of
+; the panel that is opened in the dialog, dynamically shadow the #/openPanel objc function. 
+; And in that shadowed function, call the original, and then set the title of the resulting panel to prompt
+
+(defun make-panel-and-set-prompt (fun-orig prompt)
+  (lambda (&rest args)
+    (let ((panel (apply fun-orig args)))
+      (when prompt
+        (#/setTitle: panel (objc:make-nsstring prompt)))
+      panel)))
+
 (defun choose-file-dialog (&key directory mac-file-type button-string prompt file)
-  (gui::cocoa-choose-file-dialog :directory (get-directory-with-fallback directory)
-                                 :file-types (aif mac-file-type (os-type->extensions it))
-                                 :file file
-                                 :button-string button-string))
+  (with-shadow (#/openPanel (make-panel-and-set-prompt fun-orig prompt))
+    (gui::cocoa-choose-file-dialog :directory (get-directory-with-fallback directory)
+                                   :file-types (aif mac-file-type (os-type->extensions it))
+                                   :file file
+                                   :button-string button-string)))
 
 ; FIXME: Write this
 (defun os-type->extensions (os-type)
   ())
 
-(defun choose-new-file-dialog (&key directory prompt button-string)
-  (gui::cocoa-choose-new-file-dialog :directory (get-directory-with-fallback directory)))
+; And use the shadowing technique here.
 
-(defun choose-directory-dialog (&key directory)
-  (easygui:choose-directory-dialog :directory (get-directory-with-fallback directory)))
+(defun choose-new-file-dialog (&key directory mac-file-type button-string prompt file)
+  (with-shadow (#/savePanel (make-panel-and-set-prompt fun-orig prompt))
+    (gui::cocoa-choose-new-file-dialog :directory (get-directory-with-fallback directory)
+                                       :file-types (aif mac-file-type (os-type->extensions it))
+                                       :file file)))
 
+; And here as well. Except in this case latch into the #/setTitle: method, since that is being used in the
+; cocoa-choose-directory-dialog function.
+
+(defun set-title-and-use-prompt (fun-orig prompt)
+  (lambda (panel string)
+    (funcall fun-orig 
+             panel 
+             (aif prompt
+               (objc:make-nsstring it)
+               string))))
+
+(defun choose-directory-dialog (&key directory prompt)
+  (with-shadow (#/setTitle: (set-title-and-use-prompt fun-orig prompt))
+    (gui::cocoa-choose-directory-dialog :directory (get-directory-with-fallback directory))))
 
 (defun osx-p ()
   t)

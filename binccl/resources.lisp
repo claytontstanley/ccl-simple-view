@@ -95,7 +95,8 @@
   (format nil "~a.~a" id type))
 
 (defun add-resource (resource id &optional (pool *resource-pool*))
-  (when (resource-present-p resource id pool)
+  (sv-log "adding resource with key ~a" (get-key id (type resource)))
+  (when (resource-present-p id (type resource) pool)
     (sv-log "adding resource with key ~a and overwriting resource with same key that is already present~%"
             (get-key id (type resource))))
   (setf (gethash (get-key id (type resource)) pool) resource))
@@ -188,24 +189,6 @@
                       (res (create-resource type (format nil "~a~a" dir image-name-lisp-str))))
                  (add-resource res (objc:lisp-string-from-nsstring image-name-no-ext)))))))
 
-; This is a wrapper function to maintain backwards compatibility with lab code that was loading a resource file.
-; The idea is that we take all images and sounds in the resource file, and place them into a single folder. Then
-; on the old code, load the folder instead of the resource file, but the old code doesn't have to be changed, since
-; it just calls the function below, which calls the proper open-resource-folder function
-
-#|
-(defun open-resource-file (dir &key if-does-not-exist errorp direction perm data-fork-p)
-  (open-resource-folder dir))|#
-
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :resources))
-
-; Section for test code:
-#| 
-(let ((dir (choose-directory-dialog)))
-  (setf *resource-pool* (init-pool))
-  (open-resource-file (directory-namestring dir))
-  (print-pool)
-  (get-resource-val "voteboxbg"))
-|#
 
