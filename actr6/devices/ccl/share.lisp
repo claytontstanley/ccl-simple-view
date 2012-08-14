@@ -658,6 +658,16 @@
                        ,@body)
        (#/restoreGraphicsState ,g!context))))
 
+; ----------------------------------------------------------------------
+; Section to handle current focused view and font focused view.
+; 
+; The dynamic variables are used to keep track of any views that are focused in the dynamic environment.
+; Code could call with-focused-view explicitly, or a view might become focused b/c code called paint-rect
+; and passed a view to that function. The goal is to have the code do the right thing and try to
+; figure out which view has focus. If it can't figure this out, then an exception will be thrown.
+; These can be seen where the guard macros are used.
+; ----------------------------------------------------------------------
+
 (defparameter *current-graphics-context-stroke-color* nil)
 
 (defmacro! with-fore-color (o!color &body body)
@@ -784,7 +794,6 @@
    event
    pos
    0))
-
 
 (defun left-mouse-up (pos)
   (#_CGEventPost
