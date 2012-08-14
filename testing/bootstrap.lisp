@@ -1,3 +1,5 @@
+(setf ccl:*default-external-format* :utf-8)
+
 (load (format nil "~a~a" (directory-namestring *load-truename*) "utilities.lisp"))
 
 (defparameter *base-repo-namestring*

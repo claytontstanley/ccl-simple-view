@@ -521,6 +521,9 @@
 (defmethod dialog-item-text ((view view-text-mixin))
   (easygui:view-text view))
 
+(defmethod set-dialog-item-text ((view view-text-mixin) text)
+  (setf (easygui:view-text view) text))
+
 (defmethod text-just ((view view-text-mixin))
   (text-justification view))
 
@@ -537,9 +540,6 @@
 
 (defmethod initialize-instance :after ((view view-text-mixin) &key)
   (set-text-justification view (text-justification view)))
-
-(defmethod set-dialog-item-text ((view view-text-mixin) text)
-  (setf (easygui:view-text view) text))
 
 (defmethod set-selection-range ((view view-text-mixin) &optional position cursorpos)
   (destructuring-bind (position cursorpos) (if position
