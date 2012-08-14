@@ -603,6 +603,12 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
 ;;;; Readable writing stuff
 ;;;; ---------------------------------------------------------------------- ;;;;
 
+; Taken from MCL's src.
+#+:clozure
+(defun class-instance-slots (class)
+  (loop for s in (class-slots class)
+        when (eq :instance (slot-definition-allocation s))
+        collect s))
 
 (defgeneric write-readable (thing &optional strm)
   (:documentation "Write THING to STRM in a way that it can be re-read."))
