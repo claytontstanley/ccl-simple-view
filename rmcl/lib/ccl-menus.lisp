@@ -106,18 +106,6 @@
             (t (window-show dialog)
              dialog)))))
 
-#|
-(let ((string "hello")
-      (size #@(100 100)))
-  (message-dialog string :title "Message" :size size :position #@(300 250)))
-(#/defaultButtonCell (cocoa-ref *))
-(cocoa-ref (view-named :db **))
-(#/cell *)
-(inspect *)
-(setf *modal-dialog-ret* nil)
-(consp t)
-(get-string-from-user "hello" :initial-string "j")
-|#
 
 ; need close box if modal nil 
 (defun message-dialog (message &key (ok-text "OK")
