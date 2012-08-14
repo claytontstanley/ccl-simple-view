@@ -1,7 +1,7 @@
 # Think text substitution / template programming. I don't use Make to compile C files. I use it
 # as a templating language to manipulate Bash commands.
 
-testFiles = testLevelIndicator.lisp testFormat.lisp testModalDialog.lisp testPolygon.lisp testSound.lisp testGetText.lisp testImages.lisp testCCLDevice.lisp testTutorials.lisp testVotebox.lisp testVoteboxKristen.lisp testTamboDisModel.lisp
+testFiles = testLevelIndicator.lisp testMCLInterFaceBuilder.lisp testFormat.lisp testModalDialog.lisp testPolygon.lisp testSound.lisp testGetText.lisp testImages.lisp testCCLDevice.lisp testTutorials.lisp testVotebox.lisp testVoteboxKristen.lisp testTamboDisModel.lisp
 initFiles = 
 
 testString = ${testFiles:%=-l % }

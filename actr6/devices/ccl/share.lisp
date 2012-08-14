@@ -387,6 +387,30 @@
                        attributes)))
     obj))
 
+(defclass menu-view (easygui::menu-view view view-text-via-title-mixin easygui::decline-menu-mixin)
+  ((easygui::text :initarg :menu-title)
+   (default-item :initarg :default-item :initform 1)
+   (auto-update-default :initarg :auto-update-default)
+   (item-display :initarg :item-display))
+  (:default-initargs :specifically 'easygui::cocoa-pop-up-button))
+
+; FIXME: menu-item-checked isn't being used at all. default-item from menu-view determines which item is checked. Is it worth the time
+; to use this slot, and make it so that the char rendered for the checked item can be changed, or also that multiple items can be checked,
+; etc.?
+
+(defclass menu-item (easygui::menu-item-view view view-text-via-title-mixin action-view-mixin easygui::decline-menu-mixin)
+  ((easygui::text :initarg :menu-item-title)
+   (style :initarg :style)
+   (menu-item-checked :initarg :menu-item-checked :initform nil))
+  (:default-initargs :specifically 'easygui::cocoa-menu-item))
+
+(defmethod initialize-instance :around ((view menu-view) &rest args &key default-item menu-items)
+  (if menu-items
+    (apply #'call-next-method view :selection (nth (1- default-item) menu-items) args)
+    (call-next-method)))
+
+(defclass pop-up-menu (easygui::pop-up-menu menu-view) ())
+
 ; ----------------------------------------------------------------------
 ; Building methods that allow CCL to understand basic MCL drawing commands
 
@@ -410,9 +434,9 @@
 (ccl::register-character-name "DownArrow" #\U+F701)
 (ccl::register-character-name "BackArrow" #\U+F702)
 (ccl::register-character-name "ForwardArrow" #\U+F703)
+(ccl::register-character-name "CheckMark" #\t)
 (defparameter *arrow-cursor* (#/arrowCursor ns:ns-cursor))
 (defparameter *black-pattern* 'black-pattern-fixme)
-
 
 (defun make-point (x y)
   (easygui::point x y :allow-negative-p t))
