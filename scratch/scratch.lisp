@@ -1,7 +1,18 @@
 (print (list-all-packages))
 (load #P"NebulaSL:Users:claytonstanley:src:mcl-migration:testing:testVotebox.lisp")
 
-
+(dotimes (i 100)
+  (let ((win (make-instance 'window)))
+    ;(sleep (/ (random 1000) 1000))
+    ;(window-close win)
+    ))
+(while (get-front-window)
+  (window-close (get-front-window)))
+(all-processes)    
+(random 100)
+(dotimes (i 100)
+  (let ((win (make-instance 'window :view-position #@(10 10))))
+    (window-close win)))
 
 (print $tejustleft)
 (print #$tejustleft)
