@@ -110,6 +110,7 @@
    (initialized-p :accessor initialized-p :initform nil)
    (easygui::background :initform (color-symbol->system-color 'white))
    (close-requested-p :accessor close-requested-p :initform nil)
+   (window-close-fct :reader window-close-fct :initform #'easygui:perform-close)
    (sema-finished-close :accessor sema-finished-close :initform (make-semaphore))
    (sema-request-close :accessor sema-request-close :initform (make-semaphore)))
   (:default-initargs 
@@ -137,9 +138,7 @@
                        ; easygui's perform-close currently runs on current thread; maintenance thread does 
                        ; not have an autorelease-pool set up; so explicitly create one for the close
                        (easygui::with-autorelease-pool
-                         (if (windoid-p win)
-                           (#/close (cocoa-ref win))
-                           (easygui:perform-close win)))
+                         (funcall (window-close-fct win) win))
                        (signal-semaphore (sema-finished-close win)))
                       ((aand (get-front-window) (eq win it))
                        (window-null-event-handler win)))
@@ -189,6 +188,7 @@
   ((easygui::level :initform 1)
    (easygui::resizable-p :initform nil)
    (easygui::minimizable-p :initform nil)
+   (window-close-fct :initform (lambda (win) (#/close (cocoa-ref win))))
    (easygui::closable-p :initform nil)))
 
 (defmethod windoid-p ((win t))
