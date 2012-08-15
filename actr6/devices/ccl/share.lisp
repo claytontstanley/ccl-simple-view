@@ -146,8 +146,8 @@
 
 (objc:defmethod (#/close :void) ((self easygui::cocoa-window))
   (let ((win (easygui::easygui-window-of self)))
-    (call-next-method)
-    (slot-makunbound win 'easygui::ref)))
+    (slot-makunbound win 'easygui::ref)
+    (call-next-method)))
 
 (defparameter *window-null-event-handler-lock* (make-lock "window-null-event-handler-lock")) 
 
