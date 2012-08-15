@@ -143,10 +143,17 @@
                             :view-nick-name :rb2))
 (add-visual-items-to-rpm-window *win* *view*)
 
-
-
 #|
+#$NSBorderlessWindowMask
+(make-instance 'windoid)
+(#/setStyleMask: (cocoa-ref *)
+ #$NSBorderlessWindowMask)
+(#/close (cocoa-ref *))
+***
+(window-close *)
 (cocoa-ref (view-named :et *win*))
+(window-close *win*)
+
 (#/isEnabled *)
 (#/isSelected *)
 (#/selectedRanges

@@ -137,7 +137,9 @@
                        ; easygui's perform-close currently runs on current thread; maintenance thread does 
                        ; not have an autorelease-pool set up; so explicitly create one for the close
                        (easygui::with-autorelease-pool
-                         (easygui:perform-close win))
+                         (if (windoid-p win)
+                           (#/close (cocoa-ref win))
+                           (easygui:perform-close win)))
                        (signal-semaphore (sema-finished-close win)))
                       ((aand (get-front-window) (eq win it))
                        (window-null-event-handler win)))
@@ -184,7 +186,10 @@
   (:default-initargs :contained-view-specifically 'static-contained-view)) 
 
 (defclass windoid (window)
-  ((easygui::level :initform 1)))
+  ((easygui::level :initform 1)
+   (easygui::resizable-p :initform nil)
+   (easygui::minimizable-p :initform nil)
+   (easygui::closable-p :initform nil)))
 
 (defmethod windoid-p ((win t))
   nil)
