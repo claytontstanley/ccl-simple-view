@@ -27,7 +27,7 @@
 (objc:defmethod (#/drawRect: :void) ((self cocoa-drawing-view)
                                      (rect :<NSR>ect)))
 (objc:defmethod (#/performKeyEquivalent: :boolean) ((self easygui::cocoa-window) the-event)
-  (print "here")
-  #$NO)
-  ;(call-next-method the-event))
+                (print "here")
+                #$NO)
+;(call-next-method the-event))
 |#

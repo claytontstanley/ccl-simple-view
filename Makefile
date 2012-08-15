@@ -26,8 +26,18 @@ file-list-%:
 
 exclude-list = ^bincarbon*|^testing
 
+list-cmd = git ls-files
+
 reformat:
-	git ls-files | grep '.lisp$$' | egrep -v '${exclude-list}' | xargs -n 1 -o -I {} bash -ic "ai {} || true"
+	${list-cmd} | grep '.lisp$$' | egrep -v '${exclude-list}' | xargs -n 1 -o -I {} bash -ic "echo '{}'; ai {} || true"
+
+reformat-repo:
+	make reformat
+
+reformat-builds:
+	make reformat list-cmd="cat build/file-list*"
+
+reformat-all: reformat-repo reformat-builds
 
 # This is way experimental, but it did work for me. 
 convertToWriteRepo:
