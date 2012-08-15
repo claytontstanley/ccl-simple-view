@@ -116,4 +116,16 @@
           #@(434 389)
           #@(70 16)
           "Untitled"
-          'NIL)))
+          'NIL)
+        (MAKE-DIALOG-ITEM
+          'EDITABLE-TEXT-DIALOG-ITEM
+          #@(139 406)
+          #@(81 16)
+          "Untitled"
+          'NIL
+          :PART-COLOR-LIST
+          '(:BODY 16777215)
+          :ALLOW-RETURNS
+          NIL
+          :DRAW-OUTLINE
+          T)))

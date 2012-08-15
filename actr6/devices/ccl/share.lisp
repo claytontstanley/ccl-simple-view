@@ -225,6 +225,7 @@
 
 (defclass dialog-item (view view-text-mixin action-view-mixin)
   ((easygui::dialog-item-enabled-p :initarg :enabled-p)
+   (part-color-list :reader part-color-list :initarg :part-color-list)
    (text-truncation :initarg :text-truncation :reader text-truncation :initform #$NSLineBreakByTruncatingTail))
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
@@ -241,6 +242,12 @@
                     (call-next-method))
     (awhen (text-truncation view)
       (#/setLineBreakMode: (#/cell (cocoa-ref view)) it))))
+
+; FIXME: part-color-list and foreground/background slots should all remain in sync; how does MCL achieve this cleanly?
+(defmethod initialize-instance :after ((view dialog-item) &key)
+  (when (slot-boundp view 'part-color-list)
+    (loop for (part color) in (group (part-color-list view) 2)
+          do (set-part-color view part (mcl-color->system-color color)))))
 
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
 ; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.
@@ -261,8 +268,7 @@
   (:default-initargs :dialog-item-text "OK" :default-button t :cancel-button nil))
 
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
-  ((part-color-list :reader part-color-list :initarg :part-color-list)
-   (bordered-p :reader bordered-p)
+  ((bordered-p :reader bordered-p)
    (easygui::drawsbackground :initform nil))
   (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
 
@@ -278,13 +284,6 @@
 (defmethod (setf bordered-p) (bordered-p (view static-text-dialog-item))
   (unwind-protect (setf (slot-value view 'bordered-p) bordered-p)
     (#/setBordered: (easygui:cocoa-ref view) (if bordered-p #$YES #$NO))))
-
-; FIXME: part-color-list and foreground/background slots should all remain in sync; how does MCL achieve this cleanly?
-
-(defmethod initialize-instance :after ((view static-text-dialog-item) &key)
-  (when (slot-boundp view 'part-color-list)
-    (loop for (part color) in (group (part-color-list view) 2)
-          do (set-part-color view part (mcl-color->system-color color)))))
 
 (defclass editable-text-dialog-item (easygui:text-input-view view-text-via-stringvalue-mixin dialog-item)
   ((allow-returns :initarg :allow-returns)
@@ -750,14 +749,14 @@
   (declare (ignore part))
   (get-fore-color view))
 
-(defmethod set-part-color ((view static-text-dialog-item) (part (eql :body)) new-color)
+(defmethod set-part-color ((view dialog-item) (part (eql :body)) new-color)
   (set-back-color view new-color))
 
-(defmethod set-part-color ((view static-text-dialog-item) (part (eql :text)) new-color)
+(defmethod set-part-color ((view dialog-item) (part (eql :text)) new-color)
   (set-fore-color view new-color))
 
 ; FIXME: Keep this as a compiler warning until you figure out how to color a border with Cocoa
-(defmethod set-part-color ((view static-text-dialog-item) (part (eql :frame)) new-color)
+(defmethod set-part-color ((view dialog-item) (part (eql :frame)) new-color)
   (setf (bordered-p view) t))
 
 (defmethod get-fore-color ((view simple-view))
