@@ -1037,16 +1037,14 @@
       (cond ((eq pattern *black-pattern*) 'black)))))
 
 (defmethod fill-polygon ((view simple-view) pattern polygon)
-  (unwind-protect (with-focused-view view
-                    (with-window-of-focused-view-fallback-fore-color
-                      (#/fill (bezier-path view))))
-    ()))
+  (with-fallback-focused-view view
+    (with-window-of-focused-view-fallback-fore-color
+      (#/fill (bezier-path view)))))
 
 (defmethod frame-polygon ((view simple-view) polygon)
-  (unwind-protect (with-focused-view view
-                    (with-window-of-focused-view-fallback-fore-color
-                      (#/stroke (bezier-path view))))
-    ()))
+  (with-fallback-focused-view view
+    (with-window-of-focused-view-fallback-fore-color
+      (#/stroke (bezier-path view)))))
 
 (defmethod kill-polygon ((polygon ns:ns-bezier-path))
   (#/release polygon)
