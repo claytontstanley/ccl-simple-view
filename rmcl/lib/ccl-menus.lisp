@@ -46,9 +46,8 @@
                                         :text-truncation :end
                                         :view-position (make-point 6 (- (point-v size) 54 delta))
                                         :dialog-item-text message))
-      (let* ((msize (view-default-size message-item))
-             (mh (point-h msize)))  ;; would be nice if static text had a truncate option -now it does
-        (setq mh (min mh (- (point-h size) 100)))
+      (let* ((msize (view-size message-item))
+             (mh (min (point-h msize) 120)))
         (set-view-size message-item (make-point mh (point-v msize))))
       (setq message-len (+ 6 (point-h (view-size message-item)))))
     (flet ((act-on-text (item)

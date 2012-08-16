@@ -256,7 +256,13 @@
 (defmethod initialize-instance :after ((view dialog-item) &key)
   (when (slot-boundp view 'part-color-list)
     (loop for (part color) in (group (part-color-list view) 2)
-          do (set-part-color view part (mcl-color->system-color color)))))
+          do (set-part-color view part (mcl-color->system-color color))))
+  (unless (slot-boundp view 'easygui::size)
+    (#/sizeToFit (cocoa-ref view))
+    (let ((frame (#/frame (cocoa-ref view))))
+      (setf (slot-value view 'easygui::size)
+            (easygui:point (ns:ns-rect-width frame)
+                           (ns:ns-rect-height frame))))))
 
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
 ; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.

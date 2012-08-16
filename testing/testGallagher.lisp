@@ -11,7 +11,6 @@
 
 
 #|
-(#/close
- (cocoa-ref (get-front-window)))
+(window-close (get-front-window))
 
 |#

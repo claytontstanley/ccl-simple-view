@@ -282,7 +282,7 @@ Click “OK” when you are ready to continue.")
     (list 
      (make-dialog-item
       'DEFAULT-BUTTON-DIALOG-ITEM
-      #@(700 550) #@(75 20) "Continue"
+      #@(700 550) #@(85 25) "Continue"
       #'(lambda (self) (continue-click (view-window self)))
       :view-nick-name 'CONTINUE)
      (make-dialog-item
