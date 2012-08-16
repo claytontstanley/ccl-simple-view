@@ -754,6 +754,10 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
                         :unsigned-fullword))
     ))
 
+#+:clozure
+(defun move-cursor-to (x y)
+  (#_CGWarpMouseCursorPosition
+   (ns:make-ns-point x y)))
 
 
 ;;;; ---------------------------------------------------------------------- ;;;;
