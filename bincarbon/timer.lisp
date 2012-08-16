@@ -38,8 +38,9 @@
 ;;;		current-time and the appropriate unless bound function
 ;;;		to reflect this change.
 ;;; 2012.08.06 cts
-;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
-;;;               backwards compatibility with RMCL
+;;;             : Ported some of the code to work with Clozure Common Lisp,
+;;;               while maintaining backwards compatibility with RMCL. Lots
+;;;               of work on this file is still left.
 ;;;		
 ;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -77,6 +78,13 @@
 #+:digitool
 (defclass ms-timer (timer)
   ((keymap :accessor keymap :initarg :keymap :initform (make-record keymap))
+   (map-ptr :accessor map-ptr :initarg :map-ptr :initform nil)
+   )
+  )
+
+#+:clozure
+(defclass ms-timer (timer)
+  (;(keymap :accessor keymap :initarg :keymap :initform (make-record keymap))
    (map-ptr :accessor map-ptr :initarg :map-ptr :initform nil)
    )
   )

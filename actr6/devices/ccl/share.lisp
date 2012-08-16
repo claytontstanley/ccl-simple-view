@@ -95,7 +95,8 @@
   ()
   (:documentation "Top-level class for views"))
 
-(defclass contained-view (view easygui::contained-view) ())
+(defclass contained-view (easygui::contained-view view)
+  ((easygui::background :initform (color-symbol->system-color 'white))))
 
 (defclass static-view-mixin (easygui::static-view-mixin) ())
 
@@ -974,9 +975,13 @@
 (defmethod fill-oval ((view simple-view) pattern left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
          (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
-    (with-focused-view view
+    (with-fallback-focused-view view
       (with-window-of-focused-view-fallback-fore-color
         (#/fill path)))))
+
+(defmethod paint-oval ((view simple-view) left &optional top right bottom)
+  (with-fallback-focused-view view
+    (fill-oval view (pen-pattern view) left top right bottom)))
 
 (defmethod stroke-ns-rect ((rect ns:ns-rect))
   (with-window-of-focused-view-fallback-fore-color
@@ -1003,9 +1008,9 @@
 (defmethod erase-rect ((view window) left &optional top right bottom)
   (erase-rect (content-view view) left top right bottom))
 
-(defmethod erase-rect ((view view) left &optional top right bottom)
+(defmethod erase-rect ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
-    (with-focused-view view
+    (with-fallback-focused-view view
       (with-fore-color (get-back-color view)
         (fill-ns-rect rect)))))
 
