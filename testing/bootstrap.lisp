@@ -1,4 +1,5 @@
 #+:clozure (setf ccl:*default-external-format* :utf-8)
+#+:clozure (pushnew :sv-dev *features*)
 
 (load (format nil "~a~a" (directory-namestring *load-truename*) "utilities.lisp"))
 

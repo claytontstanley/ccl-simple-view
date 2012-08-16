@@ -525,9 +525,11 @@
 
 ;FIXME: This looks very strange. Prob related to Phaser's floating window
 (defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))
+  #-:sv-dev (declare (ignore wptr))
   nil)
 
 (defmethod set-window-layer ((window window) new-layer &optional include-invisibles)
+  #-:sv-dev (declare (ignore new-layer include-invisibles))
   'fixme)
 
 (defmethod window-title ((view window))
@@ -769,6 +771,7 @@
 
 ; FIXME: Keep this as a compiler warning until you figure out how to color a border with Cocoa
 (defmethod set-part-color ((view dialog-item) (part (eql :frame)) new-color)
+  #-:sv-dev (declare (ignore new-color))
   (setf (bordered-p view) t))
 
 (defmethod get-fore-color ((view simple-view))
@@ -790,6 +793,7 @@
 
 ; FIXME: What does this do? Keep as compiler warning until you figure it out
 (defmethod window-update-cursor ((window window) point)
+  #-:sv-dev (declare (ignore point))
   nil)
 
 (defmethod view-click-event-handler ((device simple-view) position)
@@ -984,6 +988,7 @@
         (#/stroke path)))))
 
 (defmethod fill-oval ((view simple-view) pattern left &optional top right bottom)
+  #-:sv-dev (declare (ignore pattern))
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
          (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
     (with-fallback-focused-view view
@@ -1004,6 +1009,7 @@
       (stroke-ns-rect rect))))
 
 (defmethod fill-ns-rect ((rect ns:ns-rect) &optional pattern)
+  #-:sv-dev (declare (ignore pattern))
   (with-window-of-focused-view-fallback-fore-color
     (#/fillRect: ns:ns-bezier-path rect)))
 
@@ -1037,11 +1043,13 @@
       (cond ((eq pattern *black-pattern*) 'black)))))
 
 (defmethod fill-polygon ((view simple-view) pattern polygon)
+  #-:sv-dev (declare (ignore polygon pattern))
   (with-fallback-focused-view view
     (with-window-of-focused-view-fallback-fore-color
       (#/fill (bezier-path view)))))
 
 (defmethod frame-polygon ((view simple-view) polygon)
+  #-:sv-dev (declare (ignore polygon))
   (with-fallback-focused-view view
     (with-window-of-focused-view-fallback-fore-color
       (#/stroke (bezier-path view)))))
@@ -1220,11 +1228,13 @@
 
 ; FIXME: Write this
 (defun os-type->extensions (os-type)
+  #-:sv-dev (declare (ignore os-type))
   ())
 
 ; And use the shadowing technique here.
 
 (defun choose-new-file-dialog (&key directory mac-file-type button-string prompt file)
+  #-:sv-dev (declare (ignore button-string))
   (with-shadow (#/savePanel (make-panel-and-set-prompt fun-orig prompt))
     (gui::cocoa-choose-new-file-dialog :directory (get-directory-with-fallback directory)
                                        :file-types (aif mac-file-type (os-type->extensions it))
