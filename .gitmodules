@@ -25,3 +25,6 @@
 [submodule "submodules/tambo-diss"]
 	path = submodules/tambo-diss
 	url = git://cstanley.no-ip.biz/tambo-diss
+[submodule "submodules/gallagher"]
+	path = submodules/gallagher
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/gallagher.git
