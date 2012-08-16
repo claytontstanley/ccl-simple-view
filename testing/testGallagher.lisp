@@ -6,5 +6,12 @@
 
 (load-file-list "file-lists" "Gallagher" "testGallagher.txt")
 
+
 (begin-experiment)
 
+
+#|
+(#/close
+ (cocoa-ref (get-front-window)))
+
+|#

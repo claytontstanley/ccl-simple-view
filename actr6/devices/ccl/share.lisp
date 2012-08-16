@@ -185,12 +185,20 @@
   ()
   (:default-initargs :contained-view-specifically 'static-contained-view)) 
 
-(defclass windoid (window)
+(defclass not-closable-window-mixin (window)
+  ((window-close-fct :initform (lambda (win) (#/close (cocoa-ref win))))))
+  
+(defclass windoid (not-closable-window-mixin window)
   ((easygui::level :initform 1)
    (easygui::resizable-p :initform nil)
    (easygui::minimizable-p :initform nil)
-   (window-close-fct :initform (lambda (win) (#/close (cocoa-ref win))))
    (easygui::closable-p :initform nil)))
+
+(defclass borderless-window (not-closable-window-mixin window)
+  ((easygui::resizable-p :initform nil)
+   (easygui::minimizable-p :initform nil)
+   (easygui::closable-p :initform nil)
+   (easygui::style :initform #$NSBorderlessWindowMask)))
 
 (defmethod windoid-p ((win t))
   nil)

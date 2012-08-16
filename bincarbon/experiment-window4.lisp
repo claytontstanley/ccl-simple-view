@@ -79,7 +79,7 @@
 
 (defconstant *end-of-block-str*
   "Finished block ~A of ~A. Please take a short break to help your concentration.
-Click ÒOKÓ when you are ready to continue.")
+Click â€œOKâ€ when you are ready to continue.")
 
 (defconstant *end-of-expt-str*
   "Thank you, you've finished the main portion of the experiment. Please take a few moments to answer a few simple questions.")
@@ -294,7 +294,7 @@ Click ÒOKÓ when you are ready to continue.")
      (make-dialog-item
       'STATIC-TEXT-DIALOG-ITEM
       #@(2 560) #@(433 15)
-      "press the ÒReturnÓ key or click ÒContinueÓ when you are ready to go on"
+      "press the â€œReturnâ€ key or click â€œContinueâ€ when you are ready to go on"
       'NIL
       :view-font '("Geneva" 10 :SRCOR :BOLD (:COLOR-INDEX 0))))))
 
