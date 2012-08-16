@@ -187,7 +187,7 @@
 
 (defclass not-closable-window-mixin (window)
   ((window-close-fct :initform (lambda (win) (#/close (cocoa-ref win))))))
-  
+
 (defclass windoid (not-closable-window-mixin window)
   ((easygui::level :initform 1)
    (easygui::resizable-p :initform nil)
