@@ -162,11 +162,8 @@
 #+:clozure
 (defmethod current-time ((tmr event-timer))
   (cond (*actr-enabled-p* (mp-time))
-        (t (coerce 
-             (* 1000
-                (/ (get-internal-real-time)
-                   internal-time-units-per-second))
-             'double-float))))
+        (t (coerce (internal-real-time->ms (get-internal-real-time))
+                   'double-float))))
 
 (defgeneric stop-timing (tmr)
   (:documentation "Stops an event timer at the current event and returns the time in ms."))
