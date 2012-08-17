@@ -131,6 +131,7 @@
              `(,(make-instance
                   'static-text-dialog-item
                   :dialog-item-text message
+                  :text-truncation #$NSLineBreakByWordWrapping
                   :view-size (make-point
                                message-width
                                (- (point-v size)

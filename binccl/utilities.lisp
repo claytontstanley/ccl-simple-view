@@ -36,6 +36,10 @@
           when pos do (write-string replacement out)
           while pos))) 
 
+#+:digitool
+(defmacro without-duplicate-definition-warnings (&body body)
+  `(progn ,@body))
+
 (without-duplicate-definition-warnings
   (defun file-string (path)
     "Sucks up an entire file from PATH into a freshly-allocated string,
