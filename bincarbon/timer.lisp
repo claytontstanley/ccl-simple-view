@@ -21,28 +21,32 @@
 ;;; Todo        : 
 ;;; 
 ;;; ----- History -----
-;;; 99.11.05 Mike Byrne
-;;;             :  Incept date.
-;;; 00.02.02 mdb
-;;;             : Added unless bound modifications.
-;;; 00.11.15 mdb
-;;;             : Added exit methods.
-;;; 2002.11.24 mdb [r2]
-;;;             : Minor bug fix.
-;;; 2004.10.31 mdb [r3]
-;;;             : Added FIND-KEY-COORDS function.  Use 
-;;;             : (wait-for-keys <timer> #'find-key-coords) to figure out
-;;;             : what the values are for any particular key.
-;;; 2008.06.11 fpt [r4]
-;;;		: ACT-R 6 dropped pm-get-time for mp-time, so I updated
-;;;		current-time and the appropriate unless bound function
-;;;		to reflect this change.
 ;;; 2012.08.06 cts
 ;;;             : Ported some of the code to work with Clozure Common Lisp,
 ;;;               while maintaining backwards compatibility with RMCL. Lots
 ;;;               of work on this file is still left.
+;;; 2012.06.26 mdb
+;;;             : Changed "keymap.array" to "keymap.contents" in the INIT 
+;;;             : method for ms-timer.  Might now break under older configs.
+;;; 2008.06.11 fpt [r4]
+;;;		: ACT-R 6 dropped pm-get-time for mp-time, so I updated
+;;;		current-time and the appropriate unless bound function
+;;;		to reflect this change.
+;;; 2006.03.03 mdb [r4]
+;;;             : Now works with ACT-R 6.
+;;; 2004.10.31 mdb [r3]
+;;;             : Added FIND-KEY-COORDS function.  Use 
+;;;             : (wait-for-keys <timer> #'find-key-coords) to figure out
+;;;             : what the values are for any particular key.
+;;; 2002.11.24 mdb [r2]
+;;;             : Minor bug fix.
+;;; 00.11.15 mdb
+;;;             : Added exit methods.
+;;; 00.02.02 mdb
+;;;             : Added unless bound modifications.
+;;; 99.11.05 Mike Byrne
+;;;             :  Incept date.
 ;;;		
-;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -163,7 +167,6 @@
 
 #+:digitool
 (defmethod initialize-instance :after ((tmr ms-timer) &key)
-  ;(setf (map-ptr tmr) (rref (keymap tmr) keymap.array)))
   (setf (map-ptr tmr) (rref (keymap tmr) keymap.contents)))
 
 
