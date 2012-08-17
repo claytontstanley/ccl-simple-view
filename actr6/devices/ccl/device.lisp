@@ -546,9 +546,14 @@
 ;;;             : ring.
 
 (defmethod device-update-attended-loc ((wind window) xyloc)
-  (unless (visual-fixation-marker)
-    (setf (visual-fixation-marker) (make-instance 'focus-ring)))
-  (update-me (visual-fixation-marker) wind xyloc))
+  (let ((update-me))
+    (cond ((not (visual-fixation-marker))
+           (setf (visual-fixation-marker) (make-instance 'focus-ring))
+           (setf update-me t))
+          ((aand (view-window (visual-fixation-marker)) (eq it wind))
+           (setf update-me t)))
+    (when (and update-me (wptr wind))
+      (update-me (visual-fixation-marker) wind xyloc))))
 
 ; When called with nil xyloc, remove the current visual-fication-marker.
 ; Note that this is called in cases where the current marker is not a subview in wind.
