@@ -419,17 +419,23 @@
                                                  (point-v xyloc)))
   (event-dispatch))
 
-#|
 ;;; DEVICE-SPEAK-STRING      [Method]
 ;;; Description : If the Mac Speech Manager is installed, actually speak the
 ;;;             : string.
 
+#+:digitool
 (defmethod device-speak-string ((device window) string)
   (when (speech-available-p)
     (speak-string string)
     ))
 
-|#
+; Haven't ported MCL's speech code yet.
+
+#+:clozure
+(defmethod device-speak-string ((device window) string)
+  #-:sv-dev (declare (ignore string))
+  nil)
+
 
 ;;; GET-MOUSE-COORDINATES      [Method]
 ;;; Description : Return the current mouse loc in #(x y) format.
