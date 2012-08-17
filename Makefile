@@ -4,12 +4,17 @@ TOP := $(shell pwd)
 zip-% : zipDir = .
 zip-actr6 : zipDir = submodules/actr6
 
-zip-%:
+zip-%: clean-%
 	make -C testing clean-actr-compiled-files
 	make -C build all
 	rm -f $*.zip	
 	cd ${zipDir}; make -C ${TOP} -s file-list-$* | while read line; do zip --symlinks -r $*.zip "$$line"; done
 
+clean-%:
+	echo "done"
+
+clean-tamborello:
+	rm -rf submodules/tambo-diss/tamborello-dissertation-model/model-data/
 
 file-list-all : fl = Votebox VoteboxKristen Phaser Tutorials
 file-list-tamborello: fl = Phaser TamboDis TamboDisModel
