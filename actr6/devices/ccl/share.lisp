@@ -451,7 +451,11 @@
 (ccl::register-character-name "BackArrow" #\U+F702)
 (ccl::register-character-name "ForwardArrow" #\U+F703)
 (ccl::register-character-name "CheckMark" #\t)
+
 (defparameter *arrow-cursor* (#/arrowCursor ns:ns-cursor))
+(defparameter *crosshair-cursor* (#/crosshairCursor ns:ns-cursor))
+(defparameter *i-beam-cursor* (#/IBeamCursor ns:ns-cursor))
+
 (defparameter *black-pattern* 'black-pattern-fixme)
 
 (defun make-point (x y)
@@ -500,6 +504,9 @@
 
 (defmethod window-show ((win window))
   (easygui:window-show win))
+
+(defmethod window-shown-p ((window window))
+  (not (easygui::window-hidden window)))
 
 (defun find-window (title &optional class)
   (let ((title (format nil "~a" title)))
@@ -1308,6 +1315,13 @@
   (#/addCursorRect:cursor: self
    (#/bounds self)
    *current-cursor*))
+
+; Another option here is to call #/currentCursor on ns-cursor class, but since 
+; *current-cursor* is (currently) the current cursor for all windows of the applicaiton,
+; just use this.
+
+(defmethod window-cursor ((window window))
+  *current-cursor*)
 
 (defmethod create-resource ((type (eql 'cursor)) id)
   (make-instance

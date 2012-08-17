@@ -199,8 +199,6 @@
       (#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))
       (#.#$tejustright (+ 1 left-x (- (width self) text-width))))))
 
-#|
-
 (defmethod cursor-to-vis-loc ((the-window window))
   (let ((pos (view-mouse-position the-window))
         (shape (window-cursor the-window)))
@@ -208,26 +206,21 @@
       (car (define-chunks-fct `((isa visual-location kind cursor 
                                      screen-x ,(point-h pos)
                                      screen-y ,(point-v pos)
-                                     value ,(case shape
-                                              (*i-beam-cursor* 'i-beam)
-                                              (*crosshair-cursor* 'crosshair)
-                                              (*watch-cursor* 'watch)
-                                              (otherwise 'pointer)))))))))
+                                     value ,(cond ((eq shape *i-beam-cursor*) 'i-beam)
+                                                  ((eq shape *crosshair-cursor*) 'crosshair)
+                                                  (t 'pointer)))))))))
 
 (defgeneric cursor-in-window-p (wind)
             (:documentation  "Returns T if the cursor is over <wind>, NIL otherwise."))
 
 (defmethod cursor-in-window-p ((tw window))
   (when (window-shown-p tw)
-    (rlet ((the-rect rect))
-          (points-to-rect (view-position tw)
-                          (add-points (view-position tw) (view-size tw))
-                          the-rect)
-          (point-in-rect-p the-rect 
-                           (local-to-global tw (view-mouse-position tw))))))
-
-
-|#
+    (let ((size (view-size tw))
+          (cpos (view-mouse-position tw)))
+      (and (>= (point-h cpos) 0)
+           (>= (point-v cpos) 0)
+           (<= (point-h cpos) (point-h size))
+           (<= (point-v cpos) (point-v size))))))
 
 (defmethod view-loc ((self view))
   (let ((pos (view-position self))
