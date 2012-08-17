@@ -154,14 +154,14 @@
 
 #+:digitool
 (defmethod current-time ((tmr event-timer))
-  (cond (*actr-enabled-p* (mp-time))
+  (cond (*actr-enabled-p* (* 1000 (mp-time)))
         ((boundp '*current-event*)
          (tick->ms tmr (pref *current-event* :eventrecord.when)))
         (t (tick->ms tmr (#_tickcount)))))
 
 #+:clozure
 (defmethod current-time ((tmr event-timer))
-  (cond (*actr-enabled-p* (mp-time))
+  (cond (*actr-enabled-p* (* 1000 (mp-time)))
         (t (coerce (internal-real-time->ms (get-internal-real-time))
                    'double-float))))
 
@@ -176,7 +176,6 @@
   (let ((lat (stop-timing tmr)))
     (start-timing tmr)
     lat))
-
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; ms-level (roughly) keyboard timing
