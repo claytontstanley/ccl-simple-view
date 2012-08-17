@@ -263,7 +263,7 @@
     (setf (chunk-visual-object f) lnr)
     f))
 
-#|(defmethod vis-loc-to-obj ((lnr td-liner) loc)
+(defmethod vis-loc-to-obj ((lnr td-liner) loc)
     (let ((start-pt (view-position lnr))
           (end-pt (subtract-points (add-points (view-position lnr) (view-size lnr)) 
                                    (make-point 1 1)))
@@ -272,7 +272,7 @@
       (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
       (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
       (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-      v-o))|#
+      v-o))
 
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : A bu-liner is just a line-feature located "at" it's mid-point.
@@ -295,7 +295,7 @@
     (setf (chunk-visual-object f) lnr)
     f))
 
-#|(defmethod vis-loc-to-obj ((lnr bu-liner) loc)
+(defmethod vis-loc-to-obj ((lnr bu-liner) loc)
     (let ((start-pt (add-points (view-position lnr)
                                 (make-point 0 (1- (point-v (view-size lnr))))))
           (end-pt (add-points (view-position lnr) 
@@ -305,8 +305,7 @@
       (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
       (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
       (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-      v-o))|#
-
+      v-o))
 
 #|
 
