@@ -61,6 +61,8 @@
 ;;;             : #@(300 250)) that it in turn supplies to message-dialog.
 ;;; 2007.06.06 mdb [r7]
 ;;;             : Added WRITE-READABLE method for pathnames.   
+;;; 2012.06.26 mdb
+;;;             : Some changes to MOVE-CURSOR-TO to handle RMCL 5.2 better. 
 ;;; 2012.08.06 cts
 ;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
 ;;;               backwards compatibility with RMCL
@@ -78,14 +80,14 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 
 (defconstant *end-of-block-str*
-  "Finished block ~A of ~A. Please take a short break to help your concentration.
-Click “OK” when you are ready to continue.")
+             "Finished block ~A of ~A. Please take a short break to help your concentration.
+              Click “OK” when you are ready to continue.")
 
 (defconstant *end-of-expt-str*
-  "Thank you, you've finished the main portion of the experiment. Please take a few moments to answer a few simple questions.")
+             "Thank you, you've finished the main portion of the experiment. Please take a few moments to answer a few simple questions.")
 
 (defconstant *end-of-expt-nourl-str*
-  "You're done, thank you! Please see the experimenter.")
+             "You're done, thank you! Please see the experimenter.")
 
 
 (defvar *experiment* nil "The experiment window itself.")
@@ -280,23 +282,23 @@ Click “OK” when you are ready to continue.")
     :close-box-p nil
     :view-subviews
     (list 
-     (make-dialog-item
-      'DEFAULT-BUTTON-DIALOG-ITEM
-      #@(700 550) #@(85 25) "Continue"
-      #'(lambda (self) (continue-click (view-window self)))
-      :view-nick-name 'CONTINUE)
-     (make-dialog-item
-      'STATIC-TEXT-DIALOG-ITEM
-      #@(20 40) #@(595 450) ""
-      'NIL
-      :view-nick-name 'TEXT
-      :view-font '("Geneva" 12 :SRCOR :PLAIN (:COLOR-INDEX 0)))
-     (make-dialog-item
-      'STATIC-TEXT-DIALOG-ITEM
-      #@(2 560) #@(433 15)
-      "press the “Return” key or click “Continue” when you are ready to go on"
-      'NIL
-      :view-font '("Geneva" 10 :SRCOR :BOLD (:COLOR-INDEX 0))))))
+      (make-dialog-item
+        'DEFAULT-BUTTON-DIALOG-ITEM
+        #@(700 550) #@(85 25) "Continue"
+        #'(lambda (self) (continue-click (view-window self)))
+        :view-nick-name 'CONTINUE)
+      (make-dialog-item
+        'STATIC-TEXT-DIALOG-ITEM
+        #@(20 40) #@(595 450) ""
+        'NIL
+        :view-nick-name 'TEXT
+        :view-font '("Geneva" 12 :SRCOR :PLAIN (:COLOR-INDEX 0)))
+      (make-dialog-item
+        'STATIC-TEXT-DIALOG-ITEM
+        #@(2 560) #@(433 15)
+        "press the “Return” key or click “Continue” when you are ready to go on"
+        'NIL
+        :view-font '("Geneva" 10 :SRCOR :BOLD (:COLOR-INDEX 0))))))
 
 
 
@@ -351,7 +353,7 @@ Click “OK” when you are ready to continue.")
 
 (defgeneric finish-experiment (wind)
   (:documentation "Clean-up at the end of the experiment: beep, close the experiment window, 
-display a finished message, and clean up the data file. Might want an :AFTER method here."))
+                   display a finished message, and clean up the data file. Might want an :AFTER method here."))
 
 (defmethod finish-experiment ((wind experiment-window))
   (beep)
@@ -372,10 +374,10 @@ display a finished message, and clean up the data file. Might want an :AFTER met
     ;; if there's no experiment number, use a "dumb" URL.  If there is,
     ;; then use a "smart" URL
     (let ((url-str (if (null (xnum wind))
-                       (url wind)
-                       (mkstr (url wind) "?xnum=" (xnum wind) 
-                              "&snum=" (snum wind)
-                              "&xcond=" (xcond wind)))))
+                     (url wind)
+                     (mkstr (url wind) "?xnum=" (xnum wind) 
+                            "&snum=" (snum wind)
+                            "&xcond=" (xcond wind)))))
       (warning *end-of-expt-str*)
       (if (osx-p)
         (launch-url url-str)
@@ -404,11 +406,11 @@ display a finished message, and clean up the data file. Might want an :AFTER met
 
 (defgeneric setup-trial (wind trl)
   (:documentation "Pops the window's trial-lst into the <current-trial> slot.  Probably will 
-require an :AFTER method from the subclass."))
+                   require an :AFTER method from the subclass."))
 
 (defmethod setup-trial ((wind experiment-window) (trl trial))
-    (setf (trial-block trl) (cblock wind)
-          (start-time trl) (get-internal-real-time))
+  (setf (trial-block trl) (cblock wind)
+        (start-time trl) (get-internal-real-time))
   )
 
 
@@ -488,7 +490,7 @@ require an :AFTER method from the subclass."))
 
 (defgeneric finish-block (wind blk)
   (:documentation "Called upon finishing a block of trials.  Write the data, put up a status update. 
-Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
+                   Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
 
 (defmethod finish-block ((wind experiment-window) (blk trial-block))
   (write-block wind blk)
@@ -497,8 +499,8 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
   (beep)
   (unless (= (cblock wind) (nblocks wind))
     (warning 
-     (format nil *end-of-block-str* 
-             (cblock wind) (nblocks wind)))))
+      (format nil *end-of-block-str* 
+              (cblock wind) (nblocks wind)))))
 
 
 ;;; FINISH-BLOCK      [Method]
@@ -593,8 +595,8 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
 (defun wait-for-instructions (texts)
   "Displays TEXTS as a modal dialog."
   (modal-dialog 
-   (make-instance 'instruction-dialog :texts texts :modal-p t
-                  :completion '(return-from-modal-dialog t))))
+    (make-instance 'instruction-dialog :texts texts :modal-p t
+                   :completion '(return-from-modal-dialog t))))
 
 
 
@@ -693,7 +695,7 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
 
 
 (defun warning (string &key (cursor nil) 
-                      (size #@(400 200)))
+                       (size #@(400 200)))
   "Displays a warning dialog, with a cursor."
   (when cursor (#_ShowCursor))
   (message-dialog string :title "Message" :size size :position #@(300 250))
@@ -707,52 +709,57 @@ Subclasses do more.  Might add a :BEFORE method to compute accuracy."))
       (setf num (read-from-string (get-string-from-user "Subject number:"))))
     num))
 
-#|
-#-ccl-4.3.1
-(defun move-cursor-to (x y)
-  "Moves the cursor to absolute coordinates X Y."
-  (let ((tp (make-point x y)))
-    (without-interrupts
-     (ccl::%put-point (%int-to-ptr #$MTemp) tp)
-     (ccl::%put-point (%int-to-ptr #$RawMouse) tp)
-     (%put-word (%int-to-ptr #$CrsrNew) -1))))
-|#
 
-#+(and ccl-4.3.1 (not :ccl-5.2))
-(if (osx-p)
+;;; under MCL 5.2, can't use CFBundle, but there are alternate ways to 
+;;; deal with framework calls, so use that.
+
+#+ccl-5.2
+(when (osx-p)
   (progn
-    (defparameter *warp* (lookup-function-in-framework 
-                       "CGWarpMouseCursorPosition"))
+    (defparameter *warp* (ccl::lookup-function-in-bundle 
+                           "CGWarpMouseCursorPosition"
+                           (ccl::load-framework-bundle "ApplicationServices.framework")))
+
     (defun move-cursor-to (x y)
       "Moves the cursor to absolute coordinates X Y."
       (ccl::ppc-ff-call *warp* 
                         :single-float (coerce x 'short-float)
                         :single-float (coerce y 'short-float)
-                        :unsigned-fullword)))
-  
-  (defun move-cursor-to (x y)
-    "Moves the cursor to absolute coordinates X Y."
-    (let ((tp (make-point x y)))
-      (without-interrupts
-       (#_LMSetMouseTemp tp)
-       (#_LMSetRawMouseLocation tp)
-       (#_LMSetCursorNew -1)))))
-
-;;; under MCL 5.2, can't use CFBundle, but there are alternate ways to 
-;;; deal with framework calls, so use that.
-#+ccl-5.2
-(when (osx-p)
-  (progn
-    (defparameter *warp* (ccl::lookup-function-in-bundle
-                          "CGWarpMouseCursorPosition"
-                          (ccl::load-framework-bundle "ApplicationServices.framework")))
-
-    (defun move-cursor-to (x y) 
-      (ccl::ppc-ff-call *warp*
-                        :single-float (coerce x 'short-float)
-                        :single-float (coerce y 'short-float)
                         :unsigned-fullword))
     ))
+
+#+(and :ccl-5.0 (not :ccl-5.2))
+(when (osx-p)
+  (progn
+    (defparameter *warp* (lookup-function-in-framework 
+                           "CGWarpMouseCursorPosition"))
+    (defun move-cursor-to (x y)
+      "Moves the cursor to absolute coordinates X Y."
+      (ccl::ppc-ff-call *warp* 
+                        :single-float (coerce x 'short-float)
+                        :single-float (coerce y 'short-float)
+                        :unsigned-fullword))))
+
+
+
+
+#+(and :ccl-4.3.1 (not :ccl-5.0))
+(defun move-cursor-to (x y)
+  "Moves the cursor to absolute coordinates X Y."
+  (let ((tp (make-point x y)))
+    (without-interrupts
+      (#_LMSetMouseTemp tp)
+      (#_LMSetRawMouseLocation tp)
+      (#_LMSetCursorNew -1))))
+
+#-(or ccl-4.3.1 :clozure)
+(defun move-cursor-to (x y) 
+  "Moves the cursor to absolute coordinates X Y."
+  (let ((tp (make-point x y)))
+    (without-interrupts
+      (ccl::%put-point (%int-to-ptr #$MTemp) tp)
+      (ccl::%put-point (%int-to-ptr #$RawMouse) tp)
+      (%put-word (%int-to-ptr #$CrsrNew) -1))))
 
 #+:clozure
 (defun move-cursor-to (x y)
