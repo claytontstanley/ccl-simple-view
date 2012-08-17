@@ -73,10 +73,15 @@
 
 (defclass timer () ())
 
-
+#+:digitool
 (defclass event-timer (timer)
   ((tickms :accessor tickms :initarg :tickms :initform 50/3)
    (start-time :accessor start-time :initarg :start-time :initform nil)
+   ))
+
+#+clozure
+(defclass event-timer (timer)
+  ((start-time :accessor start-time :initarg :start-time :initform nil)
    ))
 
 #+:digitool
@@ -144,10 +149,14 @@
          (tick->ms tmr (pref *current-event* :eventrecord.when)))
         (t (tick->ms tmr (#_tickcount)))))
 
-
 #+:clozure
 (defmethod current-time ((tmr event-timer))
-  0)
+  (cond (*actr-enabled-p* (mp-time))
+        (t (coerce 
+             (* 1000
+                (/ (get-internal-real-time)
+                   internal-time-units-per-second))
+             'double-float))))
 
 (defgeneric stop-timing (tmr)
   (:documentation "Stops an event timer at the current event and returns the time in ms."))
