@@ -1283,13 +1283,15 @@
         (#/boolValue
          (#/objectForKey: dict (objc:make-nsstring "NSFileImmutable"))))))
   (defun lock-file (path)
-    (unless (file-locked-p path)
-      (guard-!nil
-        (set-immutable-attr path #$YES))))
+    (let ((path (namestring path)))
+      (unless (file-locked-p path)
+        (guard-!nil
+          (set-immutable-attr path #$YES)))))
   (defun unlock-file (path)
-    (when (file-locked-p path)
-      (guard-!nil
-        (set-immutable-attr path #$NO)))))
+    (let ((path (namestring path)))
+      (when (file-locked-p path)
+        (guard-!nil
+          (set-immutable-attr path #$NO))))))
 
 ; FIXME: Write this
 (defun set-mac-file-creator (path mac-file-creator)
