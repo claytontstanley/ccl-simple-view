@@ -1,4 +1,5 @@
 testing/bootstrap.lisp
+testing/bootstrap-mcl.lisp
 testing/utilities.lisp
 binccl/utilities.lisp
 testing/file-lists/all.txt
