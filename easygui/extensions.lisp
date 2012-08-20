@@ -21,10 +21,10 @@
 ; For the time being, there are no types of cocoa windows that should not be able to become key or main. So until customization is
 ; needed, override these methods for cocoa windows and allow everyone the ability to become key and main.
 
-(objc:defmethod (#/canBecomeKeyWindow :boolean) ((win easygui::cocoa-window))
+(objc:defmethod (#/canBecomeKeyWindow #>BOOL) ((self easygui::cocoa-window))
   #$YES)
 
-(objc:defmethod (#/canBecomeMainWindow :boolean) ((win easygui::cocoa-window))
+(objc:defmethod (#/canBecomeMainWindow #>BOOL) ((self easygui::cocoa-window))
   #$YES)
 
 ; ----------------------------------------------------------------------
