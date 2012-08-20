@@ -1,0 +1,4 @@
+testing/testGallagher112.lisp
+submodules/actr6
+testing/file-lists/Gallagher112/testGallagher.txt
+submodules/gallagher/xinstructions112.lisp

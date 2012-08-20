@@ -962,6 +962,12 @@
   (with-fore-color (get-fore-color view) 
     (line-to view (get-end view))))
 
+(defmethod pen-position ((view window))
+  (pen-position (content-view view)))
+
+(defmethod (setf pen-position) (new (view window))
+  (setf (pen-position (content-view view)) new))
+
 (defmethod move-to ((view window) x &optional y)
   (move-to (content-view view) x y))
 
@@ -986,6 +992,12 @@
        ns:ns-bezier-path
        (ns:make-ns-point startx starty) 
        (ns:make-ns-point endx endy)))))
+
+(defmethod line ((view simple-view) x &optional (y nil))
+  (destructuring-bind (x y) (canonicalize-point x y)
+    (line-to view (add-points
+                    (pen-position view)
+                    (make-point x y)))))
 
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
