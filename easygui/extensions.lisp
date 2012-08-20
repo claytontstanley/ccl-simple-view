@@ -14,6 +14,19 @@
 
 (setf easygui::*debug-cocoa-calls* nil)
 
+; There are particular window configurations that keep the window from becoming key or main (borderless windows for example).
+; And this causes odd behavior for these types of windows (can't select the win when using command `, window is backgrounded behind
+; the listener window after a dialog window opens and closes).
+;
+; For the time being, there are no types of cocoa windows that should not be able to become key or main. So until customization is
+; needed, override these methods for cocoa windows and allow everyone the ability to become key and main.
+
+(objc:defmethod (#/canBecomeKeyWindow :boolean) ((win easygui::cocoa-window))
+  #$YES)
+
+(objc:defmethod (#/canBecomeMainWindow :boolean) ((win easygui::cocoa-window))
+  #$YES)
+
 ; ----------------------------------------------------------------------
 ; Extend the Objective C cocoa-drawing-view in the easygui package with a view that does not monitor mouse movement or clicks
 ;
