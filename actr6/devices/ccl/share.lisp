@@ -1188,7 +1188,7 @@
 ; where the subviews are supposed to go. If the view is a window, then the subviews go as subviews under the content-view slot.
 ; easygui handles all of this in their add-subviews method, so the technique here is to use a temp slot on the view-mixin class,
 ; make that :initarg :view-subviews, and then on object initialization, take any provided subviews and call easygui's add-subviews method
-; on them. Then clear the temp slot. Again, kinda' hacky, but it seems to work, and requires minimal code additions and still uses
+; on them. Then clear the temp slot. Kinda' hacky, but it seems to work, and requires minimal code additions and still uses
 ; easygui's add-subviews machinery, etc.
 
 (defmethod initialize-instance :after ((view view-mixin) &key) 
