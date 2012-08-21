@@ -205,8 +205,8 @@
 
 ; Converting MCL colors (specified as a huge (technical term) integer) to 'system' colors
 
-; FIXME: Stole this code from CCL's src; couldn't figure out how to load it with a require;
-; fix this. This code was initially stolen from MCL, so this is the actual MCL code to do the conversion
+; FIXME: Copied this code from CCL's src; couldn't figure out how to load it with a require;
+; fix this. This code matches what's in MCL's src, so this is the actual MCL code to do the conversion
 
 (defun make-mcl-color (red green blue)
   "given red, green, and blue, returns an encoded rgb value"
