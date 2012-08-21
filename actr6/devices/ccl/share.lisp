@@ -1059,6 +1059,9 @@
   (#/moveToPoint: (bezier-path view)
    (easygui::ns-point-from-point (pen-position view))))
 
+(defmethod start-polygon ((win window))
+  (start-polygon (content-view win)))
+
 (defun pattern->system-color (pattern)
   (color-symbol->system-color
     (guard-!nil
@@ -1069,6 +1072,9 @@
   (with-fallback-focused-view view
     (with-window-of-focused-view-fallback-fore-color
       (#/fill (bezier-path view)))))
+
+(defmethod fill-polygon ((win window) pattern polygon)
+  (fill-polygon (content-view win) pattern polygon))
 
 (defmethod frame-polygon ((view simple-view) polygon)
   #-:sv-dev (declare (ignore polygon))
@@ -1083,6 +1089,8 @@
 (defmethod get-polygon ((view simple-view))
   (bezier-path view))
 
+(defmethod get-polygon ((win window))
+  (get-polygon (content-view win)))
 
 ; FIXME: Currently it's expected that a format call to a view is done only once per view-draw-contents. So write
 ; a single string to the view, etc. But CCL calls write-char when the string has a negative sign at the beginning.
