@@ -982,22 +982,25 @@
   (line-to (content-view view) x y))
 
 (defmethod line-to ((view simple-view) x &optional (y nil))
-  (destructuring-bind (endx endy) (canonicalize-point x y)
-    (destructuring-bind (startx starty) (list (point-x (pen-position view))
-                                              (point-y (pen-position view)))
-      (when (bezier-path view)
-        (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
-      (setf (pen-position view) (make-point endx endy))
-      (#/strokeLineFromPoint:toPoint:
-       ns:ns-bezier-path
-       (ns:make-ns-point startx starty) 
-       (ns:make-ns-point endx endy)))))
+  (with-fallback-focused-view view
+    (with-window-of-focused-view-fallback-fore-color
+      (destructuring-bind (endx endy) (canonicalize-point x y)
+        (destructuring-bind (startx starty) (list (point-x (pen-position view))
+                                                  (point-y (pen-position view)))
+          (when (bezier-path view)
+            (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
+          (setf (pen-position view) (make-point endx endy))
+          (#/strokeLineFromPoint:toPoint:
+           ns:ns-bezier-path
+           (ns:make-ns-point startx starty) 
+           (ns:make-ns-point endx endy)))))))
 
 (defmethod line ((view simple-view) x &optional (y nil))
-  (destructuring-bind (x y) (canonicalize-point x y)
-    (line-to view (add-points
-                    (pen-position view)
-                    (make-point x y)))))
+  (with-fallback-focused-view view
+    (destructuring-bind (x y) (canonicalize-point x y)
+      (line-to view (add-points
+                      (pen-position view)
+                      (make-point x y))))))
 
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
