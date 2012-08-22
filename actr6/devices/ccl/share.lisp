@@ -719,7 +719,7 @@
 
 (defmacro! with-focused-view (o!view &body body)
   "Any changes to the graphics environment by body will be directed to the view object"
-  `(let ((*current-focused-view* ,g!view))
+  `(let ((*current-focused-view* (content-view ,g!view)))
      (easygui:with-focused-view (easygui:cocoa-ref (content-view ,g!view))
        ,@body)))
 
@@ -970,14 +970,34 @@
   (with-fore-color (get-fore-color view) 
     (line-to view (get-end view))))
 
+; Drawing commands on windows are directed to the window's content view.
+; This is achieved by having with-focused-view focus on the window's content
+; view (if it's a window), and also by specializing on the accessors that are 
+; used when drawing. The window's pen-position and bezier-path are never used;
+; instead, those are directed to the content view of the window.
+;
+; Another approach would have been to write a specialized method for the window
+; for each public drawing method, and have that method call the method with the
+; same name on the window's content view, but this would require adding a 
+; window-specialized method for each public drawing method. So instead I looked
+; at what accessors the public methods are using, and specialized on those, so that
+; the necessary code changes for drawing to window's content view could be isolated
+; in the few methods below. Adding/removing this functionality can be achived by
+; adding/deleting the few methods here.
+
 (defmethod pen-position ((view window))
   (pen-position (content-view view)))
 
 (defmethod (setf pen-position) (new (view window))
   (setf (pen-position (content-view view)) new))
 
-(defmethod move-to ((view window) x &optional y)
-  (move-to (content-view view) x y))
+(defmethod bezier-path ((view window))
+  (bezier-path (content-view view)))
+
+(defmethod (setf bezier-path) (new (view window))
+  (setf (bezier-path (content-view view)) new))
+
+; Actual drawing methods
 
 (defmethod move-to ((view simple-view) x &optional (y nil))
   (destructuring-bind (x y) (canonicalize-point x y)
@@ -985,9 +1005,6 @@
       (when (bezier-path view)
         (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y)))
       (setf (pen-position view) position))))
-
-(defmethod line-to ((view window) x &optional y)
-  (line-to (content-view view) x y))
 
 (defmethod line-to ((view simple-view) x &optional (y nil))
   (with-fallback-focused-view view
@@ -1052,13 +1069,10 @@
   (with-fallback-focused-view view
     (fill-rect view (pen-pattern view) left top right bottom)))
 
-(defmethod erase-rect ((view window) left &optional top right bottom)
-  (erase-rect (content-view view) left top right bottom))
-
 (defmethod erase-rect ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
     (with-fallback-focused-view view
-      (with-fore-color (get-back-color view)
+      (with-fore-color (get-back-color (content-view view))
         (fill-ns-rect rect)))))
 
 (defmethod start-polygon ((view simple-view))
@@ -1066,9 +1080,6 @@
   (#/retain (bezier-path view))
   (#/moveToPoint: (bezier-path view)
    (easygui::ns-point-from-point (pen-position view))))
-
-(defmethod start-polygon ((win window))
-  (start-polygon (content-view win)))
 
 (defun pattern->system-color (pattern)
   (color-symbol->system-color
@@ -1080,9 +1091,6 @@
   (with-fallback-focused-view view
     (with-window-of-focused-view-fallback-fore-color
       (#/fill (bezier-path view)))))
-
-(defmethod fill-polygon ((win window) pattern polygon)
-  (fill-polygon (content-view win) pattern polygon))
 
 (defmethod frame-polygon ((view simple-view) polygon)
   #-:sv-dev (declare (ignore polygon))
@@ -1096,9 +1104,6 @@
 
 (defmethod get-polygon ((view simple-view))
   (bezier-path view))
-
-(defmethod get-polygon ((win window))
-  (get-polygon (content-view win)))
 
 ; FIXME: Currently it's expected that a format call to a view is done only once per view-draw-contents. So write
 ; a single string to the view, etc. But CCL calls write-char when the string has a negative sign at the beginning.

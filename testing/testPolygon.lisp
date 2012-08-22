@@ -4,8 +4,8 @@
 (defparameter *win* (make-instance 'static-window))
 
 (defparameter *view* (make-instance 'simple-view
-                            :view-size (make-point 50 50)
-                            :view-position (make-point 10 60)))
+                                    :view-size (make-point 50 50)
+                                    :view-position (make-point 10 60)))
 
 (with-focused-view *win*
   (with-fore-color *blue-color*
@@ -18,7 +18,7 @@
     (let ((polygon (get-polygon *win*)))
       (fill-polygon *win* *black-pattern* polygon)
       (kill-polygon polygon))))
-                   
+
 (defmethod view-draw-contents ((view (eql *view*))) 
   (start-polygon *view*)
   (move-to view 0 0)
