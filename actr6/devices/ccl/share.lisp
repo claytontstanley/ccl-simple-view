@@ -919,9 +919,11 @@
 ; to the display
 ; ----------------------------------------------------------------------
 
-(objc:defmethod (#/drawRect: :void) ((self easygui::cocoa-drawing-view)
-                                     (rect :<NSR>ect))
-                (easygui::dcc (view-draw-contents (easygui::easygui-view-of self))))
+(objc:defmethod (#/drawRect: :void) ((self easygui::cocoa-drawing-view) (rect :<NSR>ect))
+  (let ((view (easygui::easygui-view-of self)))
+    (setf *current-focused-view* view)
+    (easygui::dcc
+      (view-draw-contents view))))
 
 ; Drawing methods
 
