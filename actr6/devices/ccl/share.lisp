@@ -919,9 +919,15 @@
 ; to the display
 ; ----------------------------------------------------------------------
 
+
+; Note that Cocoa focuses the view before calling #/drawRect, so there's no reason to have a
+; with-focused-view inside of the lisp code. But in order for the with-fallback-focused-view stuff to 
+; work, it needs to know that a view is already focused. So just set the global var to the view
+; in order to do this.
+
 (objc:defmethod (#/drawRect: :void) ((self easygui::cocoa-drawing-view) (rect :<NSR>ect))
-  (let ((view (easygui::easygui-view-of self)))
-    (setf *current-focused-view* view)
+  (let* ((view (easygui::easygui-view-of self))
+         (*current-focused-view* view))
     (easygui::dcc
       (view-draw-contents view))))
 
