@@ -16,7 +16,6 @@
     (line *win* -10 0)
     (line *win* 0 10)
     (let ((polygon (get-polygon *win*)))
-      (format t "~a~%" polygon)
       (fill-polygon *win* *black-pattern* polygon)
       (kill-polygon polygon))))
                    
