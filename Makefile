@@ -18,6 +18,7 @@ clean-tamborello:
 
 file-list-all : fl = Votebox VoteboxKristen Phaser Tutorials
 file-list-tamborello: fl = Phaser TamboDis TamboDisModel
+file-list-gallagher: fl = Gallagher Gallagher112
 file-list-% : fl = $*
 
 file-list-actr6:
