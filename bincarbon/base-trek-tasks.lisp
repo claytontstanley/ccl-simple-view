@@ -84,7 +84,7 @@
 ;;;; Ships' course class definition
 ;;;; ---------------------------------------------------------------------- ;;;;
 
-(defclass ships-course-window (procedure-window #+:clozure static-window)
+(defclass ships-course-window (#+:clozure static-window procedure-window)
   ((draw-hack-p :accessor draw-hack-p :initarg :draw-hack-p :initform t) 
    (match-p :accessor match-p :initarg :match-p :initform (flip)))
   (:default-initargs
