@@ -204,8 +204,9 @@
         (shape (window-cursor the-window)))
     (when (cursor-in-window-p the-window)
       (car (define-chunks-fct `((isa visual-location kind cursor 
-                                     screen-x ,(point-h pos)
-                                     screen-y ,(point-v pos)
+                                     screen-x ,(round (point-h pos))
+                                     screen-y ,(round (point-v pos))
+                                     color ,(system-color->symbol (color shape))
                                      value ,(cond ((eq shape *i-beam-cursor*) 'i-beam)
                                                   ((eq shape *crosshair-cursor*) 'crosshair)
                                                   (t 'pointer)))))))))
@@ -523,6 +524,11 @@
     :view-size #@(19 19)
     :offset #@(-10 -10)))
 
+(defmethod rpm-overlay-p ((view rpm-overlay))
+  t)
+
+(defmethod rpm-overlay-p ((view simple-view))
+  nil)
 
 (defmethod view-draw-contents ((self focus-ring))
   (let ((oldmode (pen-mode self))
@@ -546,14 +552,11 @@
 ;;;             : ring.
 
 (defmethod device-update-attended-loc ((wind window) xyloc)
-  (let ((update-me))
-    (cond ((not (visual-fixation-marker))
-           (setf (visual-fixation-marker) (make-instance 'focus-ring))
-           (setf update-me t))
-          ((aand (view-window (visual-fixation-marker)) (eq it wind))
-           (setf update-me t)))
-    (when (and update-me (wptr wind))
-      (update-me (visual-fixation-marker) wind xyloc))))
+  (unless (aand (visual-fixation-marker) (eq (type-of it) 'focus-ring)
+                (view-window (visual-fixation-marker)) (eq it wind))
+    (setf (visual-fixation-marker) (make-instance 'focus-ring)))
+  (when (wptr wind)
+    (update-me (visual-fixation-marker) wind xyloc)))
 
 ; When called with nil xyloc, remove the current visual-fication-marker.
 ; Note that this is called in cases where the current marker is not a subview in wind.
@@ -563,10 +566,10 @@
 ; location marker to nil.
 
 (defmethod device-update-attended-loc ((wind window) (xyloc (eql nil)))
-  (when (visual-fixation-marker)
-    (when (aand (view-window (visual-fixation-marker)) (eq it wind) (wptr wind))
-      (remove-subviews wind (visual-fixation-marker)))
-    (setf (visual-fixation-marker) nil)))
+  (when (aand (visual-fixation-marker) (eq (type-of it) 'focus-ring)
+              (view-window (visual-fixation-marker)) (eq it wind) (wptr wind))
+    (remove-subviews wind (visual-fixation-marker)))
+  (setf (visual-fixation-marker) nil))
 
 #|
 This library is free software; you can redistribute it and/or

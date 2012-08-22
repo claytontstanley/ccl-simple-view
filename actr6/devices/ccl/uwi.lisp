@@ -146,9 +146,10 @@
 ;;; Description : Remove all the subvies of the window and redisplay it.
 
 (defmethod remove-all-items-from-rpm-window ((win rpm-real-window))
-  (apply #'remove-subviews win (subviews win))
-  (view-draw-contents win)
-  (event-dispatch))
+  (awhen (remove-if #'rpm-overlay-p (subviews win))
+    (apply #'remove-subviews win it)
+    (view-draw-contents win)
+    (event-dispatch)))
 
 ;;; RPM-WINDOW-TITLE  [Method]
 ;;; Description : Return the title of the window.

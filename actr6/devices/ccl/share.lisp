@@ -1361,6 +1361,12 @@
 (defmethod window-cursor ((window window))
   *current-cursor*)
 
+(defmethod color ((cursor ns:ns-cursor))
+  (guard-!nil
+    (cond ((eq cursor *i-beam-cursor*) *black-color*)
+          ((eq cursor *arrow-cursor*) *black-color*)
+          ((eq cursor *crosshair-cursor*) *black-color*))))
+
 (defmethod create-resource ((type (eql 'cursor)) id)
   (make-instance
     'resource
