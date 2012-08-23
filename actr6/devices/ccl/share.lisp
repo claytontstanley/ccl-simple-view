@@ -803,6 +803,11 @@
   #-:sv-dev (declare (ignore point))
   nil)
 
+(defmethod view-click-event-handler :around ((device simple-view) position)
+  (sv-log-n 1 "starting view-click-event-handler")
+  (unwind-protect (call-next-method)
+    (sv-log-n 1 "ending view-click-event-handler")))
+
 (defmethod view-click-event-handler ((device simple-view) position)
   (awhen (view-container device) 
     (view-click-event-handler it position)))
@@ -837,6 +842,7 @@
 
 (defun left-mouse-click (pos)
   (let ((pos (easygui::ns-point-from-point pos)))
+    (sv-log-n 1 "starting left mouse click")
     (left-mouse-down pos)
     (left-mouse-up pos)
     (sleep .05)))
@@ -869,12 +875,18 @@
 ; Same sleep time here.
 
 (defun keypress (key)
+  (sv-log-n 1 "starting keypress")
   (keypress-down key)
   (keypress-up key)
   (sleep .05))
 
 (defmethod easygui::view-key-event-handler ((device window) key)
   (view-key-event-handler device key))
+
+(defmethod view-key-event-handler :around ((device window) key)
+  (sv-log-n 1 "starting view-key-event-handler")
+  (unwind-protect (call-next-method)
+    (sv-log-n 1 "ending view-key-event-handler")))
 
 (defmethod view-key-event-handler ((device window) key)
   (declare (ignore key))
@@ -1236,11 +1248,13 @@
 ; here. Fun-orig is an anaphor that points to the default queue-for-event-process function.
 
 (defun event-dispatch ()
+  (sv-log-n 1 "starting event dispatch")
   (with-shadow (gui::queue-for-event-process
                  (lambda (f &key at-start)
                    (declare (ignore at-start))
                    (funcall fun-orig f :at-start nil)))
-               (gui::call-in-event-process (lambda () ()))))
+               (gui::call-in-event-process (lambda () ())))
+  (sv-log-n 1 "ending event dispatch"))
 
 (defparameter *current-dialog-directory* nil)
 

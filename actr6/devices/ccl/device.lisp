@@ -416,8 +416,10 @@
 
 (defmethod device-move-cursor-to ((device window) (xyloc vector))
   (setf xyloc (local-to-global device (vpt2p xyloc)))
+  (sv-log-n 1 "moving cursor to ~a" xyloc)
   (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
                                                  (point-v xyloc)))
+  (sleep .05)
   (event-dispatch))
 
 ;;; DEVICE-SPEAK-STRING      [Method]
