@@ -237,7 +237,9 @@
 ;;;             : a person to respond.
 
 (defmethod allow-event-manager ((win rpm-real-window))
-  (event-dispatch))
+  (sv-log-n 1 "starting allow-event-manager")
+  (event-dispatch)
+  (sv-log-n 1 "ending-allow-event-manager"))
 
 #|
 This library is free software; you can redistribute it and/or
