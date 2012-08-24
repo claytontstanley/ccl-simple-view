@@ -2,7 +2,7 @@
   (require :cocoa)
   (require :easygui))
 
-(defparameter *sv-log-level* 1)
+(defparameter *sv-log-level* 0) 
 
 (defun sv-log (&rest args)
   (#_NSLog 
