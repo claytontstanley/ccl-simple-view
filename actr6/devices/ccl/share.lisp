@@ -399,7 +399,9 @@
                        (if action
                          (list
                            :action (lambda ()
-                                     (funcall action obj))))
+                                     (sv-log-n 1 "calling action for ~a" obj)
+                                     (funcall action obj)
+                                     (sv-log-n 1 "finished calling action for ~a" obj))))
                        attributes)))
     obj))
 
@@ -828,24 +830,33 @@
    0))
 
 (defun left-mouse-up (pos)
-  (#_CGEventPost
-   0
-   (create-mouse-event #$NSLeftMouseUp pos)))
+  (let ((event
+          (create-mouse-event #$NSLeftMouseUp pos)))
+    (sv-log-n 1 "posting mouse-up event ~a" event)
+    (#_CGEventPost 0 event) 
+    (sv-log-n 1 "releasing mouse-up event ~a" event)
+    (#_CFRelease event)))
 
 (defun left-mouse-down (pos)
-  (#_CGEventPost
-   0
-   (create-mouse-event #$NSLeftMouseDown pos)))
+  (let ((event
+          (create-mouse-event #$NSLeftMouseDown pos)))
+    (sv-log-n 1 "posting mouse-down event ~a" event)
+    (#_CGEventPost 0 event) 
+    (sv-log-n 1 "releasing mouse-down event ~a" event)
+    (#_CFRelease event)))
 
 ; It takes roughly 1 ms for an event to hit the application's run loop, so sleep for 50x 
 ; longer than this, to make extra extra sure that the event has hit the run loop before returning.
 
 (defun left-mouse-click (pos)
-  (let ((pos (easygui::ns-point-from-point pos)))
-    (sv-log-n 1 "starting left mouse click")
-    (left-mouse-down pos)
-    (left-mouse-up pos)
-    (sleep .05)))
+  (sv-log-n 1 "starting left mouse click")
+  (easygui::running-on-main-thread ()
+    (let ((pos (easygui::ns-point-from-point pos)))
+      (left-mouse-down pos)
+      (left-mouse-up pos)))
+  (sv-log-n 1 "sleeping so that mouse click enters nsrun loop")
+  (spin-for-fct 50)
+  (sv-log-n 1 "ending left mouse click"))
 
 ; Handling keyboard interaction
 
@@ -863,22 +874,31 @@
       ret)))
 
 (defun keypress-down (key)
-  (#_CGEventPost
-   #$kCGHIDEventTap
-   (create-keyboard-event #$YES key)))
+  (let ((event 
+          (create-keyboard-event #$YES key)))
+    (sv-log-n 1 "posting keypress-down event ~a" event)
+    (#_CGEventPost 0 event) 
+    (sv-log-n 1 "releasing keypress-down event ~a" event)
+    (#_CFRelease event)))
 
 (defun keypress-up (key)
-  (#_CGEventPost
-   #$kCGHIDEventTap
-   (create-keyboard-event #$NO key)))
+  (let ((event 
+          (create-keyboard-event #$NO key)))
+    (sv-log-n 1 "posting keypress-up event ~a" event)
+    (#_CGEventPost 0 event) 
+    (sv-log-n 1 "releasing keypress-up event ~a" event)
+    (#_CFRelease event)))
 
 ; Same sleep time here.
 
 (defun keypress (key)
   (sv-log-n 1 "starting keypress")
-  (keypress-down key)
-  (keypress-up key)
-  (sleep .05))
+  (easygui::running-on-main-thread ()
+    (keypress-down key)
+    (keypress-up key))
+  (sv-log-n 1 "sleeping so that keypress enters nsrun loop")
+  (spin-for-fct 50)
+  (sv-log-n 1 "ending keypress"))
 
 (defmethod easygui::view-key-event-handler ((device window) key)
   (view-key-event-handler device key))

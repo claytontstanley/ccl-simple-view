@@ -391,17 +391,21 @@
 
 (defmethod device-handle-keypress ((device window) key)
   (declare (ignore device))
+  (sv-log-n 1 "starting device-handle-keypress")
   (keypress key)
-  (event-dispatch))
+  (event-dispatch)
+  (sv-log-n 1 "ending device-handle-keypress"))
 
 
 ;;; DEVICE-HANDLE-CLICK      [Method]
 ;;; Description : Again, just call the base MCL method and dispatch.
 
 (defmethod device-handle-click ((device window))
+  (sv-log-n 1 "starting device-handle-click")
   (left-mouse-click
     (local-to-global device (view-mouse-position device)))
-  (event-dispatch))
+  (event-dispatch)
+  (sv-log-n 1 "ending device-handle-click"))
 
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
 ;;; Date        : 97.02.18 [revised 98.10.29]
@@ -415,11 +419,12 @@
 ;;;             : make sure it's been registered by MCL with UPDATE-CURSOR.
 
 (defmethod device-move-cursor-to ((device window) (xyloc vector))
-  (setf xyloc (local-to-global device (vpt2p xyloc)))
-  (sv-log-n 1 "moving cursor to ~a" xyloc)
-  (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
-                                                 (point-v xyloc)))
-  (sleep .05)
+  (easygui::running-on-main-thread ()
+    (sv-log-n 1 "moving cursor to ~a" xyloc)
+    (setf xyloc (local-to-global device (vpt2p xyloc)))
+    (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
+                                                   (point-v xyloc))))
+  (spin-for-fct 50)
   (event-dispatch))
 
 ;;; DEVICE-SPEAK-STRING      [Method]

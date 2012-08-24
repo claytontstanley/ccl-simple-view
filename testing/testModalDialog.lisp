@@ -30,10 +30,9 @@
                                       (beep)
                                       (return-from-modal-dialog 5))))))))))))
 
-(process-wait
-  "waiting for modal dialog to finish"
-  (lambda () *t*))
-
+(while (not *t*)
+  (spin-for-fct 100))
+       
 (check (eq *t* 5))
 
 #|
