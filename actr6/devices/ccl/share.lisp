@@ -806,6 +806,7 @@
   nil)
 
 (defmethod view-click-event-handler :around ((device simple-view) position)
+  (declare (ignore position))
   (sv-log-n 1 "starting view-click-event-handler")
   (unwind-protect (call-next-method)
     (sv-log-n 1 "ending view-click-event-handler")))
@@ -904,6 +905,7 @@
   (view-key-event-handler device key))
 
 (defmethod view-key-event-handler :around ((device window) key)
+  (declare (ignore key))
   (sv-log-n 1 "starting view-key-event-handler")
   (unwind-protect (call-next-method)
     (sv-log-n 1 "ending view-key-event-handler")))

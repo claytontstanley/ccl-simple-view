@@ -51,16 +51,3 @@
   (if (search ".lisp" str)
     t))
 
-(defun internal-real-time->ms (internal-real-time)
-  (* 1000
-     (/ internal-real-time
-        internal-time-units-per-second)))
-
-(defun spin-for-fct (ms-delay)
-  (without-interrupts
-     (let ((start (internal-real-time->ms
-                    (get-internal-real-time))))
-       (while (> ms-delay (- (internal-real-time->ms
-                               (get-internal-real-time))
-                             start))))))
-
