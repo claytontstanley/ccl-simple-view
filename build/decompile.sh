@@ -11,5 +11,5 @@ cat $srcFile | grep 'Begin file:' | awk '{print $NF}' | while read file; do
 	echo $lstart
 	echo $lstop
 	code=$( cat "$srcFile" | sed -n "$lstart,$lstop p" )
-	echo "$code" > $file
+	echo "$code" > ../$file
 done

@@ -12,6 +12,7 @@ date = $(shell date)
 commitID = $(shell git log -n 1 | grep '^commit' | awk '{print $$2}')
 
 outFiles = ccl-simple-view.lisp device.lisp uwi.lisp
+decompileTargets = ${outFiles:%=decompile-%}
 
 all: ${outFiles}
 
@@ -19,15 +20,23 @@ ccl-simple-view.lisp : fileList = file-list.txt
 device.lisp : fileList = file-list-device.txt
 uwi.lisp : fileList = file-list-uwi.txt
 
+path-device.lisp = ${actrPath}/devices/ccl-cocoa
+path-uwi.lisp = ${path-device.lisp}
+path-ccl-simple-view.lisp = ${actrPath}/support
+
 ccl-simple-view.lisp:
-	make -s outFileHeader > ${actrPath}/support/$@
-	make -s file-list fileList="${fileList}" >> ${actrPath}/support/$@
+	make -s outFileHeader > ${path-${@}}/$@
+	make -s file-list fileList="${fileList}" >> ${path-${@}}/$@
 
-device.lisp uwi.lisp: deviceFolder
-	make -s file-list fileList="${fileList}" > ${actrPath}/devices/ccl-cocoa/$@
+device.lisp uwi.lisp:
+	mkdir -p ${path-${@}}
+	make -s file-list fileList="${fileList}" > ${path-${@}}/$@
 
-deviceFolder:
-	mkdir -p ${actrPath}/devices/ccl-cocoa
+decompile-%:
+	./decompile.sh ${path-${*}}/$*
+
+decompile-all: ${decompileTargets}
+	echo "done"
 
 file-list:
 	cat ${fileList} | while read file; do \
