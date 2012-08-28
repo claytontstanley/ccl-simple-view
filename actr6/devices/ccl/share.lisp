@@ -892,13 +892,13 @@
 
 ; Same sleep time here.
 
-(defun keypress (key)
+(defun keypress (key &optional (delay t))
   (sv-log-n 1 "starting keypress")
   (easygui::running-on-main-thread ()
     (keypress-down key)
     (keypress-up key))
   (sv-log-n 1 "sleeping so that keypress enters nsrun loop")
-  (spin-for-fct 50)
+  (when delay (spin-for-fct 50))
   (sv-log-n 1 "ending keypress"))
 
 (defmethod easygui::view-key-event-handler ((device window) key)

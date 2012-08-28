@@ -95,6 +95,15 @@
 ;;;               fully understands how these pieces should
 ;;;               work, and sees that the code isn't needed, feel free to
 ;;;               remove. Or if it is needed, please add it back in.
+;;; 2012.08.27 Dan
+;;;             : * The device-handle-keypress method now selects the window
+;;;             :   before generating the events so that it goes to the right
+;;;             :   window.
+;;;             : * In the device-handle-keypress method it now waits on a 
+;;;             :   semaphore to be set by the view-key-evet-handler method
+;;;             :   before returning to guarantee the press gets processed.
+;;;             :   It doesn't need to delay in the keypress action because of
+;;;             :   that so it passes nil for the delay.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -385,15 +394,28 @@
 ;;;; RPM device methods.
 ;;;; ---------------------------------------------------------------------- ;;;;
 
+;;; To guarantee that a keypress by the model gets processed before returning
+;;; from the device-handle-keypress method use a semaphore that gets cleared
+;;; when the view-key-event-handler method gets called.  Since this is a complete
+;;; lock-out (never have two keypresses pending at the same time regardless of
+;;; whether they're from different models or not) only need the single semaphore
+;;; instead of something fancy like a semaphore per model or window.
+
+(defvar *keypress-wait* (make-semaphore))
+
 ;;; DEVICE-HANDLE-KEYPRESS      [Method]
-;;; Description : Just call VIEW-KEY-EVENT-HANDLER and make sure that the 
-;;;             : event gets dealt with.
+;;; Description : Generate a real keypress and then wait for VIEW-KEY-EVENT-HANDLER 
+;;;             : to deal with it.
+;;;             : To make sure the event is dealt with wait for the semaphore
+;;;             : to be set and call event-dispatch periodically (every 50ms)
+;;;             : while the semaphore is still clear.
 
 (defmethod device-handle-keypress ((device window) key)
-  (declare (ignore device))
+  (window-select device)
   (sv-log-n 1 "starting device-handle-keypress")
-  (keypress key)
-  (event-dispatch)
+  (keypress key nil)
+  (while (null (timed-wait-on-semaphore *keypress-wait* .05))
+    (event-dispatch))
   (sv-log-n 1 "ending device-handle-keypress"))
 
 

@@ -42,6 +42,10 @@
 ;;; 2012.08.07  cts
 ;;;             : Tweaked original MCL uwi.lisp code, and used it to build a
 ;;;               uwi.lisp for CCL that leverages ccl-simple-view.lisp.
+;;; 2012.08.27 Dan
+;;;            : * In the view-key-event-handler, when it is a model generated
+;;;            :   keypress, signal the *keypress-wait* semaphore so that the
+;;;            :   device-handle-keypress method for the device can return.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -61,11 +65,15 @@
 
 ;;; VIEW-KEY-EVENT-HANDLER  [Method]
 ;;; Description : The method called when a key is pressed.  It
-;;;             : just calls the rpm-window-key-event-handler which is
-;;;             : to be defined by the modeler.
+;;;             : calls the rpm-window-key-event-handler which is
+;;;             : to be defined by the modeler and after that
+;;;             : if it was a model which generated the action
+;;;             : set the semaphore so that the device knows it
+;;;             : has been dealt with.
 
 (defmethod view-key-event-handler ((device rpm-real-window) key)
-  (rpm-window-key-event-handler device key))
+  (rpm-window-key-event-handler device key)
+  (when (model-generated-action) (signal-semaphore *keypress-wait*)))
 
 ;;; RPM-WINDOW-KEY-EVENT-HANDLER  [Method]
 ;;; Description : The UWI method called when a key is pressed.  
