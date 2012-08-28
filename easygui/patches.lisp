@@ -58,13 +58,3 @@
                                     :flipped (slot-value view 'easygui::flipped))))
       (setf (slot-value view 'easygui::content-view) containee
             (slot-value containee 'easygui::parent) view))))
-
-
-
-
-
-
-
-
-
-

@@ -149,4 +149,3 @@
     (if modal
       (modal-dialog new-dialog)
       new-dialog)))
-

@@ -191,4 +191,3 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (provide :resources))
-

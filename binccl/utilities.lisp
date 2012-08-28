@@ -50,4 +50,3 @@
 (defun lisp-file-p (str)
   (if (search ".lisp" str)
     t))
-

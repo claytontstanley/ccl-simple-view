@@ -17,4 +17,3 @@
 (defun sv-log-n (log-level &rest args)
   (when (<= log-level *sv-log-level*)
     (apply #'sv-log args)))
-
