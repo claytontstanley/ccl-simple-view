@@ -99,6 +99,23 @@
   (:metaclass ns:+ns-object))
 
 (easygui::define-useful-mouse-event-handling-routines easygui::cocoa-clickable-image-view)
+(easygui::define-useful-mouse-event-handling-routines easygui::cocoa-contained-view)
+(easygui::define-useful-mouse-event-handling-routines easygui::cocoa-mouseable-text-field)
+
+
+(defmethod easygui::click-location ((cocoa-self ns:ns-view) (the-event ns:ns-event))
+  (let* ((ns-point (#/locationInWindow the-event))
+         (ns-converted-point (#/convertPoint:fromView: (#/superview cocoa-self)
+                              ns-point
+                              nil))
+         (where (easygui::point-from-ns-point ns-converted-point)))
+    where))
+
+(objc:defmethod (#/mouseDown: :void) ((self easygui::cocoa-button) the-event)
+  (call-next-method the-event)
+  (easygui::mouse-down (easygui::easygui-view-of self)
+                       :location (easygui::click-location self the-event)))
+
 
 (defclass easygui::clickable-image-view (easygui::image-view)
   ()

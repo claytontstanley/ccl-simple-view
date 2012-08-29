@@ -795,15 +795,16 @@
 (defmethod set-back-color ((view simple-view) new-color)
   (easygui:set-back-color view new-color))
 
-; Handling mouse movement/interaction
-
-(defmethod easygui::mouse-down ((view simple-view) &key location &allow-other-keys)
-  (view-click-event-handler view location))
-
 ; FIXME: What does this do? Keep as compiler warning until you figure it out
 (defmethod window-update-cursor ((window window) point)
   #-:sv-dev (declare (ignore point))
   nil)
+
+; Handling mouse movement/interaction
+
+(defmethod easygui::mouse-down :after ((view simple-view) &key location &allow-other-keys)
+  (view-click-event-handler (view-window view) location)
+  (view-click-event-handler view location))
 
 (defmethod view-click-event-handler :around ((device simple-view) position)
   (declare (ignore position))
@@ -812,8 +813,8 @@
     (sv-log-n 1 "ending view-click-event-handler")))
 
 (defmethod view-click-event-handler ((device simple-view) position)
-  (awhen (view-container device) 
-    (view-click-event-handler it position)))
+  (declare (ignore position))
+  ())
 
 (defmethod view-mouse-position ((view simple-view))
   (easygui:view-mouse-position view :allow-negative-position-p t))
@@ -901,7 +902,7 @@
   (when delay (spin-for-fct 50))
   (sv-log-n 1 "ending keypress"))
 
-(defmethod easygui::view-key-event-handler ((device window) key)
+(defmethod easygui::view-key-event-handler :after ((device window) key)
   (view-key-event-handler device key))
 
 (defmethod view-key-event-handler :around ((device window) key)
