@@ -803,8 +803,8 @@
 ; Handling mouse movement/interaction
 
 (defmethod easygui::mouse-down :after ((view simple-view) &key location &allow-other-keys)
-  (view-click-event-handler (view-window view) location)
-  (view-click-event-handler view location))
+  (view-click-event-handler view location)
+  (view-click-event-handler (view-window view) location))
 
 (defmethod view-click-event-handler :around ((device simple-view) position)
   (declare (ignore position))
@@ -850,14 +850,14 @@
 ; It takes roughly 1 ms for an event to hit the application's run loop, so sleep for 50x 
 ; longer than this, to make extra extra sure that the event has hit the run loop before returning.
 
-(defun left-mouse-click (pos)
+(defun left-mouse-click (pos &optional (delay t))
   (sv-log-n 1 "starting left mouse click")
   (easygui::running-on-main-thread ()
     (let ((pos (easygui::ns-point-from-point pos)))
       (left-mouse-down pos)
       (left-mouse-up pos)))
   (sv-log-n 1 "sleeping so that mouse click enters nsrun loop")
-  (spin-for-fct 50)
+  (when delay (spin-for-fct 50))
   (sv-log-n 1 "ending left mouse click"))
 
 ; Handling keyboard interaction

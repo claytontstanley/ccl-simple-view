@@ -94,7 +94,8 @@
 (defmethod view-click-event-handler ((device rpm-real-window) position)
   (rpm-window-click-event-handler device 
                                   (list (point-h position) (point-v position)))
-  (call-next-method))
+  (call-next-method)
+  (when (model-generated-action) (signal-semaphore *mouseclick-wait*)))
 
 ;;; RPM-WINDOW-CLICK-EVENT-HANDLER  [Method]
 ;;; Description : The UWI method called when the mouse is clicked.  

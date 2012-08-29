@@ -410,23 +410,35 @@
 ;;;             : to be set and call event-dispatch periodically (every 50ms)
 ;;;             : while the semaphore is still clear.
 
+(defun wait-n-times-on-semaphore (sema n timeout)
+  (let ((count -1)
+        (max-count n))
+    (while (and (null (timed-wait-on-semaphore sema timeout))
+                (< (incf count) max-count))
+           (event-dispatch))
+    (not (= count max-count))))
+
 (defmethod device-handle-keypress ((device window) key)
   (window-select device)
   (sv-log-n 1 "starting device-handle-keypress")
   (keypress key nil)
-  (while (null (timed-wait-on-semaphore *keypress-wait* .05))
-    (event-dispatch))
+  (unless (wait-n-times-on-semaphore *keypress-wait* 10 .05)
+    (model-warning "model-generated keypress did not receive verification that all actions triggered from the keypress have completed; model may be in inconsistent state"))
   (sv-log-n 1 "ending device-handle-keypress"))
 
+(defvar *mouseclick-wait* (make-semaphore))
 
 ;;; DEVICE-HANDLE-CLICK      [Method]
 ;;; Description : Again, just call the base MCL method and dispatch.
 
 (defmethod device-handle-click ((device window))
+  (window-select device)
   (sv-log-n 1 "starting device-handle-click")
   (left-mouse-click
-    (local-to-global device (view-mouse-position device)))
-  (event-dispatch)
+    (local-to-global device (view-mouse-position device))
+    nil)
+  (unless (wait-n-times-on-semaphore *mouseclick-wait* 10 .05)
+    (model-warning "model-generated mouse click did not receive verification that all actions triggered from the click have completed; model may be in inconsistent state"))
   (sv-log-n 1 "ending device-handle-click"))
 
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
