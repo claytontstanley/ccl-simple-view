@@ -129,7 +129,7 @@
 (setf *view* (make-instance 'editable-text-dialog-item
                             :view-position (make-point 10 300)
                             :view-nick-name :et
-                            :text "here"))
+                            :dialog-item-text "here"))
 (add-visual-items-to-rpm-window *win* *view*)
 
 (set-selection-range (view-named :et *win*) 1 2)
