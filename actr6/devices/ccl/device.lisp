@@ -104,6 +104,10 @@
 ;;;             :   before returning to guarantee the press gets processed.
 ;;;             :   It doesn't need to delay in the keypress action because of
 ;;;             :   that so it passes nil for the delay.
+;;; 2012.08.29 Dan
+;;;             : * Added a timeout to device-handle-keypress so that it doesn't
+;;;             :   hang if the semaphore never gets set.  If it's not set in
+;;;             :   500ms it prints a warning and just gives up.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -423,7 +427,7 @@
   (sv-log-n 1 "starting device-handle-keypress")
   (keypress key nil)
   (unless (wait-n-times-on-semaphore *keypress-wait* 10 .05)
-    (model-warning "model-generated keypress did not receive verification that all actions triggered from the keypress have completed; model may be in inconsistent state"))
+    (print-warning "Model keypress event was not handled correctly within 500ms."))
   (sv-log-n 1 "ending device-handle-keypress"))
 
 (defvar *mouseclick-wait* (make-semaphore))
@@ -438,7 +442,7 @@
     (local-to-global device (view-mouse-position device))
     nil)
   (unless (wait-n-times-on-semaphore *mouseclick-wait* 10 .05)
-    (model-warning "model-generated mouse click did not receive verification that all actions triggered from the click have completed; model may be in inconsistent state"))
+    (print-warning "Model mouse click was not handled correctly within 500ms."))
   (sv-log-n 1 "ending device-handle-click"))
 
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
