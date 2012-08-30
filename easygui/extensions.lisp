@@ -214,5 +214,3 @@
         (easygui::size-to-fit view))
       (easygui::set-needs-display view t)
       (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t)))))
-
-

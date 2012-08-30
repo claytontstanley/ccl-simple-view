@@ -1556,5 +1556,3 @@
   (defconstant X86-Darwin64::|tejustleft| $tejustleft)
   (defconstant X86-Darwin64::|tejustcenter| $tejustcenter)
   (defconstant X86-Darwin64::|tejustright| $tejustright))
-
-
