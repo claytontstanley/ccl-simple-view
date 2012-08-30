@@ -104,6 +104,10 @@
 ;;;             :   before returning to guarantee the press gets processed.
 ;;;             :   It doesn't need to delay in the keypress action because of
 ;;;             :   that so it passes nil for the delay.
+;;; 2012.08.29 Dan
+;;;             : * Added a timeout to device-handle-keypress so that it doesn't
+;;;             :   hang if the semaphore never gets set.  If it's not set in
+;;;             :   500ms it prints a warning and just gives up.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -410,23 +414,16 @@
 ;;;             : to be set and call event-dispatch periodically (every 50ms)
 ;;;             : while the semaphore is still clear.
 
-(defun wait-n-times-on-semaphore (sema n timeout)
-  (let ((count -1)
-        (max-count n))
-    (while (and (null (timed-wait-on-semaphore sema timeout))
-                (< (incf count) max-count))
-           (event-dispatch))
-    (not (= count max-count))))
-
 (defmethod device-handle-keypress ((device window) key)
   (window-select device)
   (sv-log-n 1 "starting device-handle-keypress")
   (keypress key nil)
-  (unless (wait-n-times-on-semaphore *keypress-wait* 10 .05)
-    (model-warning "model-generated keypress did not receive verification that all actions triggered from the keypress have completed; model may be in inconsistent state"))
+  (do ((safety 0 (incf safety))
+       (semaphore (timed-wait-on-semaphore *keypress-wait* .05) (timed-wait-on-semaphore *keypress-wait* .05)))
+      ((or semaphore (> safety 10)) (unless semaphore (print-warning "Model keypress event was not handled correctly within 500ms.")))
+    (event-dispatch))
   (sv-log-n 1 "ending device-handle-keypress"))
 
-(defvar *mouseclick-wait* (make-semaphore))
 
 ;;; DEVICE-HANDLE-CLICK      [Method]
 ;;; Description : Again, just call the base MCL method and dispatch.
@@ -435,10 +432,8 @@
   (window-select device)
   (sv-log-n 1 "starting device-handle-click")
   (left-mouse-click
-    (local-to-global device (view-mouse-position device))
-    nil)
-  (unless (wait-n-times-on-semaphore *mouseclick-wait* 10 .05)
-    (model-warning "model-generated mouse click did not receive verification that all actions triggered from the click have completed; model may be in inconsistent state"))
+    (local-to-global device (view-mouse-position device)))
+  (event-dispatch)
   (sv-log-n 1 "ending device-handle-click"))
 
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
