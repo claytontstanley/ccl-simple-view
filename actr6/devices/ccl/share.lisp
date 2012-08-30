@@ -808,13 +808,14 @@
 
 (defmethod view-click-event-handler :around ((device simple-view) position)
   (declare (ignore position))
-  (sv-log-n 1 "starting view-click-event-handler")
+  (sv-log-n 1 "starting view-click-event-handler for ~a" device)
   (unwind-protect (call-next-method)
-    (sv-log-n 1 "ending view-click-event-handler")))
+    (sv-log-n 1 "ending view-click-event-handler for ~a" device)))
 
 (defmethod view-click-event-handler ((device simple-view) position)
   (declare (ignore position))
-  ())
+  ; Default primary method is to do nothing
+  (values))
 
 (defmethod view-mouse-position ((view simple-view))
   (easygui:view-mouse-position view :allow-negative-position-p t))
