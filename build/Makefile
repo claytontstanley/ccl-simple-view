@@ -38,6 +38,12 @@ decompile-%:
 decompile-all: ${decompileTargets}
 	echo "done"
 
+clean-%:
+	rm -f ${path-${*}}/$*
+
+clean-all: ${outFiles:%=clean-%}
+	echo "done"
+
 file-list:
 	cat ${fileList} | while read file; do \
 		printf "${header}"; \
