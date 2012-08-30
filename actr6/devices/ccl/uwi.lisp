@@ -71,11 +71,11 @@
 ;;;             : set the semaphore so that the device knows it
 ;;;             : has been dealt with.
 
-(defmethod view-key-event-handler :around ((device rpm-real-window) key)
-  (unwind-protect (call-next-method)
-    (sv-log-n 1 "Finished calling all view-key-event-handlers for ~a" device)
-    (rpm-window-key-event-handler device key)
-    (when (model-generated-action) (signal-semaphore *keypress-wait*))))
+(defmethod post-view-key-event-handler ((device rpm-real-window) key)
+  (sv-log-n 1 "Finished calling all view-key-event-handlers for ~a" device)
+  (rpm-window-key-event-handler device key)
+  (when (model-generated-action)
+    (signal-semaphore *keypress-wait*)))
 
 ;;; RPM-WINDOW-KEY-EVENT-HANDLER  [Method]
 ;;; Description : The UWI method called when a key is pressed.  
@@ -93,11 +93,11 @@
 ;;;             : The rpm-window-click-event-handler is supposed 
 ;;;             : to be defined by the modeler.
 
-(defmethod view-click-event-handler :around ((device rpm-real-window) position)
-  (unwind-protect (call-next-method)
-    (sv-log-n 1 "Finished calling all view-click-event-handlers for ~a" device)
-    (rpm-window-click-event-handler device (list (point-h position) (point-v position)))
-    (when (model-generated-action) (signal-semaphore *mouseclick-wait*))))
+(defmethod post-view-click-event-handler ((device rpm-real-window) position)
+  (sv-log-n 1 "Finished calling all view-click-event-handlers for ~a" device)
+  (rpm-window-click-event-handler device (list (point-h position) (point-v position)))
+  (when (model-generated-action)
+    (signal-semaphore *mouseclick-wait*)))
 
 ;;; RPM-WINDOW-CLICK-EVENT-HANDLER  [Method]
 ;;; Description : The UWI method called when the mouse is clicked.  

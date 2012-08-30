@@ -428,6 +428,7 @@
   (keypress key nil)
   (unless (wait-n-times-on-semaphore *keypress-wait* 10 .05)
     (print-warning "Model keypress event was not handled correctly within 500ms."))
+  (event-dispatch)
   (sv-log-n 1 "ending device-handle-keypress"))
 
 (defvar *mouseclick-wait* (make-semaphore))
@@ -443,6 +444,7 @@
     nil)
   (unless (wait-n-times-on-semaphore *mouseclick-wait* 10 .05)
     (print-warning "Model mouse click was not handled correctly within 500ms."))
+  (event-dispatch)
   (sv-log-n 1 "ending device-handle-click"))
 
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]

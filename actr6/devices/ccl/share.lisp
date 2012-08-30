@@ -653,15 +653,11 @@
 (defmethod height ((view simple-view))
   (point-v (view-size view)))
 
-(defmethod view-window ((view window))
-  view)
-
 (defmethod view-container ((view simple-view))
   (easygui:view-container view))
 
 (defmethod view-window ((view simple-view))
-  (awhen (view-container view)
-    (view-window it)))
+  (easygui::easygui-window-of view))
 
 (defmethod content-view ((view window))
   (easygui:content-view view))
@@ -803,8 +799,16 @@
 ; Handling mouse movement/interaction
 
 (defmethod easygui::mouse-down :after ((view simple-view) &key location &allow-other-keys)
-  (view-click-event-handler view location)
-  (view-click-event-handler (view-window view) location))
+  (let ((win (guard-!nil
+               (guard-!null-ptr
+                 (view-window view)))))
+    (view-click-event-handler view location)
+    (view-click-event-handler win location)
+    (post-view-click-event-handler win location)))
+
+(defmethod post-view-click-event-handler ((view window) position)
+  (declare (ignore position))
+  (values))
 
 (defmethod view-click-event-handler :around ((device simple-view) position)
   (declare (ignore position))
@@ -904,7 +908,11 @@
   (sv-log-n 1 "ending keypress"))
 
 (defmethod easygui::view-key-event-handler :after ((device window) key)
-  (view-key-event-handler device key))
+  (view-key-event-handler device key)
+  (post-view-key-event-handler device key))
+
+(defmethod post-view-key-event-handler ((device window) key)
+  (values))
 
 (defmethod view-key-event-handler :around ((device window) key)
   (declare (ignore key))

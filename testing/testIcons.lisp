@@ -1,14 +1,23 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
+(setf *image-path*
+      (format nil "~a~a/~a" (directory-namestring *load-truename*) "data" "voteboxbg.aif"))
+
+(add-resource (create-resource 'image *image-path*) "voteboxbg")
+
 (setf *win*
-      (make-instance 'window
-                     :view-subviews
-                     (list (make-instance 'icon-dialog-item
-                                          :icon 501
-                                          :view-nick-name :image))))
+      (make-instance 'window))
+
+(add-subviews *win* 
+              (make-instance 'icon-dialog-item
+                             :icon "voteboxbg"
+                             :view-size (make-point 20 20)
+                             :view-nick-name :image))
 
 (inspect *win*)
+
+(view-window (view-named :image *win*))
 
 (defmethod view-click-event-handler ((view icon-dialog-item) location)
   (beep))

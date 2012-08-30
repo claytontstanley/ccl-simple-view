@@ -1,10 +1,6 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-
-;(trace (proc-display :before :backtrace))
-;(trace proc-display)
-
 ; FIXME: Does MCL need CFBundle.lisp to run Phaser?
 (provide :cfbundle)
 
