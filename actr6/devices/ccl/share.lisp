@@ -912,6 +912,7 @@
   (post-view-key-event-handler device key))
 
 (defmethod post-view-key-event-handler ((device window) key)
+  (declare (ignore key))
   (values))
 
 (defmethod view-key-event-handler :around ((device window) key)
