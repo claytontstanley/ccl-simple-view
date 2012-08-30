@@ -108,6 +108,15 @@
 ;;;             : * Added a timeout to device-handle-keypress so that it doesn't
 ;;;             :   hang if the semaphore never gets set.  If it's not set in
 ;;;             :   500ms it prints a warning and just gives up.
+;;; 2012.08.30 cts
+;;;             : * Added the semaphor method for mouse clicks. Wrapped the 
+;;;             :   timeout code into a function and using it for key presses
+;;;             :   and mouse clicks. 
+;;;             : * Calling event-dispatch one final time after semaphor is triggered,
+;;;             :   so that any events created during the keypress/mouseclick
+;;;             :   that were queued to run on the nsrunloop are run before the
+;;;             :   keypress/mouseclick method returns.
+;;;             :  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -407,13 +416,6 @@
 
 (defvar *keypress-wait* (make-semaphore))
 
-;;; DEVICE-HANDLE-KEYPRESS      [Method]
-;;; Description : Generate a real keypress and then wait for VIEW-KEY-EVENT-HANDLER 
-;;;             : to deal with it.
-;;;             : To make sure the event is dealt with wait for the semaphore
-;;;             : to be set and call event-dispatch periodically (every 50ms)
-;;;             : while the semaphore is still clear.
-
 (defun wait-n-times-on-semaphore (sema n timeout)
   (let ((count -1)
         (max-count n))
@@ -421,6 +423,13 @@
                 (< (incf count) max-count))
            (event-dispatch))
     (not (= count max-count))))
+
+;;; DEVICE-HANDLE-KEYPRESS      [Method]
+;;; Description : Generate a real keypress and then wait for VIEW-KEY-EVENT-HANDLER 
+;;;             : to deal with it.
+;;;             : To make sure the event is dealt with wait for the semaphore
+;;;             : to be set and call event-dispatch periodically (every 50ms)
+;;;             : while the semaphore is still clear.
 
 (defmethod device-handle-keypress ((device window) key)
   (window-select device)

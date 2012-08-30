@@ -46,6 +46,14 @@
 ;;;            : * In the view-key-event-handler, when it is a model generated
 ;;;            :   keypress, signal the *keypress-wait* semaphore so that the
 ;;;            :   device-handle-keypress method for the device can return.
+;;; 2012.08.30 cts
+;;;            : * Created a post-view-(key|click)-event handler method that
+;;;                gets called after all view-(key|click)-event handler methods
+;;;                are called. 'Even the around methods on the most specific class'.
+;;;                This post method calls the rpm handler methods. This guarantees
+;;;                that all view-(key|click)-event handler methods and rpm
+;;;                handler methods are called before the semaphor is triggered.
+;;;                Using this technique for both keypress and mouse clicks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
