@@ -234,7 +234,7 @@
                                                   (t 'pointer)))))))))
 
 (defgeneric cursor-in-window-p (wind)
-            (:documentation  "Returns T if the cursor is over <wind>, NIL otherwise."))
+  (:documentation  "Returns T if the cursor is over <wind>, NIL otherwise."))
 
 (defmethod cursor-in-window-p ((tw window))
   (when (window-shown-p tw)
@@ -287,15 +287,15 @@
     f))
 
 (defmethod vis-loc-to-obj ((lnr td-liner) loc)
-    (let ((start-pt (view-position lnr))
-          (end-pt (subtract-points (add-points (view-position lnr) (view-size lnr)) 
-                                   (make-point 1 1)))
-          (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
-      (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
-      (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
-      (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
-      (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-      v-o))
+  (let ((start-pt (view-position lnr))
+        (end-pt (subtract-points (add-points (view-position lnr) (view-size lnr)) 
+                                 (make-point 1 1)))
+        (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
+    (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
+    (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
+    (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
+    (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
+    v-o))
 
 ;;; VIEW-DRAW-CONTENTS [Method]
 ;;; Description : A bu-liner is just a line-feature located "at" it's mid-point.
@@ -319,16 +319,16 @@
     f))
 
 (defmethod vis-loc-to-obj ((lnr bu-liner) loc)
-    (let ((start-pt (add-points (view-position lnr)
-                                (make-point 0 (1- (point-v (view-size lnr))))))
-          (end-pt (add-points (view-position lnr) 
-                              (make-point (1- (point-h (view-size lnr))) 0)))
-          (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
-      (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
-      (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
-      (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
-      (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-      v-o))
+  (let ((start-pt (add-points (view-position lnr)
+                              (make-point 0 (1- (point-v (view-size lnr))))))
+        (end-pt (add-points (view-position lnr) 
+                            (make-point (1- (point-h (view-size lnr))) 0)))
+        (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
+    (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
+    (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
+    (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
+    (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
+    v-o))
 
 #|
 
