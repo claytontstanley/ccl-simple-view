@@ -1,5 +1,6 @@
 #+:clozure (setf ccl:*default-external-format* :utf-8)
 #+:clozure (pushnew :sv-dev *features*)
+#+:clozure (defvar *load-sv-dev-files-p* t)
 
 (load (format nil "~a~a" (directory-namestring *load-truename*) "utilities.lisp"))
 
@@ -22,7 +23,8 @@
 #-:act-r-6.0 (load-as-lst ".." "submodules" "actr6" "load-act-r-6.lisp")
 
 #+:clozure
-(cond ((member "swank-repl" *modules* :test #'string-equal)
+(cond ((and (member "swank-repl" *modules* :test #'string-equal)
+            *load-sv-dev-files-p*)
        (load-file-list ".." "build" "file-list.txt")
        (load-file-list ".." "build" "file-list-device.txt")
        (load-file-list ".." "build" "file-list-uwi.txt"))
