@@ -1,0 +1,13 @@
+testing/testLevelIndicator.lisp
+testing/testMCLInterFaceBuilder.lisp
+testing/testFormat.lisp
+testing/testModalDialog.lisp
+testing/testPolygon.lisp
+testing/testSound.lisp
+testing/testGetText.lisp
+testing/testImages.lisp
+testing/testCCLDevice.lisp
+testing/testTutorials.lisp
+testing/testVotebox.lisp
+testing/testVoteboxKristen.lisp
+testing/testTamboDisModel.lisp

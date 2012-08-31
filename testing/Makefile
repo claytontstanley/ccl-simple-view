@@ -1,12 +1,6 @@
 # Think text substitution / template programming. I don't use Make to compile C files. I use it
 # as a templating language to manipulate Bash commands.
 
-testFiles = testLevelIndicator.lisp testMCLInterFaceBuilder.lisp testFormat.lisp testModalDialog.lisp testPolygon.lisp testSound.lisp testGetText.lisp testImages.lisp testCCLDevice.lisp testTutorials.lisp testVotebox.lisp testVoteboxKristen.lisp testTamboDisModel.lisp
-initFiles = 
-
-testString = ${testFiles:%=-l % }
-initString = ${initFiles:%=-l % }
-
 actr6 = ../submodules/actr6
 
 cclQuit = -e '(quit)'
@@ -19,7 +13,7 @@ binaryFileStr = ${binaryFileLst:%= -o -name '*.%'}
 
 unit: clean-actr-compiled-files
 	make -C ../build all
-	${ccl} -e '(require :cocoa)' ${initString} ${testString} ${cclQuit}
+	${ccl} -e '(require :cocoa)' -l testCI.lisp ${cclQuit}
 
 # FIXME: Should I do anything different for CI tests compared to unit tests.
 # All of the tests are pretty-much regression CI tests anyways. Don't really have unit tests (yet) for this repo
