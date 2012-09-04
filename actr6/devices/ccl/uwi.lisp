@@ -54,6 +54,9 @@
 ;;;                that all view-(key|click)-event handler methods and rpm
 ;;;                handler methods are called before the semaphor is triggered.
 ;;;                Using this technique for both keypress and mouse clicks
+;;; 2012.09.04 Dan
+;;;            : * Changed it so the rpm-window-click-event-handler is called
+;;;            :   with a vector of the mouse position.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -103,7 +106,7 @@
 
 (defmethod post-view-click-event-handler ((device rpm-real-window) position)
   (sv-log-n 1 "Finished calling all view-click-event-handlers for ~a" device)
-  (rpm-window-click-event-handler device (list (point-h position) (point-v position)))
+  (rpm-window-click-event-handler device (vector (point-h position) (point-v position)))
   (when (model-generated-action)
     (signal-semaphore *mouseclick-wait*)))
 
