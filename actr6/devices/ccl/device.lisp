@@ -421,7 +421,7 @@
         (max-count n))
     (while (and (null (timed-wait-on-semaphore sema timeout))
                 (< (incf count) max-count))
-           (event-dispatch))
+      (event-dispatch))
     (not (= count max-count))))
 
 ;;; DEVICE-HANDLE-KEYPRESS      [Method]
