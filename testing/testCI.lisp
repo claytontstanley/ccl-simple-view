@@ -3,4 +3,4 @@
 
 ; Don't reload ccl-simple-view code anymore; already loaded.
 (let ((*load-sv-dev-files-p* nil))
-  (load-file-list "file-lists" "testCI.txt"))
+  (load-file-list "file-lists" "CI" "testCI.txt"))
