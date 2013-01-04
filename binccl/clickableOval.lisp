@@ -32,6 +32,7 @@
         (format t "glob-pos-y=~a~%" glob-pos-y)
         (format t "glob-pos-x-2=~a~%" glob-pos-x-2)
         (format t "glob-pos-y-2=~a~%" glob-pos-y-2)
+        (finish-output)
         ; Maybe get more complex here and check if 'where' is really within the circle,
         ; and not just within the view's boundary
         (beep)))))
