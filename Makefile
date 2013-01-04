@@ -35,7 +35,7 @@ exclude-list = ^bincarbon*|^testing
 list-cmd = git ls-files
 
 reformat:
-	${list-cmd} | grep '.lisp$$' | egrep -v '${exclude-list}' | xargs -n 1 -o -I {} bash -ic "echo '{}'; ai {} || true"
+	${list-cmd} | grep '.lisp$$' | egrep -v '${exclude-list}' | /usr/bin/xargs -n 1 -o -I {} bash -ic "echo '{}'; ai {} || true"
 
 reformat-repo:
 	make reformat

@@ -116,7 +116,9 @@
 ;;;             :   so that any events created during the keypress/mouseclick
 ;;;             :   that were queued to run on the nsrunloop are run before the
 ;;;             :   keypress/mouseclick method returns.
-;;;             :  
+;;; 2013.01.03 Dan
+;;;             : * Clipped the rpm-view-line function (which was already commented out)
+;;;             :   to avoid confusion since it isn't needed and contained outdated code.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -330,44 +332,6 @@
     (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
     v-o))
 
-#|
-
-;;; RPM-VIEW-LINE [Function]
-;;; Description : Add a view to the window that displays a line defined by
-;;;             : the start and end points in the color supplied (an MCL
-;;;             : system style color).
-
-(defun rpm-view-line (wind start-pt end-pt &optional (color *black-color*))
-  "Adds a view in the specified window which draws a line from the start-pt to the end-pt
-  using the optional color specified (defaulting to black).  This view will add features 
-  to the icon on PM-PROC-DISPLAY."
-  (let* ((gx (> (point-h end-pt) (point-h start-pt)))
-         (gy (> (point-v end-pt) (point-v start-pt)))
-         (vs (subtract-points start-pt end-pt)))
-    (setf vs (make-point (+ 1 (abs (point-h vs)))
-                         (+ 1 (abs (point-v vs)))))
-    (add-subviews wind (cond ((and gx gy)
-                              (make-instance 'td-liner
-                                             :color color
-                                             :view-position start-pt 
-                                             :view-size vs))
-                             ((and (not gx) (not gy))
-                              (make-instance 'td-liner
-                                             :color color
-                                             :view-position end-pt 
-                                             :view-size vs))
-                             ((and gx (not gy))
-                              (make-instance 'bu-liner
-                                             :color color
-                                             :view-position (make-point (point-h start-pt) (point-v end-pt))
-                                             :view-size vs))
-                             (t
-                               (make-instance 'bu-liner
-                                              :color color
-                                              :view-position (make-point (point-h end-pt) (point-v start-pt))
-                                              :view-size vs))))))
-
-|#
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; Utilities
