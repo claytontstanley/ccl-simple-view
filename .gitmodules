@@ -28,3 +28,6 @@
 [submodule "submodules/gallagher"]
 	path = submodules/gallagher
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/gallagher.git
+[submodule "submodules/NSFMotor"]
+	path = submodules/NSFMotor
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/NSF Motor
