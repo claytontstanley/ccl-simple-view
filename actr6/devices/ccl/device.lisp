@@ -432,13 +432,14 @@
 ;;;             : make sure it's been registered by MCL with UPDATE-CURSOR.
 
 (defmethod device-move-cursor-to ((device window) (xyloc vector))
+  (when (and device (wptr device))
+    (window-select device))
   (easygui::running-on-main-thread ()
     (sv-log-n 1 "moving cursor to ~a" xyloc)
-    (setf xyloc (local-to-global device (vpt2p xyloc)))
-    (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
-                                                   (point-v xyloc))))
-  (spin-for-fct 50)
-  (event-dispatch))
+    (let ((xyloc (local-to-global device (vpt2p xyloc))))
+      (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
+                                                     (point-v xyloc)))))
+  (assert (vpt= xyloc (p2vpt (view-mouse-position device)))))
 
 ;;; DEVICE-SPEAK-STRING      [Method]
 ;;; Description : If the Mac Speech Manager is installed, actually speak the
