@@ -1,3 +1,4 @@
+testing/testNSFMotor.lisp
 testing/testLevelIndicator.lisp
 testing/testMCLInterFaceBuilder.lisp
 testing/testFormat.lisp

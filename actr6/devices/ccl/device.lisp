@@ -439,7 +439,8 @@
     (let ((xyloc (local-to-global device (vpt2p xyloc))))
       (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
                                                      (point-v xyloc)))))
-  (assert (vpt= xyloc (p2vpt (view-mouse-position device)))))
+  (unless (vpt= xyloc (p2vpt (view-mouse-position device)))
+    (print-warning "Model cursor movement was not handled correctly")))
 
 ;;; DEVICE-SPEAK-STRING      [Method]
 ;;; Description : If the Mac Speech Manager is installed, actually speak the
