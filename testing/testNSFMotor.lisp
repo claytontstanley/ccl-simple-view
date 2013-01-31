@@ -7,3 +7,4 @@
 
 (run-model)
 
+(unintern 'check-hit)

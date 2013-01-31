@@ -380,13 +380,21 @@
 
 (defvar *keypress-wait* (make-semaphore))
 
-(defun wait-n-times-on-semaphore (sema n timeout)
+(defun wait-n-times (fun n delay-secs)
   (let ((count -1)
         (max-count n))
-    (while (and (null (timed-wait-on-semaphore sema timeout))
+    (while (and (null (funcall fun))
                 (< (incf count) max-count))
-      (event-dispatch))
+      (event-dispatch)
+      (awhen delay-secs 
+        (spin-for-fct (* 1000 it))))
     (not (= count max-count))))
+
+(defun wait-n-times-on-semaphore (sema n delay-secs)
+  (wait-n-times
+    (lambda () (timed-wait-on-semaphore sema delay-secs))
+    n
+    nil))
 
 ;;; DEVICE-HANDLE-KEYPRESS      [Method]
 ;;; Description : Generate a real keypress and then wait for VIEW-KEY-EVENT-HANDLER 
@@ -432,15 +440,16 @@
 ;;;             : make sure it's been registered by MCL with UPDATE-CURSOR.
 
 (defmethod device-move-cursor-to ((device window) (xyloc vector))
-  (when (and device (wptr device))
-    (window-select device))
+  (window-select device)
+  (sv-log-n 1 "moving cursor to ~a" xyloc)
   (easygui::running-on-main-thread ()
-    (sv-log-n 1 "moving cursor to ~a" xyloc)
     (let ((xyloc (local-to-global device (vpt2p xyloc))))
-      (#_CGWarpMouseCursorPosition (ns:make-ns-point (point-h xyloc)
-                                                     (point-v xyloc)))))
-  (unless (vpt= xyloc (p2vpt (view-mouse-position device)))
-    (print-warning "Model cursor movement was not handled correctly")))
+      (#_CGWarpMouseCursorPosition
+       (ns:make-ns-point (point-h xyloc) (point-v xyloc)))))
+  (unless (wait-n-times (lambda () (vpt= xyloc (p2vpt (view-mouse-position device)))) 10 .05)
+    (print-warning "Model cursor movement was not handled correctly within 500ms."))
+  (event-dispatch)
+  (sv-log-n 1 "ending move cursor"))
 
 ;;; DEVICE-SPEAK-STRING      [Method]
 ;;; Description : If the Mac Speech Manager is installed, actually speak the
