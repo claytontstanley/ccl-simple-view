@@ -214,3 +214,9 @@
         (easygui::size-to-fit view))
       (easygui::set-needs-display view t)
       (unless (easygui::view-subviews-busy super-view) (easygui::set-needs-display super-view t)))))
+
+; Isolating the code to convert a vertical coordinate if the screen is flipped. Using just this part in ccl-simple-view.lisp
+(defun easygui::convert-if-screen-flipped (y height)
+  (if easygui::*screen-flipped*
+    (- (easygui::screen-height) height y)
+    y))

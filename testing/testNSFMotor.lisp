@@ -8,3 +8,16 @@
 (run-model)
 
 (unintern 'check-hit)
+
+#|
+(set-view-position *exp* (make-point 150 150))
+(view-position *exp*)
+(easygui::view-position *exp*)
+(view-size *exp*)
+(#/frame (cocoa-ref (get-front-window)))
+(set-view-position (get-front-window) 10 10)
+(setf easygui::*screen-flipped* t)
+easygui::*screen-flipped*
+(easygui::view-content-rect (get-front-window))
+(easygui::screen-height)
+|#
