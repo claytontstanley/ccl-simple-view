@@ -119,6 +119,11 @@
 ;;; 2013.01.03 Dan
 ;;;             : * Clipped the rpm-view-line function (which was already commented out)
 ;;;             :   to avoid confusion since it isn't needed and contained outdated code.
+;;; 2013.02.01 Clayton
+;;;             : * Streamlined the device-move-cursor-to call.
+;;;             :   The function no longer pauses for a set time to ensure that the move
+;;;             :   is registered. Instead, it polls and checks that the move is registered
+;;;             :   and exits immediately after success.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
