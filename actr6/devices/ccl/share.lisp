@@ -610,7 +610,7 @@
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
 
-(defmethod view-position ((window window))
+(defmethod view-position :before ((window window))
   (let ((frame (#/frame (cocoa-ref window))))
     (let ((position 
             (make-point
@@ -618,8 +618,7 @@
               (easygui::convert-if-screen-flipped
                 (ns:ns-rect-y frame)
                 (point-y (view-size window))))))
-      (setf (slot-value window 'easygui::position) position)
-      (easygui::view-position window))))
+      (setf (slot-value window 'easygui::position) position))))
 
 ; FIXME: This seems to work properly, but I don't currently understand why,
 ; or what view-origin is supposed to do in MCL
