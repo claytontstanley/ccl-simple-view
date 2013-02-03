@@ -5,6 +5,18 @@
 
 (setf *exp* (make-instance 'target-window))
 
+(let ((orig-pos (view-position *exp*)))
+  (labels ((same-place-p ()
+             (let ((pos (view-position *exp*)))
+               (vpt=
+                 (p2vpt orig-pos)
+                 (p2vpt pos)))))
+    (wait-n-times (lambda ()
+                    (cond ((same-place-p)
+                           (beep)
+                           nil)
+                          (t t))) 10 1)))
+
 (run-model)
 
 (unintern 'check-hit)
