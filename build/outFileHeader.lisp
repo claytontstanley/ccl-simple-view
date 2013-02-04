@@ -41,4 +41,9 @@
 ;;;             : Initial build that allows Votebox MCL GUI to be read in  and used by CCL
 ;;; 2012.08.13 cts
 ;;;             : Release build that works with Votebox, NextGen, and Phaser from Mike's lab
+;;; 2013.02.04 cts
+;;;             : Fixed bug that did not update window position after window moved with
+;;;               mouse drag. Window position is correctly tracked, and a call to
+;;;               view-position on the window works correctly both before and after
+;;;               the window position is moved with a mouse drag on the window pane.
 
