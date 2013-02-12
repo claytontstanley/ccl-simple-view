@@ -46,4 +46,6 @@
 ;;;               mouse drag. Window position is correctly tracked, and a call to
 ;;;               view-position on the window works correctly both before and after
 ;;;               the window position is moved with a mouse drag on the window pane.
-
+;;; 2013.03.11 cts
+;;;            : Removed easygui::drawing-view dependency in codebase.
+;;;              Simplifies OO hierarchy, removes unecessary cruft, and decreases technical debt
