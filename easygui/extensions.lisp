@@ -41,7 +41,7 @@
 ; And create the lisp equivalent class
 ; And register the objective c extension and lisp class to the easygui package, so that it instantiates a 
 ; cocoa-drawing-overlay-view object in the cocoa-ref slot when a drawing-overlay-view lisp object is instantiated
-(defclass easygui::drawing-overlay-view (easygui::drawing-view)
+(defclass easygui::overlay-view (easygui::view)
   ()
   (:default-initargs :specifically 'easygui::cocoa-drawing-overlay-view))
 
@@ -62,7 +62,7 @@
   ()
   (:metaclass ns:+ns-object))
 
-(defclass easygui::drawing-consuming-view (easygui::drawing-view)
+(defclass easygui::consuming-view (easygui::view)
   ()
   (:default-initargs :specifically 'easygui::cocoa-drawing-consuming-view))
 
