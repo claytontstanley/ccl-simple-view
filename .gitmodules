@@ -31,3 +31,6 @@
 [submodule "submodules/NSFMotor"]
 	path = submodules/NSFMotor
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/NSF Motor
+[submodule "submodules/FittsErrorModel"]
+	path = submodules/FittsErrorModel
+	url = ssh://clayton@chil.rice.edu/srv/git/FittsErrorModel
