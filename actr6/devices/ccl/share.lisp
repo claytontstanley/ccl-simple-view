@@ -206,18 +206,18 @@
 (defmethod windoid-p ((win windoid))
   t)
 
-(defclass simple-overlay-view (easygui::drawing-overlay-view view easygui::drawing-view) 
+(defclass simple-overlay-view (easygui::overlay-view view) 
   ()
   (:documentation "Top-level class for views that do not monitor mouse clicks and mouse movement"))
 
-(defclass consuming-view (easygui::drawing-consuming-view view easygui::drawing-view)
+(defclass consuming-view (easygui::consuming-view view)
   ())
 
 (defclass color-dialog (window)
   ()
   (:documentation "Top-level class for windows"))
 
-(defclass liner (simple-view)
+(defclass liner (view)
   ((easygui::foreground :reader color :initarg :color)))
 
 (defclass td-liner (liner) ())
@@ -610,6 +610,16 @@
 (defmethod view-position ((view simple-view))
   (easygui:view-position view))
 
+(defmethod view-position :before ((window window))
+  (let ((frame (#/frame (cocoa-ref window))))
+    (let ((position 
+            (make-point
+              (ns:ns-rect-x frame)
+              (easygui::convert-if-screen-flipped
+                (ns:ns-rect-y frame)
+                (point-y (view-size window))))))
+      (setf (slot-value window 'easygui::position) position))))
+
 ; FIXME: This seems to work properly, but I don't currently understand why,
 ; or what view-origin is supposed to do in MCL
 (defmethod view-origin ((view simple-view))
@@ -762,7 +772,7 @@
        (easygui::cocoa-ref view)))))
 
 (defmethod local-to-global ((view simple-view) local-pos)
-  (add-points (easygui:view-position view) local-pos))
+  (add-points (view-position view) local-pos))
 
 (defmethod part-color ((view view-text-mixin) (part (eql :text)))
   (declare (ignore part))
