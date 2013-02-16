@@ -49,3 +49,5 @@
 ;;; 2013.03.11 cts
 ;;;            : Removed easygui::drawing-view dependency in codebase.
 ;;;              Simplifies OO hierarchy, removes unecessary cruft, and decreases technical debt
+;;; 2013.03.16 cts
+;;;            : Changes to ensure code is compatible with CCL 1.8 thru CCL 1.9rc2
