@@ -24,6 +24,12 @@
   `(guard ((or (eq it1 nil) (eq it1 t)) "~a returned when evaling form ~a: exptected t or nil" it1 ',body)
      (progn ,@body)))
 
+(defmacro! return-time-ms (&body body)
+  `(let ((,g!ctime (get-internal-real-time)))
+     ,@body
+     (* (/ (- (get-internal-real-time) ,g!ctime) internal-time-units-per-second)
+        1000)))
+
 ; ----------------------------------------------------------------------
 ; Building class definitions to match MCL's GUI class heirarchy
 ;
@@ -172,12 +178,10 @@
   (setf (close-requested-p win) t)
   (signal-semaphore (sema-request-close win))
   (sv-log "requesting to close win ~a on thread ~a~%" win *current-process*)
-  (let ((ctime (get-internal-real-time)))
-    (timed-wait-on-semaphore (sema-finished-close win) .5)
-    (sv-log "waited for ~a ms before win ~a was closed by maintenance thread~%"
-            (coerce (* (/ (- (get-internal-real-time) ctime) internal-time-units-per-second)
-                       1000) 'double-float)
-            win)))
+  (let ((time
+          (return-time-ms
+            (timed-wait-on-semaphore (sema-finished-close win) .5))))
+    (sv-log "waited for ~,2f ms before win ~a was closed by maintenance thread~%" time win)))
 
 (defclass static-contained-view (static-view-mixin contained-view) ())
 
@@ -1284,20 +1288,20 @@
 ; the main Cocoa thread to be evaluated, and block until that function is 
 ; processed. This guarantees that all current event code in the Cocoa run loop
 ; has been processed before event-dispatch returns.
-;
-; Note that I had to tweak the queue-for-event-process function. The dummy function
-; needs to 'not' go to the start of the queue, (and it goes to the front when called
-; within the call-in-event-process function), so I'm dynamically shadowing that function
-; here. Fun-orig is an anaphor that points to the default queue-for-event-process function.
 
 (defun event-dispatch ()
   (sv-log-n 1 "starting event dispatch")
-  (with-shadow (gui::queue-for-event-process
-                 (lambda (f &key at-start)
-                   (declare (ignore at-start))
-                   (funcall fun-orig f :at-start nil)))
-    (gui::call-in-event-process (lambda () ())))
-  (sv-log-n 1 "ending event dispatch"))
+  (let ((time 0))
+    (dotimes (i 2)
+      (let ((sema (make-semaphore)))
+        (gui::queue-for-gui 
+          (lambda ()
+            (signal-semaphore sema))
+          :at-start nil)
+        (incf time 
+              (return-time-ms
+                (wait-on-semaphore sema nil "sema event-dispatch wait")))))
+    (sv-log-n 1 "ending event dispatch after ~,2f ms" time)))
 
 (defparameter *current-dialog-directory* nil)
 
