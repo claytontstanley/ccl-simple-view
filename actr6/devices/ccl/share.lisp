@@ -1291,16 +1291,16 @@
 
 (defun event-dispatch ()
   (sv-log-n 1 "starting event dispatch")
-  (let ((time 0))
-    (dotimes (i 2)
-      (let ((sema (make-semaphore)))
-        (gui::queue-for-gui 
-          (lambda ()
-            (signal-semaphore sema))
-          :at-start nil)
-        (incf time 
-              (return-time-ms
-                (wait-on-semaphore sema nil "sema event-dispatch wait")))))
+  (let ((time
+          (return-time-ms
+            (unless (eq ccl::*current-process* ccl::*initial-process*)
+              (dotimes (i 2)
+                (let ((sema (make-semaphore)))
+                  (gui::queue-for-gui 
+                    (lambda ()
+                      (signal-semaphore sema))
+                    :at-start nil)
+                  (wait-on-semaphore sema nil "sema event-dispatch wait")))))))
     (sv-log-n 1 "ending event dispatch after ~,2f ms" time)))
 
 (defparameter *current-dialog-directory* nil)
