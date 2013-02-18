@@ -3,7 +3,7 @@
 	url = git://cstanley.no-ip.biz/actr6
 [submodule "submodules/ccl"]
 	path = submodules/ccl
-	url = git://cstanley.no-ip.biz/ccl
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/ccl
 [submodule "submodules/rmcl"]
 	path = submodules/rmcl
 	url = git://cstanley.no-ip.biz/rmcl.git
