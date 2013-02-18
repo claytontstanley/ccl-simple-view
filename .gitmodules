@@ -34,3 +34,6 @@
 [submodule "submodules/FittsErrorModel"]
 	path = submodules/FittsErrorModel
 	url = ssh://clayton@chil.rice.edu/srv/git/FittsErrorModel
+[submodule "submodules/ccl-1.9"]
+	path = submodules/ccl-1.9
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/ccl-1.9
