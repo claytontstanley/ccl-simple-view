@@ -1,4 +1,5 @@
-(require :ccl-simple-view)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (require :ccl-simple-view))
 
 (defun save-snapshot (fname)
   "Saves snapshot of current window as a tiff stored in fname"
@@ -54,5 +55,11 @@
 (objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
   (call-next-method the-event)
   (#/keyDown: (#/window cocoa-self) the-event))
+
+(defun print-objc-arglists (message)
+  (mapcar (lambda (obj)
+            (list obj (ccl::objc-method-info-arglist obj)))
+          (ccl::objc-message-info-methods
+            (ccl::get-objc-message-info message))))
 
 (provide :chil-ccl-utilities)

@@ -52,7 +52,8 @@
 ;;; 2013.02.28 cts 
 ;;;             : Creation
 
-(require :chil-ccl-utilities)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (require :chil-ccl-utilities))
 
 (defclass easygui::cocoa-password-entry-text-view (easygui::cocoa-text-view)
   ((pending-fun :accessor pending-fun :initform nil)
@@ -67,13 +68,14 @@
   ()
   (:default-initargs :specifically 'easygui::cocoa-password-entry-text-view))
 
-(defmethod initialize-instance :after ((view password-entry-text-view) &key)
-  (#/replaceLayoutManager: (#/textContainer (cocoa-ref view))
+(objc:defmethod #/init ((self easygui::cocoa-password-entry-text-view))
+  (call-next-method)
+  (#/replaceLayoutManager: (#/textContainer self)
    (#/init (#/alloc easygui::cocoa-password-entry-layout-manager)))
-  (#/setFont: (cocoa-ref view)
+  (#/setFont: self
    (convert-font "Courier" 12)))
 
-(objc:defmethod (#/drawGlyphsForGlyphRange:atPoint: :void) ((self easygui::cocoa-password-entry-layout-manager) (glyph-range #>NSRange) (at-point #>NSRange))
+(objc:defmethod (#/drawGlyphsForGlyphRange:atPoint: :void) ((self easygui::cocoa-password-entry-layout-manager) (glyph-range #>NSRange) (at-point #>NSPoint))
   (let ((glyph-cnt (#/numberOfGlyphs self)))
     (let ((hide-until (if (last-char-vis-p self) (1- glyph-cnt) glyph-cnt)))
       (dotimes (i hide-until)
@@ -122,6 +124,8 @@
                      (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil)
                      (#/setNeedsDisplay: cocoa-self #$YES))))
            (schedule-for-event-process (pending-fun cocoa-self) (visible-char-time-secs cocoa-self))))))
+
+; Interface for programmatically adding/deleting text
 
 (defmethod keypress-on-view :around ((view password-entry-text-view) key)
   (declare (ignore key))
