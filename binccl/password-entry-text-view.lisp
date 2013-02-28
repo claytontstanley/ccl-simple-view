@@ -68,12 +68,12 @@
   ()
   (:default-initargs :specifically 'easygui::cocoa-password-entry-text-view))
 
-(objc:defmethod #/init ((self easygui::cocoa-password-entry-text-view))
-  (call-next-method)
-  (#/replaceLayoutManager: (#/textContainer self)
-   (#/init (#/alloc easygui::cocoa-password-entry-layout-manager)))
-  (#/setFont: self
-   (convert-font "Courier" 12)))
+(objc:defmethod #/initWithFrame: ((self easygui::cocoa-password-entry-text-view) (frame #>NSRect))
+  (unwind-protect (call-next-method frame)
+    (#/replaceLayoutManager: (#/textContainer self)
+     (#/init (#/alloc easygui::cocoa-password-entry-layout-manager)))
+    (#/setFont: self
+     (convert-font "Courier" 12))))
 
 (objc:defmethod (#/drawGlyphsForGlyphRange:atPoint: :void) ((self easygui::cocoa-password-entry-layout-manager) (glyph-range #>NSRange) (at-point #>NSPoint))
   (let ((glyph-cnt (#/numberOfGlyphs self)))
