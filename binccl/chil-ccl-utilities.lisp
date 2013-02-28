@@ -32,8 +32,17 @@
   ()
   (:metaclass ns:+ns-object))
 
-(defclass text-view (view)
-  ()
+(defclass easygui::view-text-via-text-view-string-mixin ()
+  ())
+
+(defmethod easygui::view-text ((view easygui::view-text-via-text-view-string-mixin))
+  (objc:lisp-string-from-nsstring (#/string (cocoa-ref view))))
+
+(defmethod (setf easygui::view-text) (new-text (view easygui::view-text-via-text-view-string-mixin))
+  (#/setString: (cocoa-ref view) (objc:make-nsstring new-text)))
+
+(defclass text-view (dialog-item easygui::view-text-via-text-view-string-mixin)
+  ((text-truncation :initform nil))
   (:default-initargs :specifically 'easygui::cocoa-text-view))
 
 ; Relay keypresses to the window, to match behavior for ns-text-field base cocoa class 

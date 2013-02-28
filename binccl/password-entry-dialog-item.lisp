@@ -14,37 +14,42 @@
 ;;; Filename    : password-entry-text-view.lisp
 ;;; Version     : 1.0 
 ;;; 
-;;; Description : Mimicks iOS password entry field for OS X
+;;; Description : Mimics iOS password entry field for OS X
 ;;;
 ;;;		  OS X's NSSecureTextField implementation does not display the last
 ;;;		  character for a set amount of time before hiding it. All characters
-;;;		  are hidden immediately after typing. So the code extends a standard
-;;;		  editable-text-dialog-item (text entry field) and hides the characters
-;;;		  after a set amount of time, like iOS. 
+;;;		  are hidden immediately after typing. So this class extends a standard
+;;;		  dialog-item (using NSTextView for the cocoa class) and hides
+;;;		  the characters after a set amount of time, like iOS. 
 ;;;
-;;; Design     :  The text stored in the cocoa object is the hidden text, so a call to
-;;;               dialog-item-text on this view will return the text that is displayed
-;;;               on the screen (hidden characters will be part of the text).
-;;;               If you want the original text, then call the dialog-item-hidden-text
-;;;               method on the view.
+;;; Design     :  NSTextField is unsuitable for the cocoa class because it does not
+;;;               separate the drawing of the text from the actual text stored in the 
+;;;               class. NSTextView does however, (see drawGlyphsForGlyphRange:atPoint:),
+;;;               so NSTextView is used as the cocoa class.
 ;;;
-;;;               The keyUp: method was used to hook into a keypress (instead of keyDown:)
-;;;               because Cocoa does not allow one to override the default keyDown: method
-;;;               on ns-text-field (which easygui::cocoa-text-field inherits).
+;;;               Because this class inherits dialog-item for the common-lisp class,
+;;;               methods like dialog-item-text will work.
 ;;;
-;;;               Since keyUp: was used, the keypress is already stored in the object when
-;;;               keyUp: is called, so draw calls in keyUp: essentially 'clean up' what 
-;;;               previous drawing had done by hiding appropriate characters. Although
-;;;               this is definitely a bit of a hack, the view looks and responds just fine
-;;;               for my testing.
-;;;		  
+;;;               All keypresses in the view will be relayed to the window, so that the 
+;;;               view-key-event-handler methods are called on the window when a key is 
+;;;               is either manually or programmatically entered into the view.
+;;;
+;;;               The view has two main entry points: either manually typing into it, or
+;;;               programmatically entering/removing characters. For programmatic entry,
+;;;               reference the keypress-in-view methods.
+;;;
+;;;               Calling the dialog-item-text method will return the text stored in the
+;;;               view (no hidden characters). Calling dialog-item-hidden-text will 
+;;;               return the text as displayed (hidden characters included) at the time
+;;;               of the call.
+;;;
 ;;; Bugs        : ?
 ;;; 
 ;;; Todo        : [] 
 ;;;             : 
 ;;; 
 ;;; ----- History -----
-;;; 2013.02.23 cts 
+;;; 2013.02.28 cts 
 ;;;             : Creation
 
 (require :chil-ccl-utilities)
@@ -74,6 +79,16 @@
       (dotimes (i hide-until)
         (#/replaceGlyphAtIndex:withGlyph: self i 13))))
   (call-next-method glyph-range at-point))
+
+(defmethod dialog-item-hidden-text ((view password-entry-text-view))
+  (let ((text (dialog-item-text view)))
+    (let ((layout-manager (#/layoutManager (cocoa-ref view))))
+      (with-output-to-string (strm)
+        (dotimes (i (1- (length text)))
+          (format strm "*"))
+        (format strm "~a" (if (last-char-vis-p layout-manager)
+                            (char text (1- (length text)))
+                            "*"))))))
 
 (defmethod cursor-at-end-of-text-p ((cocoa-self easygui::cocoa-password-entry-text-view))
   (awhen (#/selectedRanges cocoa-self)
@@ -120,7 +135,7 @@
   (format view "~a" key))
 
 (defmethod stream-write-string ((view password-entry-text-view) string &optional start end)
-  (#/insertText: (cocoa-ref view) (objc:make-nsstring (subseq string start end)))) 
+  (#/insertText: (cocoa-ref view) (objc:make-nsstring (subseq string (aif start it 0) (aif end it (length string))))))
 
 (defmethod keypress-on-view ((view password-entry-text-view) (key (eql #\rubout)))
   (let* ((range (#/selectedRange (cocoa-ref view)))
@@ -144,6 +159,7 @@
             'password-entry-text-view
             :view-size (make-point 100 30)
             :view-nick-name :pw
+            :text "hello, world"
             )
           (make-instance
            'editable-text-dialog-item
@@ -154,4 +170,8 @@
 (dotimes (i 10)
   (keypress-on-view (view-named :pw *win*) "ab")
   (sleep .1))
+(dialog-item-text (view-named :pw *win*))
+(progn
+  (keypress-on-view (view-named :pw *win*) "abc")
+  (dialog-item-hidden-text (view-named :pw *win*)))
 |#
