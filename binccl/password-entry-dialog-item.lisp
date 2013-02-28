@@ -11,7 +11,7 @@
 ;;;             : clayton.stanley@rice.edu 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 
-;;; Filename    : password-entry-dialog-item.lisp
+;;; Filename    : password-entry-text-view.lisp
 ;;; Version     : 1.0 
 ;;; 
 ;;; Description : Mimicks iOS password entry field for OS X
@@ -47,18 +47,7 @@
 ;;; 2013.02.23 cts 
 ;;;             : Creation
 
-(defclass easygui::cocoa-text-view (easygui::cocoa-extension-mixin ns:ns-text-view)
-  ()
-  (:metaclass ns:+ns-object))
-
-(defclass text-view (view)
-  ()
-  (:default-initargs :specifically 'easygui::cocoa-text-view))
-
-(objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
-  (call-next-method the-event)
-  (#/keyDown: (#/window cocoa-self) the-event))
-
+(require :chil-ccl-utilities)
 
 (defclass easygui::cocoa-password-entry-text-view (easygui::cocoa-text-view)
   ((pending-fun :accessor pending-fun :initform nil)
@@ -69,11 +58,11 @@
   ((last-char-vis-p :accessor last-char-vis-p :initform nil))
   (:metaclass ns:+ns-object))
 
-(defclass password-entry-dialog-item (text-view)
+(defclass password-entry-text-view (text-view)
   ()
   (:default-initargs :specifically 'easygui::cocoa-password-entry-text-view))
 
-(defmethod initialize-instance :after ((view password-entry-dialog-item) &key)
+(defmethod initialize-instance :after ((view password-entry-text-view) &key)
   (#/replaceLayoutManager: (#/textContainer (cocoa-ref view))
    (#/init (#/alloc easygui::cocoa-password-entry-layout-manager)))
   (#/setFont: (cocoa-ref view)
@@ -105,7 +94,7 @@
                char)))
     (handle-keypress-on-view (easygui::easygui-view-of cocoa-self) (get-keypress the-event))))
 
-(defmethod handle-keypress-on-view ((view password-entry-dialog-item) keypress)
+(defmethod handle-keypress-on-view ((view password-entry-text-view) keypress)
   (let ((cocoa-self (cocoa-ref view)))
     (cond ((or (eq keypress #\rubout)
                (not (cursor-at-end-of-text-p cocoa-self)))
@@ -119,21 +108,21 @@
                      (#/setNeedsDisplay: cocoa-self #$YES))))
            (schedule-for-event-process (pending-fun cocoa-self) (visible-char-time-secs cocoa-self))))))
 
-(defmethod keypress-on-view :around ((view password-entry-dialog-item) key)
+(defmethod keypress-on-view :around ((view password-entry-text-view) key)
   (declare (ignore key))
   (easygui::running-on-main-thread ()
     (call-next-method)))
 
-(defmethod keypress-on-view :before ((view password-entry-dialog-item) key)
+(defmethod keypress-on-view :before ((view password-entry-text-view) key)
   (handle-keypress-on-view view key))
 
-(defmethod keypress-on-view ((view password-entry-dialog-item) key)
+(defmethod keypress-on-view ((view password-entry-text-view) key)
   (format view "~a" key))
 
-(defmethod stream-write-string ((view password-entry-dialog-item) string &optional start end)
+(defmethod stream-write-string ((view password-entry-text-view) string &optional start end)
   (#/insertText: (cocoa-ref view) (objc:make-nsstring (subseq string start end)))) 
 
-(defmethod keypress-on-view ((view password-entry-dialog-item) (key (eql #\rubout)))
+(defmethod keypress-on-view ((view password-entry-text-view) (key (eql #\rubout)))
   (let* ((range (#/selectedRange (cocoa-ref view)))
          (pos (ns:ns-range-location range))
          (length (ns:ns-range-length range)))
@@ -142,17 +131,8 @@
         (#/setSelectedRange: (cocoa-ref view) (ns:make-ns-range (1- pos) (1+ length))))))
   (#/delete: (cocoa-ref view) ccl:+null-ptr+))
 
-(defmethod backspace-on-view ((view password-entry-dialog-item))
+(defmethod backspace-on-view ((view password-entry-text-view))
   (keypress-on-view view #\rubout))
-
-(defun schedule-for-event-process (f time-in-secs)
-  (ccl::call-in-event-process
-    (lambda ()
-      (#/performSelector:withObject:afterDelay:
-       gui::*NSApp*
-       (objc:@selector #/lispInterrupt:)
-       (make-instance 'ns:ns-number :with-int (ccl::assign-id-map-id ccl::*interrupt-id-map* f))
-       (coerce time-in-secs 'double-float)))))
 
 #|
 (setf *win*
@@ -161,7 +141,7 @@
         :view-subviews
         (list
           (make-instance
-            'password-entry-dialog-item
+            'password-entry-text-view
             :view-size (make-point 100 30)
             :view-nick-name :pw
             )
