@@ -39,7 +39,8 @@
   (objc:lisp-string-from-nsstring (#/string (cocoa-ref view))))
 
 (defmethod (setf easygui::view-text) (new-text (view easygui::view-text-via-text-view-string-mixin))
-  (#/setString: (cocoa-ref view) (objc:make-nsstring new-text)))
+  (#/setString: (cocoa-ref view) (objc:make-nsstring new-text))
+  new-text)
 
 (defclass text-view (dialog-item easygui::view-text-via-text-view-string-mixin)
   ((text-truncation :initform nil))
