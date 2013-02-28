@@ -47,135 +47,58 @@
 ;;; 2013.02.23 cts 
 ;;;             : Creation
 
-(defclass easygui::cocoa-password-entry-text-field (easygui::cocoa-text-field)
-  ()
-  (:metaclass ns:+ns-object))
-
-(defclass easygui::cocoa-password-entry-text-field-cell (ns:ns-text-field-cell)
-  ()
-  (:metaclass ns:+ns-object))
-
-(#/setCellClass: easygui::cocoa-password-entry-text-field easygui::cocoa-password-entry-text-field-cell)
-
-(defclass easygui::cocoa-password-formatter (ns:ns-formatter)
-  ()
-  (:metaclass ns:+ns-object))
-
-(defclass easygui::cocoa-password-entry-text-view (ns:ns-text-view)
-  ()
+(defclass easygui::cocoa-password-entry-text-view (easygui::cocoa-extension-mixin ns:ns-text-view)
+  ((pending-fun :accessor pending-fun :initform nil)
+   (visible-char-time-secs :reader visible-char-time-secs :initform 1))
   (:metaclass ns:+ns-object))
 
 (defclass easygui::cocoa-password-entry-layout-manager (ns:ns-layout-manager)
-  ()
+  ((last-char-vis-p :accessor last-char-vis-p :initform nil))
   (:metaclass ns:+ns-object))
-
-(#/formatter (#/cell (cocoa-ref (view-named :pw *win*))))
-
-(objc:defmethod #/stringForObjectValue: ((self easygui::cocoa-password-formatter) an-object)
-  (format t "#/stringForObjectValue: ~a ~a~%" self an-object)
-  an-object)
-
-(objc:defmethod #/editingStringForObjectValue: ((self easygui::cocoa-password-formatter) an-object)
-  (format t "#/editingStringForObjectValue: ~a ~a~%" self an-object)
-  an-object)
-
-
-(objc:defmethod (#/getObjectValue:forString:errorDescription: #>BOOL) ((self easygui::cocoa-password-formatter) an-object forString errorDescription)
-  (format t "#/getObjectValue:forString:errorDescription: ~a ~a~%" forString an-object)
-  (let ((obj (#/initWithString: (#/alloc ns:ns-mutable-string)
-              forString)))
-  t))
 
 (defclass password-entry-dialog-item (view)
   ((pending-event :accessor pending-event :initform nil)
    (dialog-item-hidden-text :accessor dialog-item-hidden-text :initform ""))
   (:default-initargs :specifically 'easygui::cocoa-password-entry-text-view))
 
-(#/layoutManager (#/textContainer (cocoa-ref (view-named :pw *win*))))
-
-(objc:defmethod (#/drawGlyphsForGlyphRange:atPoint: :void) ((self easygui::cocoa-password-entry-layout-manager) (glyph-range #>NSRange) (at-point #>NSRange))
-  (format t "#/drawGlyphsForGlyphRange:atPoint: ~a ~a~%" glyph-range at-point)
-  (print (#/numberOfGlyphs self))
-  (print
-    (loop for i from 0 to (1- (#/numberOfGlyphs self))
-          collecting (#/glyphAtIndex: self i)))
-  (dotimes (i (#/numberOfGlyphs self))
-    (#/replaceGlyphAtIndex:withGlyph: self
-     i
-     13)
-  )
-  (call-next-method glyph-range at-point))
-
-(#/glyphWithName: ns:ns-font (objc:make-nsstring "bullet"))
-
-
 (defmethod initialize-instance :after ((view password-entry-dialog-item) &key)
   (#/replaceLayoutManager: (#/textContainer (cocoa-ref view))
    (#/init (#/alloc easygui::cocoa-password-entry-layout-manager)))
   (#/setFont: (cocoa-ref view)
-   (convert-font "Courier" 12))
-  ())
-  (#/setFormatter: (#/cell (cocoa-ref view))
-   (#/init (#/alloc easygui::cocoa-password-formatter))))
+   (convert-font "Courier" 12)))
 
-(objc:defmethod (#/drawRect: :void) ((self easygui::cocoa-password-entry-text-field) (rect :<NSR>ect))
-  (call-next-method rect))
+(objc:defmethod (#/drawGlyphsForGlyphRange:atPoint: :void) ((self easygui::cocoa-password-entry-layout-manager) (glyph-range #>NSRange) (at-point #>NSRange))
+  (let ((glyph-cnt (#/numberOfGlyphs self)))
+    (let ((hide-until (if (last-char-vis-p self) (1- glyph-cnt) glyph-cnt)))
+      (dotimes (i hide-until)
+        (#/replaceGlyphAtIndex:withGlyph: self i 13))))
+  (call-next-method glyph-range at-point))
 
-(objc:defmethod (#/drawWithFrame:inView: :void) ((self easygui::cocoa-password-entry-text-field-cell) (frame :<NSR>ect) cocoa-view)
-  (format t "#/drawWithFrame:inView: on ~a, ~a~%" self frame)
-  (call-next-method frame cocoa-view)
- )
+(defmethod cursor-at-end-of-text-p ((cocoa-self easygui::cocoa-password-entry-text-view))
+  (awhen (#/selectedRanges cocoa-self)
+    (when (eq (#/count it) 1)
+      (awhen (#/rangeValue (#/objectAtIndex: it 0))
+        (let ((pos (ns:ns-range-location it)))
+          (let ((length (ns:ns-range-length it)))
+            (when (eq length 0)
+              (when (eq pos (#/length (#/string cocoa-self)))
+                t))))))))
 
-(objc:defmethod (#/drawInteriorWithFrame:inView: :void) ((self easygui::cocoa-password-entry-text-field-cell) (frame :<NSR>ect) cocoa-view)
-  (format t "#/drawInteriorWithFrame:inView: on ~a, ~a~%" self frame)
-  (let* ((str-val (#/attributedStringValue self))
-         (new-val (#/initWithAttributedString: (#/alloc ns:ns-mutable-attributed-string)
-                   str-val)))
-    (#/replaceCharactersInRange:withString: new-val
-     (ns:make-ns-range 0 2)
-     (objc:make-nsstring "**"))
-    (#/drawInRect: new-val (#/titleRectForBounds: self frame))
-    ) 
-  (#/updateCell: cocoa-view self)
-  (#/updateCellInside: cocoa-view self)
-  (#/flushGraphics (#/currentContext ns:ns-graphics-context))
- )
-;(#/flushWindow (#/window cocoa-view)))
-
-(objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-password-entry-text-field) the-event)
+(objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-password-entry-text-view) the-event)
   (call-next-method the-event)
-  (let ((view (easygui::easygui-view-of cocoa-self)))
-    (schedule-for-event-process 
-      (lambda ()
-        (#/drawInteriorWithFrame:inView: (#/cell cocoa-self)
-         (#/frame cocoa-self)
-         cocoa-self)
-        ;(#/updateCell: cocoa-self (#/cell cocoa-self))
-        ;(#/updateCellInside: cocoa-self (#/cell cocoa-self))
-        ;(#/flushGraphics (#/currentContext ns:ns-graphics-context))
-        )
-      1)))
-
-(defun get-rightmost-char-pos (char str)
-  (search (string char) str :from-end t :test #'char=))
-
-(defmethod hide-nth-character ((view view) n)
-  (let ((text (dialog-item-text view)))
-    (when (and (> (length text) n)
-               (>= n 0))
-      (set-dialog-item-text
-        view
-        (concatenate
-          'string
-          (subseq text 0 n)
-          "*"
-          (subseq text (1+ n) (length text)))))))
-
-(defmethod hide-last-character ((view view))
-  (hide-nth-character view (1- (length (dialog-item-text view)))))
-
-(defmethod hide-next-to-last-character ((view view))
-  (hide-nth-character view (1- (1- (length (dialog-item-text view))))))
+  (let ((keypress (get-keypress the-event)))
+    (cond ((or (eq keypress #\rubout)
+               (not (cursor-at-end-of-text-p cocoa-self)))
+           (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil)
+           (#/setNeedsDisplay: cocoa-self #$YES))
+          (t
+           (setf (last-char-vis-p (#/layoutManager cocoa-self)) t)
+           (setf (pending-fun cocoa-self)
+                 (alambda ()
+                   (when (eq #'self (pending-fun cocoa-self))
+                     (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil)
+                     (#/setNeedsDisplay: cocoa-self #$YES))))
+           (schedule-for-event-process (pending-fun cocoa-self) (visible-char-time-secs cocoa-self))))))
 
 (defun get-keypress (the-event)
   (let* ((chars (#/characters the-event))
