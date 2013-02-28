@@ -109,7 +109,9 @@
                     (str (objc:lisp-string-from-nsstring chars))
                     (char (char str 0)))
                char)))
-    (handle-keypress-on-view (easygui::easygui-view-of cocoa-self) (get-keypress the-event))))
+    (handle-keypress-on-view
+      (easygui::easygui-view-of cocoa-self)
+      (get-keypress the-event))))
 
 (defmethod handle-keypress-on-view ((view password-entry-text-view) keypress)
   (let ((cocoa-self (cocoa-ref view)))
@@ -123,7 +125,9 @@
                    (when (eq #'self (pending-fun cocoa-self))
                      (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil)
                      (#/setNeedsDisplay: cocoa-self #$YES))))
-           (schedule-for-event-process (pending-fun cocoa-self) (visible-char-time-secs cocoa-self))))))
+           (schedule-for-event-process
+             (pending-fun cocoa-self)
+             (visible-char-time-secs cocoa-self))))))
 
 ; Interface for programmatically adding/deleting text
 
