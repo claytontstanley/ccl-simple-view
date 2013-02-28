@@ -1,3 +1,5 @@
+(require :ccl-simple-view)
+
 (defun save-snapshot (fname)
   "Saves snapshot of current window as a tiff stored in fname"
   (let ((captured-image
