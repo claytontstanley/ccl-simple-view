@@ -47,7 +47,20 @@
 ;;; 2013.02.23 cts 
 ;;;             : Creation
 
-(defclass easygui::cocoa-password-entry-text-view (easygui::cocoa-extension-mixin ns:ns-text-view)
+(defclass easygui::cocoa-text-view (easygui::cocoa-extension-mixin ns:ns-text-view)
+  ()
+  (:metaclass ns:+ns-object))
+
+(defclass text-view (view)
+  ()
+  (:default-initargs :specifically 'easygui::cocoa-text-view))
+
+(objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
+  (call-next-method the-event)
+  (#/keyDown: (#/window cocoa-self) the-event))
+
+
+(defclass easygui::cocoa-password-entry-text-view (easygui::cocoa-text-view)
   ((pending-fun :accessor pending-fun :initform nil)
    (visible-char-time-secs :reader visible-char-time-secs :initform 1))
   (:metaclass ns:+ns-object))
@@ -56,9 +69,8 @@
   ((last-char-vis-p :accessor last-char-vis-p :initform nil))
   (:metaclass ns:+ns-object))
 
-(defclass password-entry-dialog-item (view)
-  ((pending-event :accessor pending-event :initform nil)
-   (dialog-item-hidden-text :accessor dialog-item-hidden-text :initform ""))
+(defclass password-entry-dialog-item (text-view)
+  ()
   (:default-initargs :specifically 'easygui::cocoa-password-entry-text-view))
 
 (defmethod initialize-instance :after ((view password-entry-dialog-item) &key)
@@ -86,11 +98,18 @@
 
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-password-entry-text-view) the-event)
   (call-next-method the-event)
-  (let ((keypress (get-keypress the-event)))
+  (labels ((get-keypress (the-event)
+             (let* ((chars (#/characters the-event))
+                    (str (objc:lisp-string-from-nsstring chars))
+                    (char (char str 0)))
+               char)))
+    (handle-keypress-on-view (easygui::easygui-view-of cocoa-self) (get-keypress the-event))))
+
+(defmethod handle-keypress-on-view ((view password-entry-dialog-item) keypress)
+  (let ((cocoa-self (cocoa-ref view)))
     (cond ((or (eq keypress #\rubout)
                (not (cursor-at-end-of-text-p cocoa-self)))
-           (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil)
-           (#/setNeedsDisplay: cocoa-self #$YES))
+           (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil))
           (t
            (setf (last-char-vis-p (#/layoutManager cocoa-self)) t)
            (setf (pending-fun cocoa-self)
@@ -100,11 +119,31 @@
                      (#/setNeedsDisplay: cocoa-self #$YES))))
            (schedule-for-event-process (pending-fun cocoa-self) (visible-char-time-secs cocoa-self))))))
 
-(defun get-keypress (the-event)
-  (let* ((chars (#/characters the-event))
-         (str (objc:lisp-string-from-nsstring chars))
-         (char (char str 0)))
-    char))
+(defmethod keypress-on-view :around ((view password-entry-dialog-item) key)
+  (declare (ignore key))
+  (easygui::running-on-main-thread ()
+    (call-next-method)))
+
+(defmethod keypress-on-view :before ((view password-entry-dialog-item) key)
+  (handle-keypress-on-view view key))
+
+(defmethod keypress-on-view ((view password-entry-dialog-item) key)
+  (format view "~a" key))
+
+(defmethod stream-write-string ((view password-entry-dialog-item) string &optional start end)
+  (#/insertText: (cocoa-ref view) (objc:make-nsstring (subseq string start end)))) 
+
+(defmethod keypress-on-view ((view password-entry-dialog-item) (key (eql #\rubout)))
+  (let* ((range (#/selectedRange (cocoa-ref view)))
+         (pos (ns:ns-range-location range))
+         (length (ns:ns-range-length range)))
+    (when (eq length 0)
+      (when (> pos 0)
+        (#/setSelectedRange: (cocoa-ref view) (ns:make-ns-range (1- pos) (1+ length))))))
+  (#/delete: (cocoa-ref view) ccl:+null-ptr+))
+
+(defmethod backspace-on-view ((view password-entry-dialog-item))
+  (keypress-on-view view #\rubout))
 
 (defun schedule-for-event-process (f time-in-secs)
   (ccl::call-in-event-process
@@ -130,4 +169,9 @@
            'editable-text-dialog-item
            :view-size (make-point 100 30)
            :view-position (make-point 0 100)))))
+(dotimes (i 10)
+  (keypress-on-view (view-named :pw *win*) #\rubout))
+(dotimes (i 10)
+  (keypress-on-view (view-named :pw *win*) "ab")
+  (sleep .1))
 |#
