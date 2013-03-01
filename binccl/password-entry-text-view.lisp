@@ -134,6 +134,8 @@
     (pending-fun view)
     (visible-char-time-secs view)))
 
+(provide :password-entry-text-view)
+
 #|
 (setf *win*
       (make-instance
