@@ -20,7 +20,7 @@
 ;;;		  character for a set amount of time before hiding it. All characters
 ;;;		  are hidden immediately after typing. So this class extends a standard
 ;;;		  dialog-item (using NSTextView for the cocoa class) and hides
-;;;		  the characters after a set amount of time, like iOS. 
+;;;		  the last character after a set amount of time, like iOS. 
 ;;;
 ;;; Design     :  NSTextField is unsuitable for the cocoa class because it does not
 ;;;               separate the drawing of the text from the actual text stored in the 
@@ -43,6 +43,12 @@
 ;;;               return the text as displayed (hidden characters included) at the time
 ;;;               of the call.
 ;;;
+;;;               Most likely override schedule-pending-fun-for-event-process method 
+;;;               if running ACT-R. When ACT-R is running, use its discrete event simulator
+;;;               i.e., call schedule-event-relative, so that the function to hide the last
+;;;               key fires at the right time, both when ACT-R is running at
+;;;               real time and faster than real time.
+;;;
 ;;; Bugs        : ?
 ;;; 
 ;;; Todo        : [] 
@@ -55,17 +61,19 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (require :chil-ccl-utilities))
 
-(defclass easygui::cocoa-password-entry-text-view (easygui::cocoa-text-view)
-  ((pending-fun :accessor pending-fun :initform nil)
-   (visible-char-time-secs :reader visible-char-time-secs :initform 1))
-  (:metaclass ns:+ns-object))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defclass easygui::cocoa-password-entry-text-view (easygui::cocoa-text-view)
+    ()
+    (:metaclass ns:+ns-object)))
 
-(defclass easygui::cocoa-password-entry-layout-manager (ns:ns-layout-manager)
-  ((last-char-vis-p :accessor last-char-vis-p :initform nil))
-  (:metaclass ns:+ns-object))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defclass easygui::cocoa-password-entry-layout-manager (ns:ns-layout-manager)
+    ((last-char-vis-p :accessor last-char-vis-p :initform nil))
+    (:metaclass ns:+ns-object)))
 
 (defclass password-entry-text-view (text-view)
-  ()
+  ((pending-fun :accessor pending-fun :initform nil)
+   (visible-char-time-secs :reader visible-char-time-secs :initform 1))
   (:default-initargs :specifically 'easygui::cocoa-password-entry-text-view))
 
 (objc:defmethod #/initWithFrame: ((self easygui::cocoa-password-entry-text-view) (frame #>NSRect))
@@ -120,14 +128,17 @@
            (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil))
           (t
            (setf (last-char-vis-p (#/layoutManager cocoa-self)) t)
-           (setf (pending-fun cocoa-self)
+           (setf (pending-fun view)
                  (alambda ()
-                   (when (eq #'self (pending-fun cocoa-self))
+                   (when (eq #'self (pending-fun view))
                      (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil)
                      (#/setNeedsDisplay: cocoa-self #$YES))))
-           (schedule-for-event-process
-             (pending-fun cocoa-self)
-             (visible-char-time-secs cocoa-self))))))
+           (schedule-pending-fun-for-event-process view)))))
+
+(defmethod schedule-pending-fun-for-event-process ((view password-entry-text-view))
+  (schedule-for-event-process
+    (pending-fun view)
+    (visible-char-time-secs view)))
 
 ; Interface for programmatically adding/deleting text
 
@@ -170,9 +181,9 @@
             :text "hello, world"
             )
           (make-instance
-           'editable-text-dialog-item
-           :view-size (make-point 100 30)
-           :view-position (make-point 0 100)))))
+            'editable-text-dialog-item
+            :view-size (make-point 100 30)
+            :view-position (make-point 0 100)))))
 (dotimes (i 10)
   (keypress-on-view (view-named :pw *win*) #\rubout))
 (dotimes (i 10)
