@@ -19,9 +19,14 @@
          (objc:make-nsstring fname)
          #$NO)))))
 
+#-:ccl-1.9 (defstatic ccl::*interrupt-id-map* (ccl::make-id-map))
+
+#-:ccl-1.9 (objc:defmethod (#/lispInterrupt: :void) ((self ns:ns-application) id)
+             (funcall (ccl::id-map-free-object ccl::*interrupt-id-map* (#/intValue (#/autorelease id)))))
+
 (defun schedule-for-event-process (f time-in-secs)
   "Fires lambda f on main run loop after time-in-secs seconds"
-  (ccl::call-in-event-process
+  (gui::execute-in-gui
     (lambda ()
       (#/performSelector:withObject:afterDelay:
        gui::*NSApp*
