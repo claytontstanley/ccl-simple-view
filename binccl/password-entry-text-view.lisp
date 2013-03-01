@@ -12,7 +12,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 
 ;;; Filename    : password-entry-text-view.lisp
-;;; Version     : 1.0 
 ;;; 
 ;;; Description : Mimics iOS password entry field for OS X
 ;;;
