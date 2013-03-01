@@ -167,6 +167,7 @@
           (make-instance
             'password-entry-text-view
             :view-size (make-point 100 30)
+            :view-position (make-point 0 10)
             :view-nick-name :pw
             :text "hello, world"
             )
