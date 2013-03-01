@@ -31,7 +31,8 @@
 ;;;
 ;;;               All keypresses in the view will be relayed to the window, so that the 
 ;;;               view-key-event-handler methods are called on the window when a key is 
-;;;               is either manually or programmatically entered into the view.
+;;;               is either manually or programmatically entered into the view (see 
+;;;               text-view.lisp (parent class))
 ;;;
 ;;;               The view has two main entry points: either manually typing into it, or
 ;;;               programmatically entering/removing characters. For programmatic entry,
@@ -124,6 +125,9 @@
                      (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil)
                      (#/setNeedsDisplay: cocoa-self #$YES))))
            (schedule-pending-fun-for-event-process view)))))
+
+(defmethod keypress-on-view :before ((view password-entry-text-view) key)
+  (handle-keypress-on-view view key))
 
 (defmethod schedule-pending-fun-for-event-process ((view password-entry-text-view))
   (schedule-for-event-process

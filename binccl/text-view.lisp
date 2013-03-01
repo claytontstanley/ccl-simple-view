@@ -46,9 +46,6 @@
   (easygui::running-on-main-thread ()
     (call-next-method)))
 
-(defmethod keypress-on-view :before ((view text-view) key)
-  (handle-keypress-on-view view key))
-
 (defmethod keypress-on-view :after ((view text-view) key)
   (easygui::view-key-event-handler (view-window view) key))
 
