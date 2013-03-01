@@ -35,7 +35,7 @@
 ;;;
 ;;;               The view has two main entry points: either manually typing into it, or
 ;;;               programmatically entering/removing characters. For programmatic entry,
-;;;               reference the keypress-in-view methods.
+;;;               reference the keypress-in-view methods in text-view.lisp (parent class)
 ;;;
 ;;;               Calling the dialog-item-text method will return the text stored in the
 ;;;               view (no hidden characters). Calling dialog-item-hidden-text will 
@@ -58,7 +58,8 @@
 ;;;             : Creation
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (require :chil-ccl-utilities))
+  (require :chil-ccl-utilities)
+  (require :text-view))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defclass easygui::cocoa-password-entry-text-view (easygui::cocoa-text-view)
@@ -128,34 +129,6 @@
   (schedule-for-event-process
     (pending-fun view)
     (visible-char-time-secs view)))
-
-; Interface for programmatically adding/deleting text
-
-(defmethod keypress-on-view :around ((view password-entry-text-view) key)
-  (declare (ignore key))
-  (easygui::running-on-main-thread ()
-    (call-next-method)))
-
-(defmethod keypress-on-view :before ((view password-entry-text-view) key)
-  (handle-keypress-on-view view key))
-
-(defmethod keypress-on-view ((view password-entry-text-view) key)
-  (format view "~a" key))
-
-(defmethod stream-write-string ((view password-entry-text-view) string &optional start end)
-  (#/insertText: (cocoa-ref view) (objc:make-nsstring (subseq string (aif start it 0) (aif end it (length string))))))
-
-(defmethod keypress-on-view ((view password-entry-text-view) (key (eql #\rubout)))
-  (let* ((range (#/selectedRange (cocoa-ref view)))
-         (pos (ns:ns-range-location range))
-         (length (ns:ns-range-length range)))
-    (when (eq length 0)
-      (when (> pos 0)
-        (#/setSelectedRange: (cocoa-ref view) (ns:make-ns-range (1- pos) (1+ length))))))
-  (#/delete: (cocoa-ref view) ccl:+null-ptr+))
-
-(defmethod backspace-on-view ((view password-entry-text-view))
-  (keypress-on-view view #\rubout))
 
 #|
 (setf *win*

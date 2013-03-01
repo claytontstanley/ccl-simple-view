@@ -29,44 +29,6 @@
        (make-instance 'ns:ns-number :with-int (ccl::assign-id-map-id ccl::*interrupt-id-map* f))
        (coerce time-in-secs 'double-float)))))
 
-; Class definitions for ns-text-view base cocoa class
-
-(defclass easygui::cocoa-text-view (easygui::cocoa-extension-mixin ns:ns-text-view)
-  ()
-  (:metaclass ns:+ns-object))
-
-(defclass easygui::view-text-via-text-view-string-mixin ()
-  ())
-
-(defmethod easygui::view-text ((view easygui::view-text-via-text-view-string-mixin))
-  (objc:lisp-string-from-nsstring (#/string (cocoa-ref view))))
-
-(defmethod (setf easygui::view-text) (new-text (view easygui::view-text-via-text-view-string-mixin))
-  (#/setString: (cocoa-ref view) (objc:make-nsstring new-text))
-  new-text)
-
-(defclass text-view (dialog-item easygui::view-text-via-text-view-string-mixin)
-  ((text-truncation :initform nil))
-  (:default-initargs :specifically 'easygui::cocoa-text-view))
-
-; Relay keypresses to the window, to match behavior for ns-text-field base cocoa class 
-; (see mcl-migration/easygui/extensions.lisp)
-
-(objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
-  (call-next-method the-event)
-  (#/keyDown: (#/window cocoa-self) the-event))
-
-(defmethod cursor-at-end-of-text-p ((view text-view))
-  (let ((cocoa-self (cocoa-ref view)))
-    (awhen (#/selectedRanges cocoa-self)
-      (when (eq (#/count it) 1)
-        (awhen (#/rangeValue (#/objectAtIndex: it 0))
-          (let ((pos (ns:ns-range-location it)))
-            (let ((length (ns:ns-range-length it)))
-              (when (eq length 0)
-                (when (eq pos (#/length (#/string cocoa-self)))
-                  t)))))))))
-
 (defun print-objc-arglists (message)
   (mapcar (lambda (obj)
             (list obj (ccl::objc-method-info-arglist obj)))
