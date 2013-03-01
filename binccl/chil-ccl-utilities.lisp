@@ -56,6 +56,17 @@
   (call-next-method the-event)
   (#/keyDown: (#/window cocoa-self) the-event))
 
+(defmethod cursor-at-end-of-text-p ((view text-view))
+  (let ((cocoa-self (cocoa-ref view)))
+    (awhen (#/selectedRanges cocoa-self)
+      (when (eq (#/count it) 1)
+        (awhen (#/rangeValue (#/objectAtIndex: it 0))
+          (let ((pos (ns:ns-range-location it)))
+            (let ((length (ns:ns-range-length it)))
+              (when (eq length 0)
+                (when (eq pos (#/length (#/string cocoa-self)))
+                  t)))))))))
+
 (defun print-objc-arglists (message)
   (mapcar (lambda (obj)
             (list obj (ccl::objc-method-info-arglist obj)))

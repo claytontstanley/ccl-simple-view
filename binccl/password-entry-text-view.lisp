@@ -100,16 +100,6 @@
                             (char text (1- (length text)))
                             "*"))))))
 
-(defmethod cursor-at-end-of-text-p ((cocoa-self easygui::cocoa-password-entry-text-view))
-  (awhen (#/selectedRanges cocoa-self)
-    (when (eq (#/count it) 1)
-      (awhen (#/rangeValue (#/objectAtIndex: it 0))
-        (let ((pos (ns:ns-range-location it)))
-          (let ((length (ns:ns-range-length it)))
-            (when (eq length 0)
-              (when (eq pos (#/length (#/string cocoa-self)))
-                t))))))))
-
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-password-entry-text-view) the-event)
   (call-next-method the-event)
   (labels ((get-keypress (the-event)
@@ -124,7 +114,7 @@
 (defmethod handle-keypress-on-view ((view password-entry-text-view) keypress)
   (let ((cocoa-self (cocoa-ref view)))
     (cond ((or (eq keypress #\rubout)
-               (not (cursor-at-end-of-text-p cocoa-self)))
+               (not (cursor-at-end-of-text-p view)))
            (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil))
           (t
            (setf (last-char-vis-p (#/layoutManager cocoa-self)) t)
