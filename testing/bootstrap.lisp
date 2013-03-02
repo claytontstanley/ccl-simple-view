@@ -34,5 +34,5 @@
 
 (load-file-list "file-lists" "all.txt")
 
-#+:digitool (load-as-lst "bootstrap-mcl.lisp")
+#+:digitool (load-as-lst ".." "bincarbon" "bootstrap-mcl.lisp")
 
