@@ -69,7 +69,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require :timer)
-(require :cfbundle)
+#+:digitool (require :cfbundle)
 (require :misc-lib)
 (require :seq-math)
 (require :launch-url)
