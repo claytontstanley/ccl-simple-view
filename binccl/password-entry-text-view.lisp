@@ -72,10 +72,15 @@
     ((last-char-vis-p :accessor last-char-vis-p :initform nil))
     (:metaclass ns:+ns-object)))
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defclass easygui::cocoa-password-entry-scroll-view (easygui::cocoa-scroll-view)
+    ((cocoa-text-view-specifically :initform 'easygui::cocoa-password-entry-text-view))
+    (:metaclass ns:+ns-object)))
+
 (defclass password-entry-text-view (text-view)
   ((pending-fun :accessor pending-fun :initform nil)
    (visible-char-time-secs :reader visible-char-time-secs :initform 1))
-  (:default-initargs :specifically 'easygui::cocoa-password-entry-text-view))
+  (:default-initargs :specifically 'easygui::cocoa-password-entry-scroll-view))
 
 (objc:defmethod #/initWithFrame: ((self easygui::cocoa-password-entry-text-view) (frame #>NSRect))
   (unwind-protect (call-next-method frame)
@@ -93,13 +98,14 @@
 
 (defmethod dialog-item-hidden-text ((view password-entry-text-view))
   (let ((text (dialog-item-text view)))
-    (let ((layout-manager (#/layoutManager (cocoa-ref view))))
+    (let ((layout-manager (#/layoutManager (cocoa-text-view view))))
       (with-output-to-string (strm)
-        (dotimes (i (1- (length text)))
-          (format strm "*"))
-        (format strm "~a" (if (last-char-vis-p layout-manager)
-                            (char text (1- (length text)))
-                            "*"))))))
+        (when (> (length text) 0)
+          (dotimes (i (1- (length text)))
+            (format strm "*"))
+          (format strm "~a" (if (last-char-vis-p layout-manager)
+                              (char text (1- (length text)))
+                              "*")))))))
 
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-password-entry-text-view) the-event)
   (call-next-method the-event)
@@ -109,11 +115,11 @@
                     (char (char str 0)))
                char)))
     (handle-keypress-on-view
-      (easygui::easygui-view-of cocoa-self)
+      (easygui::easygui-view-of (#/enclosingScrollView cocoa-self))
       (get-keypress the-event))))
 
 (defmethod handle-keypress-on-view ((view password-entry-text-view) keypress)
-  (let ((cocoa-self (cocoa-ref view)))
+  (let ((cocoa-self (cocoa-text-view view)))
     (cond ((or (eq keypress #\rubout)
                (not (cursor-at-end-of-text-p view)))
            (setf (last-char-vis-p (#/layoutManager cocoa-self)) nil))
