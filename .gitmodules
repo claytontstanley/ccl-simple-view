@@ -30,7 +30,7 @@
 	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/gallagher.git
 [submodule "submodules/NSFMotor"]
 	path = submodules/NSFMotor
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/NSF Motor
+	url = ssh://clayton@chil.rice.edu/srv/git/NSFMotor
 [submodule "submodules/FittsErrorModel"]
 	path = submodules/FittsErrorModel
 	url = ssh://clayton@chil.rice.edu/srv/git/FittsErrorModel
