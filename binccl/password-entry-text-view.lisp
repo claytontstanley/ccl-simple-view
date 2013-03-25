@@ -31,8 +31,7 @@
 ;;;
 ;;;               All keypresses in the view will be relayed to the window, so that the 
 ;;;               view-key-event-handler methods are called on the window when a key is 
-;;;               is either manually or programmatically entered into the view (see 
-;;;               text-view.lisp (parent class))
+;;;               is manually entered into the view (see text-view.lisp (parent class))
 ;;;
 ;;;               The view has two main entry points: either manually typing into it, or
 ;;;               programmatically entering/removing characters. For programmatic entry,
