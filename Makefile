@@ -43,8 +43,6 @@ reformat-repo:
 reformat-builds:
 	make reformat list-cmd="cat build/file-list*"
 
-reformat-all: reformat-repo reformat-builds
-
 # This is way experimental, but it did work for me. 
 convertToWriteRepo:
 	cd .git; find . -type f -name config -exec perl -pi -e 's|git://cstanley.no-ip.biz|ssh://raid\@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git|' '{}' \;
