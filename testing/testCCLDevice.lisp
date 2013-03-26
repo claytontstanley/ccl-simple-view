@@ -18,12 +18,15 @@
         (remove-visual-items-from-rpm-window *win* view)))))
 
 
-(defmethod rpm-window-click-event-handler ((device rpm-real-window) position)
+(defclass test-rpm-real-window (rpm-real-window)
+  ())
+
+(defmethod rpm-window-click-event-handler ((device test-rpm-real-window) position)
   (declare (ignore device position))
   (flash-text "mouse down clicked")
   (call-next-method))
 
-(defmethod rpm-window-key-event-handler ((device rpm-real-window) key)
+(defmethod rpm-window-key-event-handler ((device test-rpm-real-window) key)
   (declare (ignorable device key))
   (setf *key* key)
   (flash-text (format nil "key ~a pressed" key))
@@ -35,7 +38,8 @@
 
 (check (null (open-rpm-window? *win*)))
 
-(setf *win* (make-rpm-window 
+(setf *win* (make-rpm-window
+              :class 'test-rpm-real-window
               :visible t
               :width 400
               :height 400
