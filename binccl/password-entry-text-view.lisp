@@ -158,11 +158,12 @@
             'editable-text-dialog-item
             :view-size (make-point 100 30)
             :view-position (make-point 0 100)))))
-(dotimes (i 10)
-  (keypress-on-view (view-named :pw *win*) #\rubout))
+(set-dialog-item-text (view-named :pw *win*) "") 
 (dotimes (i 10)
   (keypress-on-view (view-named :pw *win*) "ab")
   (sleep .1))
+(dotimes (i 10)
+  (keypress-on-view (view-named :pw *win*) #\rubout))
 (dialog-item-text (view-named :pw *win*))
 (progn
   (keypress-on-view (view-named :pw *win*) "abc")
