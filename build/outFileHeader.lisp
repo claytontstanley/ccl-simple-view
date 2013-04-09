@@ -51,3 +51,8 @@
 ;;;              Simplifies OO hierarchy, removes unecessary cruft, and decreases technical debt
 ;;; 2013.02.16 cts
 ;;;            : Changes to ensure code is compatible with CCL 1.8 thru CCL 1.9rc2
+;;; 2013.04.10 cts
+;;;            : Added feature: You can now change the color of the text shown for button objects
+;;;              (button-dialog-item, check-box-dialog-item, radio-button-dialog-item) in the usual
+;;;              MCL way for dialog items (passing :fore-color #color# or :part-color (list :text #color#)
+;;;              to initialize-instance)

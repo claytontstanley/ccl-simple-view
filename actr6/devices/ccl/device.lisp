@@ -124,6 +124,9 @@
 ;;;             :   The function no longer pauses for a set time to ensure that the move
 ;;;             :   is registered. Instead, it polls and checks that the move is registered
 ;;;             :   and exits immediately after success.
+;;; 2013.04.10 cts
+;;;             : * Feature was added in ccl device to change text color for buttons.
+;;;                 Visicon representation for buttons now shows text in appropriate color
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)

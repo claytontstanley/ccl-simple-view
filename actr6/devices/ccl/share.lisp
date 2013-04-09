@@ -47,6 +47,9 @@
 (defclass view-text-via-title-mixin (easygui::view-text-via-title-mixin)
   ((easygui::text :initarg :window-title)))
 
+(defclass view-text-via-button-title-mixin (view-text-via-title-mixin)
+  ())
+
 (defclass view-text-via-stringvalue-mixin (easygui::view-text-via-stringvalue-mixin)
   ((easygui::text :initarg :text)))
 
@@ -274,10 +277,25 @@
 ; [1] cocoa view class mappings are explicitly written, and contained within each clos class definition. 
 ; [2] As the clos classes are extended, the :specifically values are inherited/over-ridden in the usual way.
 
-(defclass button-dialog-item (easygui:push-button-view view-text-via-title-mixin easygui::text-fonting-mixin dialog-item)
+(defclass button-dialog-item (easygui:push-button-view view-text-via-button-title-mixin easygui::text-fonting-mixin dialog-item)
   ((easygui::default-button-p :initarg :default-button)
    (cancel-button :initarg :cancel-button))
   (:default-initargs :specifically 'easygui::cocoa-button :text-justification $tejustcenter))
+
+(defmethod set-fore-color :before ((view view-text-via-button-title-mixin) (color ns:ns-color))
+  (let* ((color-title
+           (#/initWithAttributedString: (#/alloc ns:ns-mutable-attributed-string)
+            (#/attributedTitle (cocoa-ref view))))
+         (title-range (ns:make-ns-range 0 (#/length color-title))))
+    (#/addAttribute:value:range: color-title
+     #$NSForegroundColorAttributeName
+     color
+     title-range)
+    (#/setAttributedTitle: (cocoa-ref view) color-title)))
+
+(defmethod initialize-instance :after ((view view-text-via-button-title-mixin) &key)
+  (set-fore-color view (slot-value view 'easygui::foreground)))
+
 
 (defclass default-button-dialog-item (button-dialog-item)
   ()
@@ -306,12 +324,12 @@
    (draw-outline :initarg :draw-outline))
   (:default-initargs :specifically 'easygui::cocoa-text-field))
 
-(defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-title-mixin dialog-item)
+(defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-button-title-mixin dialog-item)
   ((easygui::cluster :initarg :radio-button-cluster)
    (easygui::selected :initarg :radio-button-pushed-p))
   (:default-initargs :specifically 'easygui::cocoa-button))
 
-(defclass check-box-dialog-item (easygui:check-box-view view-text-via-title-mixin dialog-item)
+(defclass check-box-dialog-item (easygui:check-box-view view-text-via-button-title-mixin dialog-item)
   ((easygui::text :initform ""))
   (:default-initargs :specifically 'easygui::cocoa-button))
 

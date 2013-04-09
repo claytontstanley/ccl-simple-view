@@ -30,7 +30,7 @@
             (setf start-y (+ (point-v (view-position self))
                              (round (- btn-height (* (length textlines)
                                                      (+ ascent descent))) 2)))
-            (dolist (item textlines (nreverse accum))
+            (dolist (item textlines (flatten (nreverse accum)))
               (push
                 (set-color-of-feats (system-color->symbol (part-color self :text))
                                     (build-string-feats vis-mod :text item
@@ -76,7 +76,7 @@
                   (setf start-y (+ (point-v (view-position self))
                                    (round (- btn-height (* (length textlines)
                                                            (+ ascent descent))) 2)))
-                  (dolist (item textlines (nreverse accum))
+                  (dolist (item textlines (flatten (nreverse accum)))
                     (push
                       (set-color-of-feats (system-color->symbol (part-color self :text))
                                           (build-string-feats vis-mod :text item
