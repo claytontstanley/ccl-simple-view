@@ -55,8 +55,9 @@ outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g'
 
 deploy:
-	cd ${depdir}; git remote update; git rebase origin/master; git submodule update --init --recursive
-	cd ${depdir}; rlwrap testing/ccl -e '(rebuild-ccl :full t)' -e '(quit)'
+	ssh chil 'cd ${depdir} && git remote update && git rebase origin/master && git submodule update --init --recursive'
+	ssh chil 'cd ${depdir}; if [[ ! "$$(git st)" == *"nothing to commit, working directory clean"* ]]; then exit 1; fi'
+	ssh chil 'cd ${depdir}; rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
 	cd ${depdir}; make -C build all
 	cd ${depdir}; make -C docs/README
 	cd ${depdir}; make -C testing continuous-integration
