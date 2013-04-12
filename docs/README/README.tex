@@ -120,9 +120,11 @@ ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozu
 
 \item actr6: All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. Note the share.lisp file lives here for now, which contains the MCL GUI interface for CCL
 
-\item bincarbon: All original MCL bincarbon code. Just a few files have minor tweaks to work with CCL. Timer is broken on CCL currently though. Other files, like CFBundle.lisp don't work at all on CCL, but aren't necessary on CCL. The main goal for this folder is to document all changes to bincarbon files when migrating to CCL, while maintaining backwards compatibility with MCL.
-
-\item binccl: CCL-specific utility files. Contains a CCL implementation of an interface for managing resource files (e.g., sounds, images)
+\item bincarbon:
+  All original MCL bincarbon code as well as CCl-specific utility files. 
+  Most original MCL files have been ported to work with both CCL and MCL.
+  Timer is broken on CCL currently though.
+  Other files, like CFBundle.lisp don't work at all on CCL, but aren't necessary on CCL.
 
 \item build: Code to generate a single source file from current code in the repo.
 
