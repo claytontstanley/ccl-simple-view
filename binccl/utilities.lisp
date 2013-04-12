@@ -46,7 +46,3 @@
           collect cline into lines
           counting t into line-count
           finally (return (values lines line-count)))))
-
-(defun lisp-file-p (str)
-  (if (search ".lisp" str)
-    t))
