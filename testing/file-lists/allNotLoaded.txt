@@ -1,4 +1,3 @@
 testing/bootstrap.lisp
 bincarbon/bootstrap-mcl.lisp
 testing/utilities.lisp
-bincarbon/utilities.lisp

@@ -6,4 +6,3 @@ oval-view.lisp
 password-entry-text-view.lisp
 resources.lisp
 text-view.lisp
-utilities.lisp
