@@ -76,18 +76,22 @@
 (require :launch-url)
 (require :menubar-hide)
 
+#+:clozure
+(defun osx-p ()
+  t)
+
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; globals, macros, & setup
 ;;;; ---------------------------------------------------------------------- ;;;;
 
-(defconstant *end-of-block-str*
+(defparameter *end-of-block-str*
              "Finished block ~A of ~A. Please take a short break to help your concentration.
               Click “OK” when you are ready to continue.")
 
-(defconstant *end-of-expt-str*
+(defparameter *end-of-expt-str*
              "Thank you, you've finished the main portion of the experiment. Please take a few moments to answer a few simple questions.")
 
-(defconstant *end-of-expt-nourl-str*
+(defparameter *end-of-expt-nourl-str*
              "You're done, thank you! Please see the experimenter.")
 
 
@@ -380,9 +384,11 @@
                             "&snum=" (snum wind)
                             "&xcond=" (xcond wind)))))
       (warning *end-of-expt-str*)
-      (if (osx-p)
-        (launch-url url-str)
-        (ccl::msie-activate-url url-str)))))
+      (cond ((osx-p)
+             (launch-url url-str))
+            (t
+             #+:digitool (ccl::msie-activate-url url-str)
+             #+:clozure (error "should not ever get here"))))))
 
 
 (defmethod make-data-path ((wind experiment-window) type)

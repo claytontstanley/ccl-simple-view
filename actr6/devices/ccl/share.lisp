@@ -1377,9 +1377,6 @@
   (with-shadow (#/setTitle: (set-title-and-use-prompt fun-orig prompt))
     (gui::cocoa-choose-directory-dialog :directory (get-directory-with-fallback directory))))
 
-(defun osx-p ()
-  t)
-
 (labels ((gen-dict-for-immutable-attr (bool)
            (#/dictionaryWithObject:forKey: ns:ns-dictionary
             (#/numberWithBool: ns:ns-number bool)
