@@ -68,6 +68,7 @@
 ;;;               backwards compatibility with RMCL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#+:clozure (require :ccl-simple-view)
 (require :timer)
 #+:digitool (require :cfbundle)
 (require :misc-lib)
