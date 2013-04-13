@@ -83,5 +83,4 @@
 
 #+:digitool (load-file-list "file-lists" "allMCL.txt") 
 
-(load-as-lst ".." "submodules" "lisp-dev" "Lisp-Unit-Testing-Framework" "unitTestFramework.lisp")
-
+(load-file-list "file-lists" "all.txt")
