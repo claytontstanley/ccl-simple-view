@@ -1,1 +1,3 @@
 testing/bootstrap.lisp
+testing/file-lists/all.txt
+testing/file-lists/allMCL.txt
