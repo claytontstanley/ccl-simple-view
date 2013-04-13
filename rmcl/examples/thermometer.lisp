@@ -6,7 +6,8 @@
   ((direction :reader direction :initarg :direction :initform :vertical)
    (pattern :initarg :pattern)
    (thermometer-value :reader thermometer-value :initarg :thermometer-value :initform 0)
-   (max-value :reader max-value :initarg :max-value :initform 100))
+   (max-value :initarg :max-value :initform 100
+              :reader thermometer-max-value :writer (setf thermometer-max-value-slot)))
   (:default-initargs
     :specifically 'cocoa-thermometer
     :fore-color (color-symbol->system-color 'black)))
@@ -19,8 +20,8 @@
        (:vertical 90.0))))
   (easygui::set-needs-display self t))
 
-(defmethod (setf max-value) (max-value (self thermometer))
-  (unwind-protect (setf (slot-value self 'max-value) max-value)
+(defmethod (setf thermometer-max-value) (max-value (self thermometer))
+  (unwind-protect (setf (thermometer-max-value-slot self)  max-value)
     (#/setMaxValue: (cocoa-ref self) (coerce max-value 'double-float))))
 
 (defmethod (setf thermometer-value) (value (self thermometer))
@@ -32,7 +33,7 @@
    #$NSContinuousCapacityLevelIndicatorStyle)
   (setf (direction view) (direction view))
   (setf (thermometer-value view) (thermometer-value view))
-  (setf (max-value view) (max-value view)))
+  (setf (thermometer-max-value view) (thermometer-max-value view)))
 
 ; I couldn't figure out how to change the color of the NSLevelIndicator object, so
 ; instead of forcing a default Cocoa object to be drawn how I want, just extend the
@@ -49,7 +50,7 @@
         (with-fore-color (get-fore-color view)
           (frame-rect view point-x point-y (+ point-x width) (+ point-y height)))
         (let ((fraction-full (/ (thermometer-value view)
-                                (max-value view))))
+                                (thermometer-max-value view))))
           ; Due to how the NSLevelIndicator is drawn, width of the cocoa object will always be the
           ; dimension of the value of the thermometer, so no case statement is necesary here to figure
           ; out if the thermometer is being displayed horizontally or vertically. This is a nicety from having

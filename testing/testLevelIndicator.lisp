@@ -26,8 +26,8 @@
     (sleep .1)))
 
 #|
-(setf (thermometer-value *view*) 2)
-(setf (max-value *view*) 5)
+(setf (thermometer-value *view*) 3)
+(setf (thermometer-max-value *view*) 5)
 (view-size *view*)
 (setf (direction *view*) :vertical)
 |#

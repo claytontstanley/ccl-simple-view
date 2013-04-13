@@ -106,7 +106,7 @@
 
 (defmethod build-vis-locs-for ((self thermometer) (vm vision-module))
   (let* ((val (thermometer-value self))
-         (maxval (max-value self))
+         (maxval (thermometer-max-value self))
          (pos (view-position self))
          (dim (view-size self))
          (ypos (+ (point-v pos) (round (* (point-v dim)
