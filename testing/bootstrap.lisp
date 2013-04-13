@@ -68,7 +68,8 @@
 
 ; Bootstrap script/logic starts here
 
-#-:act-r-6.0 (load-as-lst ".." "submodules" "actr6" "load-act-r-6.lisp")
+(defparameter *actr6-dir-name* #+:clozure "actr6" #+:digitool "actr6mcl")
+#-:act-r-6.0 (load-as-lst ".." "submodules" *actr6-dir-name* "load-act-r-6.lisp")
 
 #+:clozure
 (cond ((and (member "swank-repl" *modules* :test #'string-equal)
@@ -80,7 +81,7 @@
 
 #+:clozure (setf *resource-pool* (init-pool))
 
-(load-as-lst ".." "submodules" "lisp-dev" "Lisp-Unit-Testing-Framework" "unitTestFramework.lisp")
+#+:digitool (load-file-list "file-lists" "allMCL.txt") 
 
-#+:digitool (load-as-lst ".." "bincarbon" "bootstrap-mcl.lisp")
+(load-as-lst ".." "submodules" "lisp-dev" "Lisp-Unit-Testing-Framework" "unitTestFramework.lisp")
 
