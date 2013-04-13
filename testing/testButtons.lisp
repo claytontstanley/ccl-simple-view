@@ -4,12 +4,12 @@
                      (list 
                        (make-instance 'button-dialog-item
                                       :view-nick-name :tb
-                                      :text "foo"
-                                      :fore-color (color-symbol->system-color 'red))
+                                      :dialog-item-text "foo"
+                                      :part-color-list (list :text (color-symbol->system-color 'red)))
                        (make-instance 'button-dialog-item
                                       :view-nick-name :cb
-                                      :fore-color (color-symbol->system-color 'green)
-                                      :text "hello"
+                                      :part-color-list (list :text (color-symbol->system-color 'green))
+                                      :dialog-item-text "hello"
                                       :view-position (make-point 30 30)))))
 (add-visual-items-to-rpm-window
   *win*
@@ -21,7 +21,9 @@
     :width 50))
 
 (sleep 2)
-(set-fore-color (view-named :cb *win*) (color-symbol->system-color 'orange))
+(set-part-color
+  (view-named :cb *win*)
+  :text (color-symbol->system-color 'orange))
 
 (clear-all)
 (define-model foo
