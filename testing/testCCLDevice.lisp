@@ -183,10 +183,14 @@
 (class-precedence-list (find-class 'easygui::contained-view))
 
 (#/sendEvent: (#/sharedApplication ns:ns-application)
- *the-event*)|#
+ *the-event*)
 
 ;(remove-all-items-from-rpm-window *win*)
-
+(get-front-window)
+(mapcar '#/close (ns-array->list (#/windows (#/sharedApplication ns:ns-application))))
+(menubar-show)
 ;(close-rpm-window *win*)
 
 ;(check (null (open-rpm-window? *win*)))
+
+|#
