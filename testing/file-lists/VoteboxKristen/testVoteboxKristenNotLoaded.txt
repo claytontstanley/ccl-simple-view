@@ -1,4 +1,3 @@
 testing/testVoteboxKristen.lisp
-submodules/actr6
 submodules/kristenVotebox/resources/
 testing/file-lists/VoteboxKristen/testVoteboxKristen.txt

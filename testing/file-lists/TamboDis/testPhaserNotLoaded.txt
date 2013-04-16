@@ -1,5 +1,4 @@
 testing/testTamboDis.lisp
-submodules/actr6
 submodules/tambo-diss/tambo-diss-expt/resources
 submodules/tambo-diss/tambo-diss-expt/fonts
 testing/file-lists/TamboDis/testPhaser.txt

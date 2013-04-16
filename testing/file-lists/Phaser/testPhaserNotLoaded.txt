@@ -1,5 +1,4 @@
 testing/testPhaser.lisp
-submodules/actr6
 submodules/X83-Frank-Trek-11/Experiment/resources
 submodules/X83-Frank-Trek-11/Experiment/fonts
 testing/file-lists/Phaser/testPhaser.txt

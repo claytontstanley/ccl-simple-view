@@ -1,3 +1,5 @@
+submodules/actr6
+submodules/actr6mcl
 testing/bootstrap.lisp
 testing/file-lists/all.txt
 testing/file-lists/allMCL.txt

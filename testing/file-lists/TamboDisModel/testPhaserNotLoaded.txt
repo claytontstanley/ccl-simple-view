@@ -1,5 +1,4 @@
 testing/testTamboDisModel.lisp
-submodules/actr6
 submodules/tambo-diss/tamborello-dissertation-model/resources
 submodules/tambo-diss/tambo-diss-expt/fonts
 testing/file-lists/TamboDisModel/testPhaser.txt
