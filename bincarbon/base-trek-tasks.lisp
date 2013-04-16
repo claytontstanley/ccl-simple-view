@@ -739,7 +739,7 @@
   (:default-initargs
     :view-size #@(33 33)
     :view-position #@(400 100)
-    :icon "Target"
+    :icon (prog1 #+:clozure "Target" #+:digitool 501)
     :view-nick-name :shoot
     ))
 
