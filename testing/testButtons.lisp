@@ -6,7 +6,7 @@
                                       :view-nick-name :tb
                                       :dialog-item-text "foo"
                                       :part-color-list (list :text (color-symbol->system-color 'red)))
-                       (make-instance 'button-dialog-item
+                       (make-instance 'check-box-dialog-item
                                       :view-nick-name :cb
                                       :part-color-list (list :text (color-symbol->system-color 'green))
                                       :dialog-item-text "hello"
