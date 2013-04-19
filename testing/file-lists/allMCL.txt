@@ -1,4 +1,4 @@
+submodules/lisp-dev/lol-subset.lisp
+submodules/lisp-dev/extras.lisp
 bincarbon/bootstrap-mcl.lisp
 bincarbon/device-patches-mcl.lisp
-submodules/lisp-dev/extras.lisp
-submodules/lisp-dev/lol-subset.lisp

@@ -2,10 +2,6 @@
 #+:clozure (pushnew :sv-dev *features*)
 #+:clozure (defvar *load-sv-dev-files-p* t)
 
-(defmacro with-continue (&body body)
-  `(handler-bind ((error #'continue))
-     ,@body))
-
 (defparameter *path-separator*
   #+:digitool ":"
   #+:clozure "/")
