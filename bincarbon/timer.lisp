@@ -135,12 +135,13 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; Event timing
 
+#+:digitool
 (defgeneric tick->ms (tmr ticks)
   (:documentation "Converts ticks to milliseconds."))
 
+#+:digitool
 (defmethod tick->ms ((tmr event-timer) ticks)
   (float (* ticks (tickms tmr))))
-
 
 (defgeneric start-timing (tmr)
   (:documentation "Starts an event timer at the current event."))
