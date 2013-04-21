@@ -198,7 +198,7 @@
 
 
 (defun remove-outliers (seq factor &key key)
-  "Returns a seqence with entries greater or less than <factor> times the SD removed."
+  "Returns a sequence with entries greater or less than <factor> times the SD removed."
   (multiple-value-bind (min max) (stdev-bounds seq factor :key key)
     (if min
       (filter-bounds seq min max :key key)
@@ -359,7 +359,7 @@
   (expt (- x y) 2))
 
 (defun sqr-pct-dev (ob pred)
-  "Returns the square of the percentage devation between two numbers."
+  "Returns the square of the percentage deviation between two numbers."
   (expt (* (/ (- ob pred) ob) 100) 2))
 
 

@@ -477,7 +477,7 @@
   (:default-initargs :specifically 'easygui::cocoa-button-checker))
 
 ; FIXME: I don't like that I have to manage converting the point (so that when the screen is 
-; flipped for MCL, the coordinates are correct). I'm betting there's a more appropriate funciton to
+; flipped for MCL, the coordinates are correct). I'm betting there's a more appropriate function to
 ; use instead of #/locationInWindow, that handles this appropriately
 
 #+:clozure

@@ -5,10 +5,10 @@
 ; ----------------------------------------------------------------------
 ; Defining color-symbol->system-color and system-color->symbol for CCL.
 ;
-; These functions may have been in the base CCL distro, but I couldn't find them.
-; So I searched online for a table of color names -> rgb mappings, threw that
+; These functions may have been in the base CCL distribution, but I couldn't find them.
+; So I searched online for a table of color names -> RGB mappings, threw that
 ; data into a bash shell, cleaned up the text, and then pasted it here. A few lisp
-; parenths were wrapped around that, which turned the data into a lexical closure.
+; parentheses were wrapped around that, which turned the data into a lexical closure.
 ; ----------------------------------------------------------------------
 
 (let ((rgb-list
@@ -209,7 +209,7 @@
 ; fix this. This code matches what's in MCL's src, so this is the actual MCL code to do the conversion
 
 (defun make-mcl-color (red green blue)
-  "given red, green, and blue, returns an encoded rgb value"
+  "given red, green, and blue, returns an encoded RGB value"
   (flet ((check-color (color)
            (unless (and (fixnump color)
                         (<= 0 (the fixnum color))

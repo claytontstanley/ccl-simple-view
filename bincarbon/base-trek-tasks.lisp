@@ -40,7 +40,7 @@
 ;;; 2006.01.30 mdb 
 ;;;             : Slightly increased hit probability for transporter.
 ;;; 2005.11.10 mdb [r2]
-;;;             : Small change to deal with different key states in transp.
+;;;             : Small change to deal with different key states in transporter
 ;;; 2005.06.30 mdb
 ;;;             : Fixed cursor handling in transporter window.
 ;;; 2005.06.26 mdb
@@ -1835,7 +1835,7 @@
 (setf *sp* 
         (make-instance 
           'snd-player :res-file nil
-          :preload '("Warning" "Whit" "Phaser" "Whip" "damn" "expolsion"
+          :preload '("Warning" "Whit" "Phaser" "Whip" "damn" "explosion"
                      "Transporter TNG" "Probe" "a" "b" "c" "d" "e" "f" "g" "h" 
                      "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" 
                      "w" "x" "y" "z" "uh oh" "glass")))

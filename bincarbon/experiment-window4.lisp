@@ -109,8 +109,8 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; The READABLE-WRITER class
 ;;;;
-;;;             : A base class for objects that can write reable 
-;;;             : represenations of themselves.
+;;;             : A base class for objects that can write readable 
+;;;             : representations of themselves.
 ;;;
 ;;;; ---------------------------------------------------------------------- ;;;;
 
@@ -125,7 +125,7 @@
 ;;;; The TRIAL class
 ;;;;
 ;;;;             : A class for storing information about trials, like condition
-;;;;             : stimuli, and the like.  Used by the EXPEIRMENT-WINDOW class.
+;;;;             : stimuli, and the like.  Used by the EXPERIMENT-WINDOW class.
 ;;;;             : A WRITE-TRIAL method is expected for printing the trial
 ;;;;             : information to the data file.
 ;;;;

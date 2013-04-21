@@ -77,7 +77,7 @@
       ;; This may be a little confusing: MCL uses fixnums (whose low 2 bits are
       ;; zero) to represent function addresses (whose low 2 bits are zero ...)
       ;; Shove the pointer in a buffer; fetch a signed 32-bit integer, shift it
-      ;; right 2 bits ... voila.
+      ;; right 2 bits, and voila.
       (rlet ((buf :long))
         (setf (%get-ptr buf) addr)
         (ash (%get-signed-long buf) -2)))))

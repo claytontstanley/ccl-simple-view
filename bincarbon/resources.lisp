@@ -9,7 +9,7 @@
 ; #'get-resource-val: Retrieves a resource's value from the pool
 ;
 ; Note that a form of lazy evaluation is used to alloc the resources only when needed
-; That is, each resource is allocd the first time it's retrieved, 'not' when it's created, or
+; That is, each resource is alloc'd the first time it's retrieved, 'not' when it's created, or
 ; added to the pool. If you want to alloc all resources currently in the pool (for pre-caching), 
 ; call #'alloc-resources
 
@@ -43,7 +43,7 @@
 
 (defmethod print-object ((obj resource) stream)
   (print-unreadable-object (obj stream :identity t :type t)
-    (format stream "val->~a,alloc-fn->~a~%"
+    (format stream "val->~a,alloc-fun->~a~%"
             (when-bound (val obj))
             (when-bound (alloc-fn obj)))))
 

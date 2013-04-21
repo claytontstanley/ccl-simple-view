@@ -16,7 +16,7 @@
 ;;; 
 ;;; Description : Provides PICT drawing within views in a way that works with
 ;;;             : MCL 5.0 under Mac OS X.  Works much like the OOU stuff, 
-;;;             : except all PICTs must be avaliable as resources, and it 
+;;;             : except all PICTs must be available as resources, and it 
 ;;;             : caches the handles for all of them, requiring an explicit
 ;;;             : release.  Also, all PICTs are scaled to the dimensions of 
 ;;;             : the view.
@@ -110,7 +110,7 @@
 (defmethod set-view-pict ((sv pict-svm) id)
   (setf (pict-id sv) id))
 
-;;;; utilites for managing resources. 
+;;;; utilities for managing resources. 
 
 #+:digitool
 (defmacro without-res-load (&body body)

@@ -22,7 +22,7 @@
                                                   (point-x (local-to-global view where))
                                                   (point-y (local-to-global view where)))
       ; And a totally hacky way to do it, but if you can't reference the view, or did not have the 'where' variable,
-      ; here's how you can find the mouse's current position w.r.t the top window and w/o any variables
+      ; here's how you can find the mouse's current position w.r.t the top window and without any variables
       (destructuring-bind (glob-pos-x-2 glob-pos-y-2) (list 
                                                         (point-x (view-mouse-position (get-front-window)))
                                                         (point-y (view-mouse-position (get-front-window))))
