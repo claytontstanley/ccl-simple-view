@@ -1489,22 +1489,30 @@
 ; ----------------------------------------------------------------------
 ; Manipulate the read table so that MCL's #@(a b) make-point shorthand works. 
 ;
-; CCL does not support this by default, and the objective-c bridge has its own use for the
-; #@ macro character, so note that no easygui/objective-c code should be loaded/read
-; after this read-table mod is made. If this needs to be done, restore the readtable first
+; CCL does not support this by default, and the objective-c bridge uses #@ to make an NSString.
+; So the #@ read macro defined below performs both tasks: If a list is passed, it 
+; will convert the points in the string to a point representation. If a string is
+; passed, it will call the CCL default read function for #@
+; 
+; Examples:
+; #@"a string" -> #<NS-CONSTANT-STRING "hello"
+; #@(5 4) -> #<EG-POINT (5.00/4.00)>)
 ; ----------------------------------------------------------------------
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *nonhacked-readtable* (copy-readtable))
-  ; Code grabbed from RMCL, since MCL is now open-sourced (yay!)
-  ; For reading #@(h v) as points.
   (set-dispatch-macro-character 
     #\# #\@
     (defun |#@-reader| (stream char arg)
-      (declare (ignore arg char))
-      (let ((list (read stream t nil t)))
-        (unless *read-suppress*
-          `(make-point ,@list))))))
+      (let ((first-char (peek-char nil stream)))
+        ; Using string-equal so that my editor doesn't get confused with stray parentheses.
+        ; Once slimv is updated with the fix, I'll change the code here.
+        (cond ((string-equal (string first-char) "(")
+               (unless *read-suppress*
+                 `(make-point ,@(read stream))))
+              ((eq first-char #\")
+               (funcall (get-dispatch-macro-character #\# #\@ *nonhacked-readtable*)
+                        stream char arg)))))))
 
 ; ----------------------------------------------------------------------
 ; Manipulate reader functionality so that references to foreign functions that no longer exist can
