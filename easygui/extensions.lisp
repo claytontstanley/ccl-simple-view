@@ -70,7 +70,7 @@
 ; for the default hitTest call, then return self; this suppresses subviews of 
 ; self from responding to mouse clicks
 ; 
-; Ref. this url for call-next-method syntax in objc:defmethod macro: 
+; Reference this URL for call-next-method syntax in objc:defmethod macro: 
 ; http://clozure.com/pipermail/openmcl-devel/2008-November/008645.html
 
 (objc:defmethod #/hitTest: ((self easygui::cocoa-drawing-consuming-view) (point :<NSP>oint))
@@ -182,7 +182,7 @@
 
 ; Relay keypress events to the window, after allowing the text field to handle the keypress properly.
 ; Note that #/keyUp is used for the text-field, which calls #/keyDown. I could only get keyUp: to fire
-; (not #/keyDown:) when typing in a text field, so that's why there's the discrepency here.
+; (not #/keyDown:) when typing in a text field, so that's why there's the discrepancy here.
 (objc:defmethod (#/keyUp: :void) ((cocoa-self easygui::cocoa-text-field) the-event)
   (call-next-method the-event)
   (#/keyDown: (#/window cocoa-self) the-event)

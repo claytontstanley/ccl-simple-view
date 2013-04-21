@@ -34,14 +34,17 @@ exclude-list = ^bincarbon*|^testing
 
 list-cmd = git ls-files
 
-reformat:
-	${list-cmd} | grep '.lisp$$' | egrep -v '${exclude-list}' | /usr/bin/xargs -n 1 -o -I {} bash -ic "echo '{}'; ai {} || true"
+reformat: vicmd = ai
+spelling: vicmd = cs
 
-reformat-all:
-	make reformat
+reformat spelling:
+	${list-cmd} | grep '.lisp$$' | egrep -v '${exclude-list}' | /usr/bin/xargs -n 1 -o -I {} bash -ic "echo '{}'; ${vicmd} {} || true"
 
-reformat-builds:
-	make reformat list-cmd="cat build/file-list*"
+reformat-all spelling-all: %-all:
+	make $* 
+
+reformat-builds spelling-builds: %-builds:
+	make $* list-cmd="cat build/file-list*"
 
 # This is way experimental, but it did work for me. 
 convertToWriteRepo:

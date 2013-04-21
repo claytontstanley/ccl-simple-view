@@ -20,7 +20,7 @@
          (mouselocation (dcc (#/mouseLocationOutsideOfEventStream w)))
          (cview (if (typep view 'window) (easygui::content-view view) view))
          (nspt (dcc (#/convertPoint:fromView: (cocoa-ref cview) mouselocation NIL))))
-    ;; todo: check point is inside bounds, lest negative coords
+    ;; TODO: check point is inside bounds, lest negative coordinates
     (easygui:point (ns:ns-point-x nspt)
                    (ns:ns-point-y nspt)
                    :allow-negative-p allow-negative-position-p)))
@@ -43,7 +43,7 @@
 
 ; I wanted to instantiate my own extended contained-view class, but I didn't see an easy way to do this given the current
 ; easygui code. So adding a contained-view-specifically slot to the mixin class, defaulting it to the contained-view class
-; defined in easygui. If you want to instantiate a different class for the contianed view, just overwrite this default.
+; defined in easygui. If you want to instantiate a different class for the contained view, just overwrite this default.
 (defclass easygui::content-view-mixin ()
   ((easygui::content-view)
    (easygui::flipped :initarg :flipped :initform easygui::*screen-flipped*)

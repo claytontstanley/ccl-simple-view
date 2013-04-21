@@ -1,6 +1,6 @@
 
 ; FIXME: Is there any way not to use a global for this? The problem is that *modal-dialog-ret* is 
-; set on a different thread than the modal dialog thread, so the cleanest whay that I've
+; set on a different thread than the modal dialog thread, so the cleanest way that I've
 ; found to communicate between threads is to use a shared global
 (defparameter *modal-dialog-ret* nil)
 

@@ -23,7 +23,7 @@
 ;;; 
 ;;; --- History ---
 ;;; 01.09.21 mdb [b2]
-;;;             : Fixed an infinte recursion bug in APPROACH-WIDTH.
+;;;             : Fixed an infinite recursion bug in APPROACH-WIDTH.
 ;;; 2002.04.16 mdb [b6]
 ;;;             : * Rolled in color text stuff.
 ;;;             : * Added BUILD-FEATURES-FOR methods for radio buttons and
@@ -66,7 +66,7 @@
 ;;; 04.10.19 Dan [Moved into ACT-R 6]
 ;;;             : Reset the version to 1.0a1
 ;;;             : added the packaging switches
-;;;             : changed the name to device to be placed in a folder called mcl
+;;;             : changed the name to device to be placed in a folder called MCL 
 ;;;             : removed references to *mp* and other minor
 ;;;             : ACT-R 6 updates
 ;;; 2006.09.07 Dan
@@ -100,7 +100,7 @@
 ;;;             :   before generating the events so that it goes to the right
 ;;;             :   window.
 ;;;             : * In the device-handle-keypress method it now waits on a 
-;;;             :   semaphore to be set by the view-key-evet-handler method
+;;;             :   semaphore to be set by the view-key-event-handler method
 ;;;             :   before returning to guarantee the press gets processed.
 ;;;             :   It doesn't need to delay in the keypress action because of
 ;;;             :   that so it passes nil for the delay.
@@ -109,12 +109,12 @@
 ;;;             :   hang if the semaphore never gets set.  If it's not set in
 ;;;             :   500ms it prints a warning and just gives up.
 ;;; 2012.08.30 cts
-;;;             : * Added the semaphor method for mouse clicks. Wrapped the 
+;;;             : * Added the semaphore method for mouse clicks. Wrapped the 
 ;;;             :   timeout code into a function and using it for key presses
 ;;;             :   and mouse clicks. 
-;;;             : * Calling event-dispatch one final time after semaphor is triggered,
+;;;             : * Calling event-dispatch one final time after semaphore is triggered,
 ;;;             :   so that any events created during the keypress/mouseclick
-;;;             :   that were queued to run on the nsrunloop are run before the
+;;;             :   that were queued to run on the NSRunLoop are run before the
 ;;;             :   keypress/mouseclick method returns.
 ;;; 2013.01.03 Dan
 ;;;             : * Clipped the rpm-view-line function (which was already commented out)
@@ -135,11 +135,6 @@
 
 (require-compiled "CCL-SIMPLE-VIEW" "ACT-R6:support;ccl-simple-view")
 
-#|(defparameter *crosshair-cursor* 
-    (#_getcursor #$crosscursor) "Crosshair cursor")|#
-
-;(defparameter *last-update* (get-internal-real-time))
-
 (defun loc-avg (x y)
   "Return the 'location' (integer) average of <x> and <y>."
   (declare (fixnum x) (fixnum y))
@@ -156,8 +151,6 @@
   (let ((base-ls (flatten
                    (mapcar #'(lambda (obj) (build-vis-locs-for obj vis-mod))
                            (get-sub-objects self)))))
-    ; (dolist (feat base-ls)
-    ;   (fill-default-dimensions feat))
     base-ls))
 
 (defmethod vis-loc-to-obj ((device window) loc)
@@ -349,7 +342,7 @@
 ;;; Description : Converts an (X Y) list into an MCL/Quickdraw point.
 
 (defun xy->point (xy)
-  "(x y) to point converstion function. Deprecated, use vpt2p instead."
+  "(x y) to point conversion function. Deprecated, use vpt2p instead."
   (declare (list xy))
   (make-point (first xy) (second xy)))
 
@@ -478,7 +471,7 @@
 
 
 ;;; GET-MOUSE-COORDINATES      [Method]
-;;; Description : Return the current mouse loc in #(x y) format.
+;;; Description : Return the current mouse location in #(x y) format.
 
 (defmethod get-mouse-coordinates ((device window))
   (p2vpt (view-mouse-position device)))
@@ -597,7 +590,7 @@
   (when (wptr wind)
     (update-me (visual-fixation-marker) wind xyloc)))
 
-; When called with nil xyloc, remove the current visual-fication-marker.
+; When called with nil xyloc, remove the current visual-fixation-marker.
 ; Note that this is called in cases where the current marker is not a subview in wind.
 ; For instance, at the start of a model run after a previous model has been run,
 ; the vis location marker might still be non-nil, but there is not a focus ring

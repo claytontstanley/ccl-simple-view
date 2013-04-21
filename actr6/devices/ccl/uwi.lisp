@@ -52,7 +52,7 @@
 ;;;                are called. 'Even the around methods on the most specific class'.
 ;;;                This post method calls the rpm handler methods. This guarantees
 ;;;                that all view-(key|click)-event handler methods and rpm
-;;;                handler methods are called before the semaphor is triggered.
+;;;                handler methods are called before the semaphore is triggered.
 ;;;                Using this technique for both keypress and mouse clicks
 ;;; 2012.09.04 Dan
 ;;;            : * Changed it so the rpm-window-click-event-handler is called
@@ -165,7 +165,7 @@
   (event-dispatch))
 
 ;;; REMOVE-ALL-ITEMS-FROM-RPM-WINDOW  [Method]
-;;; Description : Remove all the subvies of the window and redisplay it.
+;;; Description : Remove all the subviews of the window and redisplay it.
 
 (defmethod remove-all-items-from-rpm-window ((win rpm-real-window))
   (awhen (remove-if #'rpm-overlay-p (subviews win))
@@ -187,7 +187,7 @@
 
 ;;; MAKE-RPM-WINDOW  [Function]
 ;;; Description : Make and return a window based on the parameters supplied.
-;;;             : Visible determines wheter or not it should be a real or
+;;;             : Visible determines whether or not it should be a real or
 ;;;             : virtual and if the environment is connected it will use a 
 ;;;             : visible-virtual for the real window unless the user explicitly
 ;;;             : specifies the class to use.

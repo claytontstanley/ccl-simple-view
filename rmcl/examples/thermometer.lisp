@@ -52,7 +52,7 @@
         (let ((fraction-full (/ (thermometer-value view)
                                 (thermometer-max-value view))))
           ; Due to how the NSLevelIndicator is drawn, width of the cocoa object will always be the
-          ; dimension of the value of the thermometer, so no case statement is necesary here to figure
+          ; dimension of the value of the thermometer, so no case statement is necessary here to figure
           ; out if the thermometer is being displayed horizontally or vertically. This is a nicety from having
           ; #/bounds and #/frame attributes for Cocoa objects.
           (with-fore-color (get-fore-color view)
