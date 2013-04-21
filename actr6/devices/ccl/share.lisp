@@ -21,7 +21,7 @@
      (progn ,@body)))
 
 (defmacro guard-t-or-nil (&body body)
-  `(guard ((or (eq it1 nil) (eq it1 t)) "~a returned when evaling form ~a: exptected t or nil" it1 ',body)
+  `(guard ((or (eq it1 nil) (eq it1 t)) "~a returned when evaling form ~a: expected t or nil" it1 ',body)
      (progn ,@body)))
 
 (defmacro! return-time-ms (&body body)
@@ -31,7 +31,7 @@
         1000)))
 
 ; ----------------------------------------------------------------------
-; Building class definitions to match MCL's GUI class heirarchy
+; Building class definitions to match MCL's GUI class hierarchy
 ;
 ; Most of the class definitions used by MCL are available in CCL using
 ; the easygui package. However, a few of the slot initargs in the easygui
@@ -87,18 +87,6 @@
                             (parse-mcl-initarg :back-color back-color))))
       (apply #'call-next-method view (nconc view-font-lst back-color-lst args)))
     (call-next-method)))
-
-#|
-(defmethod initialize-instance :after ((view simple-view) &key)
-  (let ((rect (easygui::view-content-rect view)))
-    (destructuring-bind (x y width height) (list (ns:ns-rect-x rect)
-                                                 (ns:ns-rect-y rect)
-                                                 (ns:ns-rect-width rect)
-                                                 (ns:ns-rect-height rect))
-      (unless (slot-boundp view 'easygui::position)
-        (set-view-position view x y))
-      (unless (slot-boundp view 'easygui::size)
-        (set-view-size view width height)))))|#
 
 (defclass view (simple-view)
   ()
@@ -169,7 +157,7 @@
          (unwind-protect (call-next-method)
            (release-lock *window-null-event-handler-lock*)))
         (t
-         (sv-log "not calling null-event-handler for win ~a b/c another null-event-handler is active~%" win))))
+         (sv-log "not calling null-event-handler for win ~a because another null-event-handler is active~%" win))))
 
 (defmethod window-close ((win window))
   (unless (wptr win)
@@ -343,17 +331,6 @@
   ((icon :reader icon :initarg :icon)
    (easygui::view-text :initarg :view-text)))
 
-#|(defun convert-icon (icon)
-    (guard-!null-ptr
-      (#/iconForFileType: (#/sharedWorkspace ns:ns-workspace)
-       (#_NSFileTypeForHFSTypeCode icon))))|#
-
-#|
-(defun convert-icon (icon)
-  (#/initWithIconRef: ns:ns-image
-   icon))
-|#
-
 (defun icon->pict-id (icon)
   (format nil "~a" icon))
 
@@ -404,7 +381,7 @@
   (provide :icon-dialog-item))
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
-  ; easygui's action slot takes a lambda with zero arguments; mcl's action slots take a lambda 
+  ; easygui's action slot takes a lambda with zero arguments; MCL's action slots take a lambda 
   ; with the object/view as an argument. So to enable this feature in easygui, wrap the provided lambda
   ; in a closure that takes zero arguments. 
   ;
@@ -434,7 +411,7 @@
    (item-display :initarg :item-display))
   (:default-initargs :specifically 'easygui::cocoa-pop-up-button))
 
-; FIXME: menu-item-checked isn't being used at all. default-item from menu-view determines which item is checked. Is it worth the time
+; FIXME: menu-item-checked isn't being used at all; default-item from menu-view determines which item is checked. Is it worth the time
 ; to use this slot, and make it so that the char rendered for the checked item can be changed, or also that multiple items can be checked,
 ; etc.?
 
@@ -460,8 +437,8 @@
 ; that calls the generic method in the easygui package. Don't import the 
 ; generic functions from the easygui package, because this will cause 
 ; symbol collisions for the generic methods in the current package that are
-; already defined (might be b/c they are an act-r interface method, or b/c
-; they are an already-defined ccl method)
+; already defined (might be because they are an act-r interface method, or
+; because they are an already-defined CCL method)
 ; ----------------------------------------------------------------------
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -702,9 +679,9 @@
 ; using CCL's Objective C bridge. Most bridge calls will have #/ or #_ reader
 ; macros in the expression
 
-; A few with-... macros to handle setup/teardown, and make programming a bit easier
+; A few with- macros to handle setup/teardown, and make programming a bit easier
 
-; This one uses Doug Hoyte's defmacro! and ,g!... syntax to easily handle unwanted variable capture. 
+; This one uses Doug Hoyte's "defmacro!" and ",g!" syntax to easily handle unwanted variable capture. 
 (defmacro! with-graphics-context (&body body)
   "Any changes to the graphics environment by body, will be valid only in body"
   `(let ((,g!context (#/currentContext ns:ns-graphics-context)))
@@ -717,7 +694,7 @@
 ; Section to handle current focused view and font focused view.
 ; 
 ; The dynamic variables are used to keep track of any views that are focused in the dynamic environment.
-; Code could call with-focused-view explicitly, or a view might become focused b/c code called paint-rect
+; Code could call with-focused-view explicitly, or a view might become focused because code called paint-rect
 ; and passed a view to that function. The goal is to have the code do the right thing and try to
 ; figure out which view has focus. If it can't figure this out, then an exception will be thrown.
 ; These can be seen where the guard macros are used.
@@ -1059,7 +1036,7 @@
 ; window-specialized method for each public drawing method. So instead I looked
 ; at what accessors the public methods are using, and specialized on those, so that
 ; the necessary code changes for drawing to window's content view could be isolated
-; in the few methods below. Adding/removing this functionality can be achived by
+; in the few methods below. Adding/removing this functionality can be archived by
 ; adding/deleting the few methods here.
 
 (defmethod pen-position ((view window))
@@ -1286,7 +1263,7 @@
 ; where the subviews are supposed to go. If the view is a window, then the subviews go as subviews under the content-view slot.
 ; easygui handles all of this in their add-subviews method, so the technique here is to use a temp slot on the view-mixin class,
 ; make that :initarg :view-subviews, and then on object initialization, take any provided subviews and call easygui's add-subviews method
-; on them. Then clear the temp slot. Kinda' hacky, but it seems to work, and requires minimal code additions and still uses
+; on them. Then clear the temp slot. It's a hack, but it seems to work, and requires minimal code additions and still uses
 ; easygui's add-subviews machinery, etc.
 
 (defmethod initialize-instance :after ((view view-mixin) &key) 
@@ -1318,7 +1295,7 @@
                     (lambda ()
                       (signal-semaphore sema))
                     :at-start nil)
-                  (wait-on-semaphore sema nil "sema event-dispatch wait")))))))
+                  (wait-on-semaphore sema nil "semaphore event-dispatch wait")))))))
     (sv-log-n 1 "ending event dispatch after ~,2f ms" time)))
 
 (defparameter *current-dialog-directory* nil)
@@ -1431,7 +1408,7 @@
    *current-cursor*))
 
 ; Another option here is to call #/currentCursor on ns-cursor class, but since 
-; *current-cursor* is (currently) the current cursor for all windows of the applicaiton,
+; *current-cursor* is (currently) the current cursor for all windows of the application,
 ; just use this.
 
 (defmethod window-cursor ((window window))
@@ -1469,7 +1446,7 @@
   (#_CGDisplayShowCursor
    (#_CGMainDisplayID)))
 
-; Running on main gui thread is required for the menubar functions. Otherwise Cocoa crashes fairly often when these are called.
+; Running on main GUI thread is required for the menubar functions. Otherwise Cocoa crashes fairly often when these are called.
 
 (defun hide-menubar ()
   (easygui::running-on-main-thread ()
@@ -1491,7 +1468,7 @@
 ;
 ; CCL does not support this by default, and the objective-c bridge uses #@ to make an NSString.
 ; So the #@ read macro defined below performs both tasks: If a list is passed, it 
-; will convert the points in the string to a point representation. If a string is
+; will convert the points in the list to a point representation. If a string is
 ; passed, it will call the CCL default read function for #@
 ; 
 ; Examples:
@@ -1523,7 +1500,7 @@
 ; trick CCL into thinking that these foreign functions are defined, add a bit of a 'before' section of 
 ; code to the load-external-function call. If the symbol name of the external function being loaded is
 ; in the list of function names that are being defined natively, then just return the symbol that maps
-; to that function in the funcion symbol table. Otherwise, call the usual load-external-funcion funcion,
+; to that function in the function symbol table. Otherwise, call the usual load-external-function function,
 ; and have CCL do the standard thing to try to find the foreign function
 ; ----------------------------------------------------------------------
 
