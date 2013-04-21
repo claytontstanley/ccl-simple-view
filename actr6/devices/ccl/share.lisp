@@ -1482,13 +1482,10 @@
     #\# #\@
     (defun |#@-reader| (stream char arg)
       (let ((first-char (peek-char nil stream)))
-        ; Using string-equal so that my editor doesn't get confused with stray parentheses.
-        ; Once slimv is updated with the fix, I'll change the code here.
-        (cond ((string-equal (string first-char) "(")
-               (unless *read-suppress*
+        (ecase first-char
+          (#\( (unless *read-suppress*
                  `(make-point ,@(read stream))))
-              ((eq first-char #\")
-               (funcall (get-dispatch-macro-character #\# #\@ *nonhacked-readtable*)
+          (#\" (funcall (get-dispatch-macro-character #\# #\@ *nonhacked-readtable*)
                         stream char arg)))))))
 
 ; ----------------------------------------------------------------------
