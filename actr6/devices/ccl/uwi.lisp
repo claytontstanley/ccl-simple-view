@@ -57,6 +57,8 @@
 ;;; 2012.09.04 Dan
 ;;;            : * Changed it so the rpm-window-click-event-handler is called
 ;;;            :   with a vector of the mouse position.
+;;; 2013.04.20 cts
+;;;           : Now spell checking comments and strings in the code.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)

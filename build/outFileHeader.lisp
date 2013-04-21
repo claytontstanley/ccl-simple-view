@@ -56,3 +56,9 @@
 ;;;              (button-dialog-item, check-box-dialog-item, radio-button-dialog-item) in the usual
 ;;;              MCL way for dialog items (passing :fore-color #color# or :part-color (list :text #color#)
 ;;;              to initialize-instance)
+;;; 2013.04.20 cts
+;;;           : #@ read macro no longer clobbers CCL's original version that created NSString objects.
+;;;             The #@ read macro now creates MCL points when provided with a list, and an NSString object
+;;;             when provided with a string.
+;;;           : Reordered loading a few subcomponent files and renamed a few subcomponent files.
+;;;           : Now spell checking comments and strings in the code.

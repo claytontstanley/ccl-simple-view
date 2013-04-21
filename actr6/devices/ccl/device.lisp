@@ -127,6 +127,8 @@
 ;;; 2013.04.10 cts
 ;;;             : * Feature was added in ccl device to change text color for buttons.
 ;;;                 Visicon representation for buttons now shows text in appropriate color
+;;; 2013.04.20 cts
+;;;           : Now spell checking comments and strings in the code.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
