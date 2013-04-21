@@ -128,6 +128,7 @@
 ;;;             : * Feature was added in ccl device to change text color for buttons.
 ;;;                 Visicon representation for buttons now shows text in appropriate color
 ;;; 2013.04.20 cts
+;;;           : Removed stray commented out code that is no longer necessary.
 ;;;           : Now spell checking comments and strings in the code.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

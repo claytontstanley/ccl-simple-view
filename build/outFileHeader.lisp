@@ -61,4 +61,5 @@
 ;;;             The #@ read macro now creates MCL points when provided with a list, and an NSString object
 ;;;             when provided with a string.
 ;;;           : Reordered loading a few subcomponent files and renamed a few subcomponent files.
+;;;           : Removed stray commented out code that is no longer necessary.
 ;;;           : Now spell checking comments and strings in the code.
