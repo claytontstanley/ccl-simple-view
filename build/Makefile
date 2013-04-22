@@ -3,6 +3,7 @@ server = chil
 outFile = ccl-simple-view.lisp
 
 depdir = /Volumes/RedGiant/Projects/mcl-migration 
+repo = ~/src/mcl-migration
 
 header = ; ----------------------------------------------------------------------\n; Begin file: $$file\n; ----------------------------------------------------------------------\n\n\n
 
@@ -23,6 +24,8 @@ uwi.lisp : fileList = file-list-uwi.txt
 path-device.lisp = ${actrPath}/devices/ccl-cocoa
 path-uwi.lisp = ${path-device.lisp}
 path-ccl-simple-view.lisp = ${actrPath}/support
+
+git-is-clean = [[ -z "$$(git st --porcelain)" ]]
 
 ccl-simple-view.lisp:
 	make -s outFileHeader > ${path-${@}}/$@
@@ -55,8 +58,10 @@ outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g'
 
 deploy:
+	cd ${repo}/bincarbon && ${git-is-clean} && git push
+	cd ${repo} && ${git-is-clean} && git push
 	ssh ${server} 'cd ${depdir} && git remote update && git rebase origin/master && git submodule update --init --recursive'
-	ssh ${server} 'cd ${depdir} && [[ -z "$$(git st --porcelain)"' ]]
+	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
 	ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
 	cd ${depdir} && make -C build all
 	cd ${depdir} && make -C docs/README
