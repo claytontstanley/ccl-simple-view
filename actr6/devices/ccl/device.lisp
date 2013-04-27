@@ -273,69 +273,42 @@
 
 
 ;;; VIEW-DRAW-CONTENTS [Method]
-;;; Description : A td-liner is just a line-feature located "at" it's mid-point.
+;;; Description : A liner is just a line feature located at its mid-point
 
-(defmethod build-vis-locs-for ((lnr td-liner) (vis-mod vision-module))
+(defun 1-not<0 (val)
+  (guard ((>= val 0) "subtracting one from an already negative value"))
+  (max (1- val) 0))
+
+(defun subtract-point-1-not<0 (point)
+  (make-point
+    (1-not<0 (point-h point))
+    (1-not<0 (point-v point))))
+
+(defmethod build-vis-locs-for ((lnr liner) (vis-mod vision-module))
   "Convert the view to a feature to be placed into the visual icon"
-  (let* ((start-pt (view-position lnr))
-         (end-pt (subtract-points (add-points (view-position lnr) (view-size lnr)) 
-                                  (make-point 1 1)))
-         (f (car (define-chunks-fct `((isa visual-location
-                                           color ,(system-color->symbol (color lnr))
-                                           value line
-                                           kind line
-                                           screen-x ,(loc-avg (point-h start-pt) (point-h end-pt))
-                                           screen-y ,(loc-avg (point-v start-pt) (point-v end-pt))
-                                           width ,(abs (- (point-h start-pt) (point-h end-pt)))
-                                           height ,(abs (- (point-v start-pt) (point-v end-pt)))))))))
+  (let ((start-pt (local-to-global lnr (subtract-point-1-not<0 (get-start lnr))))
+        (end-pt (local-to-global lnr (subtract-point-1-not<0 (get-end lnr)))))
+    (let ((f (car (define-chunks-fct
+                    `((isa visual-location
+                           color ,(system-color->symbol (color lnr))
+                           value line
+                           kind line
+                           screen-x ,(loc-avg (point-h start-pt) (point-h end-pt))
+                           screen-y ,(loc-avg (point-v start-pt) (point-v end-pt))
+                           width ,(abs (- (point-h start-pt) (point-h end-pt)))
+                           height ,(abs (- (point-v start-pt) (point-v end-pt)))))))))
+      (setf (chunk-visual-object f) lnr)
+      f)))
 
-    (setf (chunk-visual-object f) lnr)
-    f))
-
-(defmethod vis-loc-to-obj ((lnr td-liner) loc)
-  (let ((start-pt (view-position lnr))
-        (end-pt (subtract-points (add-points (view-position lnr) (view-size lnr)) 
-                                 (make-point 1 1)))
+(defmethod vis-loc-to-obj ((lnr liner) loc)
+  (let ((start-pt (local-to-global lnr (subtract-point-1-not<0 (get-start lnr))))
+        (end-pt (local-to-global lnr (subtract-point-1-not<0 (get-end lnr))))
         (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
     (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
     (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
     (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
     (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
     v-o))
-
-;;; VIEW-DRAW-CONTENTS [Method]
-;;; Description : A bu-liner is just a line-feature located "at" it's mid-point.
-
-(defmethod build-vis-locs-for ((lnr bu-liner) (vis-mod vision-module))
-  "Convert the view to a feature to be placed into the visual icon"
-  (let* ((start-pt (add-points (view-position lnr)
-                               (make-point 0 (1- (point-v (view-size lnr))))))
-         (end-pt (add-points (view-position lnr) 
-                             (make-point (1- (point-h (view-size lnr))) 0)))
-         (f (car (define-chunks-fct `((isa visual-location
-                                           color ,(system-color->symbol (color lnr))
-                                           value line
-                                           kind line
-                                           screen-x ,(loc-avg (point-h start-pt) (point-h end-pt))
-                                           screen-y ,(loc-avg (point-v start-pt) (point-v end-pt))
-                                           width ,(abs (- (point-h start-pt) (point-h end-pt)))
-                                           height ,(abs (- (point-v start-pt) (point-v end-pt)))))))))
-
-    (setf (chunk-visual-object f) lnr)
-    f))
-
-(defmethod vis-loc-to-obj ((lnr bu-liner) loc)
-  (let ((start-pt (add-points (view-position lnr)
-                              (make-point 0 (1- (point-v (view-size lnr))))))
-        (end-pt (add-points (view-position lnr) 
-                            (make-point (1- (point-h (view-size lnr))) 0)))
-        (v-o (fill-default-vis-obj-slots (car (define-chunks (isa line))) loc)))
-    (set-chunk-slot-value-fct v-o 'end1-x (point-h start-pt))
-    (set-chunk-slot-value-fct v-o 'end1-y (point-v start-pt))
-    (set-chunk-slot-value-fct v-o 'end2-x (point-h end-pt))
-    (set-chunk-slot-value-fct v-o 'end2-y (point-v end-pt))
-    v-o))
-
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; Utilities
