@@ -1,4 +1,4 @@
-submodules/ACT-R-VoteBox-Models/Virtual Cursor/osx-virtual-cursor.lisp
+bincarbon/osx-virtual-cursor.lisp
 bincarbon/misc-lib.lisp
 bincarbon/pict-svm.lisp
 submodules/ACT-R-VoteBox-Models/Emulator Files/VBEmulator.lisp
