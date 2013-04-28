@@ -59,6 +59,10 @@
 ;;;            :   with a vector of the mouse position.
 ;;; 2013.04.20 cts
 ;;;           : Now spell checking comments and strings in the code.
+;;; 2013.04.27 cts
+;;;           : Added make-liner-from-points utility function that can create a 
+;;;             liner object or subclassed liner object.
+;;;             Refactored make-line-for-rpm-window to call the utility function
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -243,6 +247,14 @@
 ;;;             : window based on the parameters supplied.
 
 (defmethod make-line-for-rpm-window ((wind rpm-real-window) start-pt end-pt &optional (color 'black))
+  (make-liner-from-points start-pt end-pt color))
+
+; make-liner-from-points is a utility function that can create a liner object or subclassed liner object.
+; A separate function is used rather than extending make-line-for-rpm-window so that the interface to 
+; make-line-for-rpm-window remains the same, since that interface is public, and that interface does 
+; not allow the caller to provide a subclassed liner class to initialize
+
+(defun make-liner-from-points (start-pt end-pt color &key (liner-class 'liner))
   (destructuring-bind (startx starty) start-pt
     (destructuring-bind (endx endy) end-pt
       (unless (> endx startx)
@@ -251,7 +263,8 @@
       (let ((vs (make-point (+ 1 (abs (- endx startx)))
                             (+ 1 (abs (- endy starty)))))
             (vp (make-point startx (min starty endy))))
-        (make-instance (if (> endy starty) 'td-liner 'bu-liner)
+        (make-instance liner-class
+                       :liner-type (if (> endy starty) 'td 'bu)
                        :position vp
                        :size vs
                        :color (color-symbol->system-color color))))))

@@ -213,11 +213,8 @@
   (:documentation "Top-level class for windows"))
 
 (defclass liner (view)
-  ((easygui::foreground :reader color :initarg :color)))
-
-(defclass td-liner (liner) ())
-
-(defclass bu-liner (liner) ())
+  ((liner-type :reader liner-type :initarg :liner-type)
+   (easygui::foreground :reader color :initarg :color)))
 
 (defclass dialog (window)
   ()
@@ -1007,16 +1004,22 @@
 (defmethod view-draw-contents ((view simple-view))
   ())
 
-(defmethod get-start ((view bu-liner))
+(defmethod get-start ((view liner))
+  (get-start-using-liner-type view (liner-type view)))
+
+(defmethod get-end ((view liner))
+  (get-end-using-liner-type view (liner-type view)))
+
+(defmethod get-start-using-liner-type ((view liner) (liner-type (eql 'bu)))
   (make-point 0 (point-y (view-size view))))
 
-(defmethod get-start ((view td-liner))
+(defmethod get-start-using-liner-type ((view liner) (liner-type (eql 'td)))
   (make-point 0 0))
 
-(defmethod get-end ((view bu-liner))
+(defmethod get-end-using-liner-type ((view liner) (liner-type (eql 'bu)))
   (make-point (point-x (view-size view)) 0))
 
-(defmethod get-end ((view td-liner))
+(defmethod get-end-using-liner-type ((view liner) (liner-type (eql 'td)))
   (view-size view))
 
 (defmethod view-draw-contents ((view liner))
