@@ -30,9 +30,8 @@ file-list-%:
 	cat testing/file-lists/*.txt
 	for fl in ${fl}; do cat testing/file-lists/$$fl/*; done
 
-exclude-list = ^bincarbon*|^testing
-
-list-cmd = git ls-files
+exclude-list = ^$$
+list-cmd =
 
 reformat: vicmd = ai
 spelling: vicmd = cs
@@ -41,10 +40,13 @@ reformat spelling:
 	${list-cmd} | grep '.lisp$$' | egrep -v '${exclude-list}' | /usr/bin/xargs -n 1 -o -I {} bash -ic "echo '{}'; ${vicmd} {} || true"
 
 reformat-all spelling-all: %-all:
-	make $* 
+	make $* lst-cmd="git ls-files" 
 
 reformat-builds spelling-builds: %-builds:
-	make $* list-cmd="cat build/file-list*"
+	make $* list-cmd="cat build/file-list*" exclude-list = "^bincarbon|^testing"
+
+reformat-testing spelling-testing: %-testing:
+	make $* list-cmd="find testing -mindepth 1 -maxdepth 1 -name '*.lisp'"
 
 # This is way experimental, but it did work for me. 
 convertToWriteRepo:

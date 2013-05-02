@@ -49,9 +49,9 @@ internal-time-units-per-second
 (invalidate-view *win*)
 
 (easygui::running-on-main-thread ()
-  (print 5)
-  (easygui::invalidate-view *win*)
-  (print 4))
+                                 (print 5)
+                                 (easygui::invalidate-view *win*)
+                                 (print 4))
 
 (all-processes)
 
@@ -69,7 +69,7 @@ internal-time-units-per-second
 (#/flushWindow (cocoa-ref *))
 
 (with-focused-view *cc*
-  (dcc (#/flushWindow (#/window (cocoa-ref *cc*)))))
+                   (dcc (#/flushWindow (#/window (cocoa-ref *cc*)))))
 
 
 (invalidate-view *win*)
@@ -78,24 +78,24 @@ internal-time-units-per-second
 (setf easygui::*suppress-window-flushing* t)
 
 (running-on-main-thread ()
-  (mapc #'invalidate-view 
-        (print 
-          (subseq (subviews *win2*) 0 2))))
+                        (mapc #'invalidate-view 
+                              (print 
+                                (subseq (subviews *win2*) 0 2))))
 
 (mapcar #'#/bounds
         (mapcar #'cocoa-ref (subviews *win2*)))
 
-             (inspect *win2*) 
-              
+(inspect *win2*) 
+
 (setf *rv*
       (make-instance 'rectangle-view
-                             :view-position #@(600 600)
-                             :view-size #@(200 200)))
+                     :view-position #@(600 600)
+                     :view-size #@(200 200)))
 
 (defmethod view-draw-contents ((view rectangle-view))
   (with-focused-view view
-    (with-fore-color *red-color*
-      (paint-rect view #@(0 0) (view-size view)))))
+                     (with-fore-color *red-color*
+                                      (paint-rect view #@(0 0) (view-size view)))))
 
 (remove-subviews *win2* *sky*)
 (remove-subviews *win2* *fr*)
@@ -158,8 +158,8 @@ internal-time-units-per-second
             'rectangle-view
             :view-size (make-point 20 20)
             :view-position (make-point 10 10)))))
-            
-            
+
+
 
 
 

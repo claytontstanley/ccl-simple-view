@@ -8,11 +8,11 @@
     "flash"
     (lambda ()
       (let ((view (make-static-text-for-rpm-window
-                      *win*
-                      :x 10 
-                      :y 10 
-                      :text text
-                      :color 'orange)))
+                    *win*
+                    :x 10 
+                    :y 10 
+                    :text text
+                    :color 'orange)))
         (add-visual-items-to-rpm-window *win* view)
         (sleep .1)
         (remove-visual-items-from-rpm-window *win* view)))))
@@ -52,8 +52,8 @@
 
 (select-rpm-window *win*)
 (check (string-equal
-          (rpm-window-title *win*)
-          *win-title*))
+         (rpm-window-title *win*)
+         *win-title*))
 (check (open-rpm-window? *win*))
 (sleep .5)
 
@@ -95,7 +95,7 @@
                             :view-position (make-point 20 20)))
 (add-visual-items-to-rpm-window *win* *view*)
 (check (> (point-h (view-size *view*))
-           0))
+          0))
 
 (setf *view* (make-line-for-rpm-window
                *win*

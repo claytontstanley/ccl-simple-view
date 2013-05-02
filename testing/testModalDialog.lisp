@@ -32,7 +32,7 @@
 
 (while (not *t*)
   (spin-for-fct 100))
-       
+
 (check (eq *t* 5))
 
 #|

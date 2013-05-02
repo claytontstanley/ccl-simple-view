@@ -11,7 +11,7 @@
                   (funcall *defmacro-orig*
                            `(defmacro ,name ,args ,@body) nil))))
      (progn
-        ,@body)))
+       ,@body)))
 
 (ensure-defined
   (defun foo (a)

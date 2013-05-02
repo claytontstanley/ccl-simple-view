@@ -23,11 +23,11 @@
 (defmethod view-draw-contents ((view (eql *sv*)))
   ;(with-focused-view view
   ;  (with-fore-color *blue-color*
-      ;(#/set *red-color*)
-      (paint-rect view #@(0 0) (view-size view))
-      )
-  ;  )
-  ;)
+  ;(#/set *red-color*)
+  (paint-rect view #@(0 0) (view-size view))
+  )
+;  )
+;)
 
 (invalidate-view (first (subviews *win*)))
 

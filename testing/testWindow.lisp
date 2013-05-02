@@ -13,7 +13,7 @@
 
 (with-focused-view *win*
   (with-fore-color (get-fore-color *win*)
-  (line-to *win* 10 10)))
+    (line-to *win* 10 10)))
 
 (set-view-size (content-view *win*) (view-size *win*)) 
 

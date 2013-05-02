@@ -7,8 +7,7 @@
                          'static-text-dialog-item
                          #@(26 448)
                          #@(177 49)
-                         "STEP 3
-Review your choices"
+                         (format nil "STEP 3~%Review your choices")
                          'NIL
                          :PART-COLOR-LIST  '(:BODY 2463733)
                          :view-nick-name :tv
@@ -47,7 +46,7 @@ Review your choices"
 (#/setLineBreakMode:
  *mps*
  #$NSLineBreakByTruncatingTail)
- ;#$NSLineBreakByCharWrapping)
+;#$NSLineBreakByCharWrapping)
 *mas*
 *mps*
 *as*
@@ -65,8 +64,8 @@ Review your choices"
 
 (#/setLineBreakMode: (#/cell (cocoa-ref (view-named :tv *win*)))
  #$NSLineBreakByTruncatingTail)
- 
- 
+
+
 
 (#/setAttributedStringValue: (cocoa-ref (view-named :tv *win*))
  *mas*)
@@ -76,7 +75,7 @@ Review your choices"
 #$NSParagraphStyleAttributeName
 
 (#/tighteningFactorForTruncation (#/defaultParagraphStyle ns:ns-paragraph-style))
- (#/defaultParagraphStyle ns:ns-paragraph-style)
+(#/defaultParagraphStyle ns:ns-paragraph-style)
 
 (#/setTighteningFactorForTruncation: 
  ns:ns-paragraph-style
