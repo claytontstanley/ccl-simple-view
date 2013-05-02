@@ -13,12 +13,10 @@
 (check
   (equal (list (list 0 10) (list 0 10) (list 40 20) (list 20 40) (list 20 20) (list 40 60) (list 10 20) (list 60 80))
          (let ((loc-avg ()))
-           (macrolet ((loc-avg% ()
-                        `(lambda (x y)
-                           (push (list x y) loc-avg)
-                           (funcall fun-orig x y))))
-             (with-shadow (loc-avg (loc-avg%))
-               (proc-display)))
+           (with-shadow (loc-avg (lambda (x y)
+                                   (push (list x y) loc-avg)
+                                   (funcall fun-orig x y)))
+             (proc-display))
            loc-avg)))
 (check
   (equal '((5 5) (30 30) (50 20) (70 15))
