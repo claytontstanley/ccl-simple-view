@@ -36,30 +36,30 @@
 (progn
   (defmacro with-cfstring ((cfstring str) &body body) 
     `(with-cstrs ((cstr ,str)) 
-                 (let ((,cfstring (#_CFStringCreateWithCString
-                                   (%null-ptr)
-                                   cstr 
-                                   #$kCFStringEncodingUTF8))) 
-                   (when ,cfstring 
-                     (unwind-protect 
-                         (progn ,@body) 
-                       (#_CFRelease ,cfstring))))))
+       (let ((,cfstring (#_CFStringCreateWithCString
+                         (%null-ptr)
+                         cstr 
+                         #$kCFStringEncodingUTF8))) 
+         (when ,cfstring 
+           (unwind-protect 
+             (progn ,@body) 
+             (#_CFRelease ,cfstring))))))
 
   (defmacro with-cfurl ((cfurl str) &body body) 
     `(with-cfstring (cfstr ,str) 
-                    (let ((,cfurl
-                           (#_CFURLCreateWithString (%null-ptr)
-                                                    cfstr (%null-ptr)))) 
-                      (when ,cfurl 
-                        (unwind-protect 
-                            (progn ,@body) 
-                          (#_CFRelease ,cfurl))))))
+       (let ((,cfurl
+               (#_CFURLCreateWithString (%null-ptr)
+                cfstr (%null-ptr)))) 
+         (when ,cfurl 
+           (unwind-protect 
+             (progn ,@body) 
+             (#_CFRelease ,cfurl))))))
 
 
   (defun launch-url (strng)
     "Opens the provided URL with the OS's specified helper application."
     (with-cfurl (tmp strng)
-                (#_LSOpenCFURLRef tmp (%null-ptr))))
+      (#_LSOpenCFURLRef tmp (%null-ptr))))
   )
 
 #+lispworks
@@ -78,11 +78,11 @@
 #|
 (defun open-url (url-string)
   (with-cfstrs ((url url-string))
-    (let ((cfurl (#_cfurlcreatewithstring (%null-ptr) url (%null-ptr))))
-      (unless (%null-ptr-p cfurl)
-        (unwind-protect   ; overkill
-          (zerop (#_LSOpenCFURLRef cfurl (%null-ptr)))
-          (#_cfrelease cfurl))))))
+               (let ((cfurl (#_cfurlcreatewithstring (%null-ptr) url (%null-ptr))))
+                 (unless (%null-ptr-p cfurl)
+                   (unwind-protect   ; overkill
+                     (zerop (#_LSOpenCFURLRef cfurl (%null-ptr)))
+                     (#_cfrelease cfurl))))))
 |#
 
 (provide :launch-url)

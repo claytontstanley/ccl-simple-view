@@ -98,8 +98,8 @@
 (defclass snd-player ()
   ((res-file :accessor res-file :initarg :res-file 
              :initform (open-resource-file 
-                        (choose-file-dialog :mac-file-type "RSRC"
-                                            :button-string "Sounds")))
+                         (choose-file-dialog :mac-file-type "RSRC"
+                                             :button-string "Sounds")))
    (the-channel :accessor the-channel)
    (preload :accessor preload :initarg :preload :initform nil)
    (snd-alis :accessor snd-alis :initform nil)))
@@ -122,11 +122,11 @@
   (%stack-block ((hndl 4))
     (%put-ptr hndl (the-channel self))
     (check-mac-error
-     (#_SndNewChannel hndl #$sampledSynth #$initMono (%null-ptr))))
+      (#_SndNewChannel hndl #$sampledSynth #$initMono (%null-ptr))))
   (when (preload self)
     (dolist (name (preload self) nil)
       (push (cons name (with-pstrs ((pname name))
-                         (#_GetNamedResource "snd " pname)))
+                                   (#_GetNamedResource "snd " pname)))
             (snd-alis self)))))
 
 #+:clozure
@@ -169,12 +169,12 @@
   "Tells the given sound player to play the named sound with the supplied mode"
   (if (member snd-name (preload player))
     (check-mac-error 
-     (#_SndPlay (the-channel player)
-      (rest (assoc snd-name (snd-alis player))) async))
+      (#_SndPlay (the-channel player)
+       (rest (assoc snd-name (snd-alis player))) async))
     (check-mac-error 
-     (#_SndPlay (the-channel player)
-      (with-pstrs ((pname snd-name))
-        (#_GetNamedResource "snd " pname)) async))))
+      (#_SndPlay (the-channel player)
+       (with-pstrs ((pname snd-name))
+                   (#_GetNamedResource "snd " pname)) async))))
 
 #+:clozure
 (defmethod play-snd ((player snd-player) snd-name &optional async)

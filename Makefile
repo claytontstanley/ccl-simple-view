@@ -48,6 +48,9 @@ reformat-builds spelling-builds: %-builds:
 reformat-testing spelling-testing: %-testing:
 	make $* list-cmd="find testing -mindepth 1 -maxdepth 1 -name '*.lisp'"
 
+reformat-bincarbon spelling-bincarbon: %-bincarbon:
+	make $* list-cmd="find bincarbon -mindepth 1 -maxdepth 1 -name '*.lisp'"
+
 # This is way experimental, but it did work for me. 
 convertToWriteRepo:
 	cd .git; find . -type f -name config -exec perl -pi -e 's|git://cstanley.no-ip.biz|ssh://raid\@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git|' '{}' \;

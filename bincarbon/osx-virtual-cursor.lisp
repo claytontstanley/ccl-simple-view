@@ -74,7 +74,7 @@
     ; (let ((loc (true-cursor-loc (device-interface *mp*))))  delta for act6
     (let ((loc (true-cursor-loc (current-device))))
       (make-instance 'cursor-feature
-        :x (px loc) :y (py loc) :value 'POINTER))))
+                     :x (px loc) :y (py loc) :value 'POINTER))))
 
 
 ;;; device-level stuff

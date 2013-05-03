@@ -48,7 +48,7 @@
     (unless (zerop len)
       (dotimes (i len (float (/ accum len)))
         (incf accum (if key (funcall key (svref seq i))
-                        (svref seq i)))))))
+                      (svref seq i)))))))
 
 (defmethod seq-mean ((seq list) &key key)
   (unless (null seq)
@@ -132,7 +132,7 @@
         (incf len))
       (setf mean (float (/ accum len)))
       (values mean
-               (when (> len 1)
+              (when (> len 1)
                 (/ (sqrt (/ (- sumsq (* len (* mean mean))) (- len 1)))
                    (sqrt len)))))))
 
@@ -243,7 +243,7 @@
 
 
 (defmethod avg-over-pairs ((fn function) (s1 sequence) (s2 sequence) 
-                              &key key)
+                                         &key key)
   (let ((len (length s1))
         (accum 0))
     (unless (= len (length s2))
@@ -264,10 +264,10 @@
       (let ((n1 (length seq1)) (n2 (length seq2)))
         (/ (- m1 m2)
            (sqrt
-            (* (+ (/ 1 n1) (/ 1 n2))
-               (/ (+ (* (1- n1) sd1 sd1) (* (1- n2) sd2 sd2))
-                  (+ n1 n2 -2)))))))))
-            
+             (* (+ (/ 1 n1) (/ 1 n2))
+                (/ (+ (* (1- n1) sd1 sd1) (* (1- n2) sd2 sd2))
+                   (+ n1 n2 -2)))))))))
+
 
 
 
@@ -333,9 +333,9 @@
   (let ((covar (covar xseq yseq :key key))
         slope)
     (multiple-value-bind (xmean xstd)
-                         (seq-mean-stdev xseq :key key)
+      (seq-mean-stdev xseq :key key)
       (multiple-value-bind (ymean ystd)
-                           (seq-mean-stdev yseq :key key)
+        (seq-mean-stdev yseq :key key)
         (setf slope (/ covar (* xstd xstd)))
         (values (expt (/ covar (* xstd ystd)) 2) 
                 slope 

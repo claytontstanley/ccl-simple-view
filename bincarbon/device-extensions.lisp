@@ -110,7 +110,7 @@
          (pos (view-position self))
          (dim (view-size self))
          (ypos (+ (point-v pos) (round (* (point-v dim)
-                                           (- 1 (/ val maxval))))))
+                                          (- 1 (/ val maxval))))))
          )
     ;; only generate a feature this when the value is greater than zero
     (when (> val 0)

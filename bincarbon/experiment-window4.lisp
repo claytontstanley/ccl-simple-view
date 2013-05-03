@@ -85,14 +85,14 @@
 ;;;; ---------------------------------------------------------------------- ;;;;
 
 (defparameter *end-of-block-str*
-             "Finished block ~A of ~A. Please take a short break to help your concentration.
-              Click “OK” when you are ready to continue.")
+  "Finished block ~A of ~A. Please take a short break to help your concentration.
+   Click “OK” when you are ready to continue.")
 
 (defparameter *end-of-expt-str*
-             "Thank you, you've finished the main portion of the experiment. Please take a few moments to answer a few simple questions.")
+  "Thank you, you've finished the main portion of the experiment. Please take a few moments to answer a few simple questions.")
 
 (defparameter *end-of-expt-nourl-str*
-             "You're done, thank you! Please see the experimenter.")
+  "You're done, thank you! Please see the experimenter.")
 
 
 (defvar *experiment* nil "The experiment window itself.")

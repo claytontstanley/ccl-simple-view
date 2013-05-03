@@ -46,16 +46,16 @@
 
 (defmacro awhen (test-form &body body)
   `(aif ,test-form
-        (progn ,@body)))
+     (progn ,@body)))
 
 (defmacro awhile (expr &body body)
   `(do ((it ,expr ,expr))
-       ((not it))
+     ((not it))
      ,@body))
 
 (defmacro while (test &body body)
   `(do ()
-       ((not ,test))
+     ((not ,test))
      ,@body))
 
 
@@ -100,7 +100,7 @@
   (map 'list #'(lambda (c)
                  (intern (make-string 1 
                                       :initial-element c)))
-             (symbol-name sym)))
+       (symbol-name sym)))
 
 
 (defun group (source n)
@@ -218,7 +218,7 @@
 
 
 (defmethod objs-match-slotval ((ls list) (slot-name symbol) 
-                                  (value number))
+                                         (value number))
   "Return list of objects from <ls> that match <value> on <slot-name>."
   (when ls
     (let (accum)
@@ -228,7 +228,7 @@
 
 
 (defmethod objs-match-slotval ((ls list) (slot-name symbol) 
-                                  (value symbol))
+                                         (value symbol))
   "Return list of objects from <ls> that match <value> on <slot-name>."
   (when ls
     (let (accum)
