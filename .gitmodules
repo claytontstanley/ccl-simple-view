@@ -40,3 +40,6 @@
 [submodule "submodules/actr6mcl"]
 	path = submodules/actr6mcl
 	url = ssh://raid@raid/~/F/root/clayton.stanley/srv/git/actr6mcl
+[submodule "submodules/DMTracker"]
+	path = submodules/DMTracker
+	url = ssh://chil/srv/git/DMTracker
