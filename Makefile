@@ -40,16 +40,10 @@ reformat spelling:
 	${list-cmd} | grep '.lisp$$' | egrep -v '${exclude-list}' | /usr/bin/xargs -n 1 -o -I {} bash -ic "echo '{}'; ${vicmd} {} || true"
 
 reformat-all spelling-all: %-all:
-	make $* lst-cmd="git ls-files" exclude-list="^bincarbon|^testing"
+	make $* list-cmd="git ls-files" exclude-list="bincarbon/(CFBundle|base-trek-tasks|pict-svm|procedure-window2|timer).lisp$$"
 
 reformat-builds spelling-builds: %-builds:
 	make $* list-cmd="cat build/file-list*"
-
-reformat-testing spelling-testing: %-testing:
-	make $* list-cmd="find testing -mindepth 1 -maxdepth 1 -name '*.lisp'"
-
-reformat-bincarbon spelling-bincarbon: %-bincarbon:
-	make $* list-cmd="find bincarbon -mindepth 1 -maxdepth 1 -name '*.lisp'"
 
 # This is way experimental, but it did work for me. 
 convertToWriteRepo:
