@@ -984,6 +984,16 @@
 
 ; Drawing methods
 
+(defmacro with-rectangle-arg ((var left &optional top right bottom) &body body)
+  `(let ((,var (make-rect :from-mcl-spec ,left ,top ,right ,bottom)))
+     ,@body))
+
+(defmethod make-rect ((mode (eql :from-mcl-spec)) &rest args)
+  (destructuring-bind (left top right bottom) args
+    (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
+      (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
+        (ns:make-ns-rect startx starty width height)))))
+
 (defun canonicalize-rect (left top right bottom)
   (cond (bottom (list left top right bottom))
         (top (list (point-h left)
@@ -994,12 +1004,6 @@
                  (ns:ns-rect-y left)
                  (+ (ns:ns-rect-x left) (ns:ns-rect-width left))
                  (+ (ns:ns-rect-y left) (ns:ns-rect-height left))))))
-
-(defmethod make-rect ((mode (eql :from-mcl-spec)) &rest args)
-  (destructuring-bind (left top right bottom) args
-    (destructuring-bind (left top right bottom) (canonicalize-rect left top right bottom)
-      (destructuring-bind (startx starty width height) (list left top (- right left) (- bottom top))
-        (ns:make-ns-rect startx starty width height)))))
 
 (defmethod view-draw-contents ((view simple-view))
   ())

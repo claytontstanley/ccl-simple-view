@@ -4,6 +4,11 @@
 (defmacro ccl::ppc-ff-call (name &rest args)
   `(external-call ,name ,@args))
 
+#+:clozure
+(defmacro ccl::with-rectangle-arg ((var left &optional top right bottom) &body body)
+  `(with-rectangle-arg (,var ,left ,top ,right ,bottom)
+     ,@body))
+  
 ; defsystem.lisp in ccl/tools overwrites default #'require function
 ; with a broken version. There is a global variable that
 ; you can set in this file to not redefine require, but #'require is
