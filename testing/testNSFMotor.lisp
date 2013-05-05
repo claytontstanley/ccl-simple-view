@@ -26,10 +26,10 @@
 (view-position *exp*)
 (easygui::view-position *exp*)
 (view-size *exp*)
-(#/frame (cocoa-ref (get-front-window)))
-(set-view-position (get-front-window) 10 10)
+(#/frame (cocoa-ref (front-window)))
+(set-view-position (front-window) 10 10)
 (setf easygui::*screen-flipped* t)
 easygui::*screen-flipped*
-(easygui::view-content-rect (get-front-window))
+(easygui::view-content-rect (front-window))
 (easygui::screen-height)
 |#

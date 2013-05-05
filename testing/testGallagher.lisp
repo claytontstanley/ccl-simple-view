@@ -8,6 +8,6 @@
 
 
 #|
-(window-close (get-front-window))
+(window-close (front-window))
 
 |#

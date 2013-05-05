@@ -24,8 +24,8 @@
       ; And a totally hacky way to do it, but if you can't reference the view, or did not have the 'where' variable,
       ; here's how you can find the mouse's current position w.r.t the top window and without any variables
       (destructuring-bind (glob-pos-x-2 glob-pos-y-2) (list 
-                                                        (point-x (view-mouse-position (get-front-window)))
-                                                        (point-y (view-mouse-position (get-front-window))))
+                                                        (point-x (view-mouse-position (front-window)))
+                                                        (point-y (view-mouse-position (front-window))))
         (format t "loc-pos-x=~a~%" loc-pos-x)
         (format t "loc-pos-y=~a~%" loc-pos-y)
         (format t "glob-pos-x=~a~%" glob-pos-x)
@@ -39,7 +39,7 @@
 
 ; Test code
 
-(awhen (get-front-window)
+(awhen (front-window)
   (window-close it))
 
 (make-instance

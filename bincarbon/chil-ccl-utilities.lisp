@@ -7,7 +7,7 @@
           (#_CGWindowListCreateImage
            #$CGRectNull
            #$kCGWindowListOptionIncludingWindow
-           (#/windowNumber (cocoa-ref (get-front-window)))
+           (#/windowNumber (cocoa-ref (front-window)))
            #$kCGWindowImageBoundsIgnoreFraming)))
     (let ((ns-image
             (#/initWithCGImage:size: (#/alloc ns:ns-image)

@@ -28,7 +28,7 @@
 
 ; Test code
 
-(awhen (get-front-window)
+(awhen (front-window)
   (window-close it))
 
 (make-instance

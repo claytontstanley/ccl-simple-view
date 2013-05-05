@@ -138,7 +138,7 @@
                        (easygui::with-autorelease-pool
                          (funcall (window-close-fct win) win))
                        (signal-semaphore (sema-finished-close win)))
-                      ((aand (get-front-window) (eq win it))
+                      ((aand (front-window) (eq win it))
                        (window-null-event-handler win)))
                 (timed-wait-on-semaphore (sema-request-close win) .1)))))))
 
@@ -519,7 +519,7 @@
               (return-from find-window clos-win)))))))
   nil)
 
-(defun get-front-window ()
+(defun front-window ()
   (objc:with-autorelease-pool
     (let ((wins (gui::windows)))
       (setf wins (remove-if-not #'easygui::cocoa-win-p wins))
@@ -1412,7 +1412,7 @@
 
 (defmethod set-cursor ((cursor ns:ns-cursor))
   (unwind-protect (setf *current-cursor* cursor)
-    (awhen (get-front-window)
+    (awhen (front-window)
       (sv-log "setting cursor for window ~a to ~a" it cursor)
       (#/invalidateCursorRectsForView: (cocoa-ref it)
        (cocoa-ref (content-view it))))))

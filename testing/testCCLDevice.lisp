@@ -186,7 +186,7 @@
  *the-event*)
 
 ;(remove-all-items-from-rpm-window *win*)
-(get-front-window)
+(front-window)
 (mapcar '#/close (ns-array->list (#/windows (#/sharedApplication ns:ns-application))))
 (menubar-show)
 ;(close-rpm-window *win*)
