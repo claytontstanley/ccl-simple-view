@@ -1118,9 +1118,9 @@
 (defmethod frame-rect ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
     (with-fallback-focused-view view
-      (stroke-ns-rect rect))))
+      (qd-frame-rect rect))))
 
-(defmethod stroke-ns-rect ((rect ns:ns-rect))
+(defmethod qd-frame-rect ((rect ns:ns-rect))
   (with-window-of-focused-view-fallback-fore-color
     (#/strokeRect: ns:ns-bezier-path rect)))
 
@@ -1131,9 +1131,9 @@
 (defmethod fill-rect ((view simple-view) pattern left &optional top right bottom)
   (with-fallback-focused-view view
     (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
-      (fill-ns-rect rect pattern))))
+      (qd-paint-rect rect pattern))))
 
-(defmethod fill-ns-rect ((rect ns:ns-rect) &optional pattern)
+(defmethod qd-paint-rect ((rect ns:ns-rect) &optional pattern)
   #-:sv-dev (declare (ignore pattern))
   (with-window-of-focused-view-fallback-fore-color
     (#/fillRect: ns:ns-bezier-path rect)))
@@ -1142,7 +1142,7 @@
   (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
     (with-fallback-focused-view view
       (with-fore-color (get-back-color (content-view view))
-        (fill-ns-rect rect)))))
+        (qd-paint-rect rect)))))
 
 (defmethod start-polygon ((view simple-view))
   (setf (bezier-path view) (#/bezierPath ns:ns-bezier-path))
@@ -1570,13 +1570,13 @@
   (hide-cursor))
 
 (defun X86-Darwin64::|paintrect| (rect)
-  (fill-ns-rect rect))
+  (qd-paint-rect rect))
 
 (defun X86-Darwin64::|PaintRect| (rect)
-  (fill-ns-rect rect))
+  (qd-paint-rect rect))
 
 (defun X86-Darwin64::|framerect| (rect)
-  (stroke-ns-rect rect))
+  (qd-frame-rect rect))
 
 (defun X86-Darwin64::|drawstring| (str)
   (draw-string str))
