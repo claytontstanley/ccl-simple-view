@@ -6,8 +6,11 @@
 
 (defun load-defsystem ()
   (let ((read-table (copy-readtable)))
-    (require :defsystem)
-    (copy-readtable read-table *readtable*)))
+    (let ((orig-require #'require))
+      (unwind-protect (require :defsystem)
+        (with-continue
+          (setf (symbol-function 'require) orig-require))
+        (copy-readtable read-table *readtable*)))))
 
 #+:clozure (load-defsystem)
 
@@ -24,7 +27,13 @@
     (require :dmtracker.system) 
     (require :dmtracker-ff.system)))
 
-(mk:load-system "DMTracker")
+(let ((mk:*dont-redefine-require* t)
+      (mk::*tell-user-when-done* t)
+      (mk::*load-source-if-no-binary* t)
+      (mk::*bother-user-if-no-binary* nil)
+      (mk::*load-source-instead-of-binary* t)
+      (mk::*compile-during-load* t))
+  (mk:load-system "DMTracker"))
 
 (provide :DMTracker-bootstrap)
 
