@@ -1057,25 +1057,16 @@
 ; Actual drawing methods
 
 (defmethod move-to ((view simple-view) x &optional (y nil))
-  (destructuring-bind (x y) (canonicalize-point x y)
+  (with-fallback-focused-view view
+    (destructuring-bind (x y) (canonicalize-point x y)
+      (qd-move-to x y))))
+
+(defmethod qd-move-to (x y)
+  (let ((view *current-focused-view*))
     (let ((position (make-point x y)))
       (when (bezier-path view)
         (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y)))
       (setf (pen-position view) position))))
-
-(defmethod line-to ((view simple-view) x &optional (y nil))
-  (with-fallback-focused-view view
-    (with-window-of-focused-view-fallback-fore-color
-      (destructuring-bind (endx endy) (canonicalize-point x y)
-        (destructuring-bind (startx starty) (list (point-x (pen-position view))
-                                                  (point-y (pen-position view)))
-          (when (bezier-path view)
-            (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
-          (setf (pen-position view) (make-point endx endy))
-          (#/strokeLineFromPoint:toPoint:
-           ns:ns-bezier-path
-           (ns:make-ns-point startx starty) 
-           (ns:make-ns-point endx endy)))))))
 
 (defmethod line ((view simple-view) x &optional (y nil))
   (with-fallback-focused-view view
@@ -1084,6 +1075,24 @@
                       (pen-position view)
                       (make-point x y))))))
 
+(defmethod line-to ((view simple-view) x &optional (y nil))
+  (with-fallback-focused-view view
+    (destructuring-bind (endx endy) (canonicalize-point x y)
+      (qd-line-to endx endy))))
+
+(defmethod qd-line-to (endx endy)
+  (let ((view *current-focused-view*))
+    (destructuring-bind (startx starty) (list (point-x (pen-position view))
+                                              (point-y (pen-position view)))
+      (when (bezier-path view)
+        (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
+      (setf (pen-position view) (make-point endx endy))
+      (with-window-of-focused-view-fallback-fore-color
+        (#/strokeLineFromPoint:toPoint:
+         ns:ns-bezier-path
+         (ns:make-ns-point startx starty) 
+         (ns:make-ns-point endx endy))))))
+
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
          (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
@@ -1091,40 +1100,43 @@
       (with-window-of-focused-view-fallback-fore-color
         (#/stroke path)))))
 
-(defmethod fill-oval ((view simple-view) pattern left &optional top right bottom)
-  #-:sv-dev (declare (ignore pattern))
-  (let* ((rect (make-rect :from-mcl-spec left top right bottom))
-         (path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
-    (with-fallback-focused-view view
-      (with-window-of-focused-view-fallback-fore-color
-        (#/fill path)))))
-
 (defmethod paint-oval ((view simple-view) left &optional top right bottom)
   (with-fallback-focused-view view
     (fill-oval view (pen-pattern view) left top right bottom)))
 
-(defmethod stroke-ns-rect ((rect ns:ns-rect))
-  (with-window-of-focused-view-fallback-fore-color
-    (#/strokeRect: ns:ns-bezier-path rect)))
+(defmethod fill-oval ((view simple-view) pattern left &optional top right bottom)
+  #-:sv-dev (declare (ignore pattern))
+  (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
+    (with-fallback-focused-view view
+      (qd-paint-oval rect))))
+
+(defmethod qd-paint-oval ((rect ns:ns-rect))
+  (let ((path (#/bezierPathWithOvalInRect: ns:ns-bezier-path rect)))
+    (with-window-of-focused-view-fallback-fore-color
+      (#/fill path))))
 
 (defmethod frame-rect ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
     (with-fallback-focused-view view
       (stroke-ns-rect rect))))
 
-(defmethod fill-ns-rect ((rect ns:ns-rect) &optional pattern)
-  #-:sv-dev (declare (ignore pattern))
+(defmethod stroke-ns-rect ((rect ns:ns-rect))
   (with-window-of-focused-view-fallback-fore-color
-    (#/fillRect: ns:ns-bezier-path rect)))
+    (#/strokeRect: ns:ns-bezier-path rect)))
+
+(defmethod paint-rect ((view simple-view) left &optional top right bottom)
+  (with-fallback-focused-view view
+    (fill-rect view (pen-pattern view) left top right bottom)))
 
 (defmethod fill-rect ((view simple-view) pattern left &optional top right bottom)
   (with-fallback-focused-view view
     (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
       (fill-ns-rect rect pattern))))
 
-(defmethod paint-rect ((view simple-view) left &optional top right bottom)
-  (with-fallback-focused-view view
-    (fill-rect view (pen-pattern view) left top right bottom)))
+(defmethod fill-ns-rect ((rect ns:ns-rect) &optional pattern)
+  #-:sv-dev (declare (ignore pattern))
+  (with-window-of-focused-view-fallback-fore-color
+    (#/fillRect: ns:ns-bezier-path rect)))
 
 (defmethod erase-rect ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom)))
@@ -1280,7 +1292,8 @@
   (:nicknames :quickdraw))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (provide :quickdraw))
+  (provide :quickdraw)
+  (provide "Quickdraw"))
 
 ; To implement event-dispatch for Clozure, send a dummy function over to
 ; the main Cocoa thread to be evaluated, and block until that function is 
@@ -1509,7 +1522,7 @@
   (with-continue 
     (defun ccl::load-external-function (sym query)
       (let* ((fun-names (list "showmenubar" "hidemenubar" "getcursor" "showcursor" "ShowCursor" "hidecursor" "HideCursor"
-                              "paintrect" "framerect" "drawstring"))
+                              "paintrect" "PaintRect" "framerect" "drawstring" "moveto" "MoveTo" "lineto" "PaintOval"))
              (the-package (find-package :X86-Darwin64))
              (fun-syms (mapcar (lambda (name)
                                  (intern name the-package))
@@ -1524,7 +1537,7 @@
   (defvar *load-os-constant-orig* #'ccl::load-os-constant)
   (with-continue
     (defun ccl::load-os-constant (sym &optional query)
-      (let* ((con-names (list "tejustleft" "tejustcenter" "tejustright"))
+      (let* ((con-names (list "tejustleft" "tejustcenter" "tejustright" "crossCursor"))
              (the-package (find-package :X86-Darwin64))
              (con-syms (mapcar (lambda (name)
                                  (intern name the-package))
@@ -1559,14 +1572,30 @@
 (defun X86-Darwin64::|paintrect| (rect)
   (fill-ns-rect rect))
 
+(defun X86-Darwin64::|PaintRect| (rect)
+  (fill-ns-rect rect))
+
 (defun X86-Darwin64::|framerect| (rect)
   (stroke-ns-rect rect))
 
 (defun X86-Darwin64::|drawstring| (str)
   (draw-string str))
 
+(defun X86-Darwin64::|lineto| (x y)
+  (qd-line-to x y))
+
+(defun X86-Darwin64::|moveto| (x y)
+  (qd-move-to x y))
+
+(defun X86-Darwin64::|MoveTo| (x y)
+  (qd-move-to x y))
+
+(defun X86-DARWIN64::|PaintOval| (rect)
+  (qd-paint-oval rect))
+
 ; And the constants are here
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defconstant X86-Darwin64::|tejustleft| $tejustleft)
   (defconstant X86-Darwin64::|tejustcenter| $tejustcenter)
-  (defconstant X86-Darwin64::|tejustright| $tejustright))
+  (defconstant X86-Darwin64::|tejustright| $tejustright)
+  (defconstant X86-Darwin64::|crossCursor| *crosshair-cursor*))
