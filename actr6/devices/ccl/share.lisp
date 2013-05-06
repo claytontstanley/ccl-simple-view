@@ -318,6 +318,70 @@
   ((easygui::text :initform ""))
   (:default-initargs :specifically 'easygui::cocoa-button))
 
+(defclass table-dialog-item (view-text-via-stringvalue-mixin dialog-item)
+  ())
+
+(defclass sequence-dialog-item (table-dialog-item)
+  ((table-sequence :reader table-sequence :initarg :table-sequence)
+   (columns :reader columns :initform 1)
+   (table-print-function :reader table-print-function :initarg :table-print-function :initform #'princ)
+   (rows :reader rows)
+   (cell-size :reader cell-size :initarg :cell-size)
+   (table-hscrollp :reader table-hscrollp :initarg :table-hscrollp :initform nil)
+   (table-vscrollp :reader table-vscrollp :initarg :table-vscrollp :initform t))
+  (:default-initargs :specifically 'easygui::cocoa-matrix))
+
+(defmethod (setf rows) (new-rows (view sequence-dialog-item))
+  (with-slots (columns rows) view
+    (unwind-protect (setf rows new-rows)
+      (#/renewRows:columns: (cocoa-ref view) rows columns))))
+
+(defmethod set-cell-size ((view sequence-dialog-item) h &optional v)
+  (destructuring-bind (h v) (canonicalize-point h v)
+    (with-slots (cell-size) view
+      (unwind-protect (setf cell-size (make-point h v))
+        (#/setCellSize: (cocoa-ref view)
+         (ns:make-ns-size h v)))))) 
+
+(defmethod set-table-sequence ((view sequence-dialog-item) new-sequence)
+  (with-slots (table-sequence table-print-function) view
+    (with-accessors ((view-font view-font)) view
+      (setf (rows view) (length new-sequence))
+      (unwind-protect (setf table-sequence new-sequence)
+        (loop for item in new-sequence
+              for index from 0
+              with cell-array = (#/cells (cocoa-ref view))
+              for cell = (#/objectAtIndex: cell-array index)
+              do (#/setTitle: cell 
+                  (objc::make-nsstring (funcall table-print-function item nil)))
+              when view-font do (#/setFont: cell view-font))))))
+
+(defmethod selected-cells ((view sequence-dialog-item))
+  (let ((selected-cells))
+    (do-array (cell (#/selectedCells (cocoa-ref view)) selected-cells)
+      (push-to-end (get-location-of-cell view cell)
+                   selected-cells))))
+    
+(defmethod get-location-of-cell ((view sequence-dialog-item) (cell ns:ns-cell))
+  (rlet ((rownum #>NSInteger)
+         (colnum #>NSInteger))
+    (#/getRow:column:ofCell: (cocoa-ref view) rownum colnum cell)
+    (make-point (pref colnum #>NSInteger)
+                (pref rownum #>NSInteger))))
+
+(defmethod initialize-instance :after ((view sequence-dialog-item) &key)
+  (let ((cocoa-matrix (cocoa-ref view))
+        (prototype (make-instance 'ns:ns-text-field-cell)))
+    (with-slots (table-hscrollp table-vscrollp) view
+      (guard (table-vscrollp "Sequence dialog item must allow vertical scrolling"))
+      (guard ((not table-hscrollp) "Sequence dialog item must not allow horizontal scrolling")))
+    (#/setPrototype: cocoa-matrix prototype)
+    (#/setMode: cocoa-matrix #$NSListModeMatrix)
+    (#/setIntercellSpacing: cocoa-matrix (ns:make-ns-size 0 0))
+    (set-cell-size view (cell-size view))
+    (set-table-sequence view (table-sequence view))
+    ))
+
 (defclass image-view (easygui::image-view view) ())
 
 (defclass clickable-image-view (easygui::clickable-image-view image-view) ())
@@ -494,6 +558,10 @@
            (sv-log "no subview with view-nick-name ~a found in ~a" name view)
            nil)))
 
+(defmethod find-named-sibling ((view simple-view) name)
+  (let ((container (view-container view)))
+    (and container (view-named name container))))
+
 (defmethod view-nick-name ((view simple-view))
   (easygui:view-nick-name view))
 
@@ -502,6 +570,9 @@
 
 (defmethod window-show ((win window))
   (easygui:window-show win))
+
+(defmethod window-hide ((win window))
+  (easygui::window-hide win))
 
 (defmethod window-shown-p ((window window))
   (not (easygui::window-hidden window)))
@@ -635,6 +706,11 @@
 (defmethod invalidate-view ((view simple-view) &optional erase-p)
   (declare (ignore erase-p))
   (easygui:invalidate-view view))
+
+; FIXME: What is validate-view supposed to do differently than invalidate-view?
+; And is that difference already handled within cocoa?
+(defmethod validate-view ((view simple-view))
+  (invalidate-view view))
 
 (defun canonicalize-point (x y)
   (cond (y (list x y))

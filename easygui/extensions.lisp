@@ -220,3 +220,19 @@
   (if easygui::*screen-flipped*
     (- (easygui::screen-height) height y)
     y))
+
+(defmethod easygui::window-hide ((window easygui::window))
+  (easygui::running-on-this-thread ()
+    (let ((cwin (cocoa-ref window)))
+      (unless (easygui::window-hidden window)
+        (setf (slot-value window 'easygui::hidden) t)
+        (unless (dcc (#/isMiniaturized cwin))
+          (dcc (#/miniaturize: cwin cwin))))
+      (when (dcc (#/isFlushWindowDisabled cwin))
+        (dcc (#/enableFlushWindow cwin))
+        (dcc (#/flushWindow cwin)))
+      window)))
+
+(defclass easygui::cocoa-matrix (easygui::cocoa-extension-mixin ns:ns-form)
+  ()
+  (:metaclass ns:+ns-object))

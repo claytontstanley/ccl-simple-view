@@ -1,3 +1,4 @@
+testing/testSequenceDialog.lisp
 testing/testLiner.lisp
 testing/testNSFMotor.lisp
 testing/testLevelIndicator.lisp
