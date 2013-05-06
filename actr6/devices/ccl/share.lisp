@@ -1344,6 +1344,8 @@
 
 ; Handling fonts and string width/height in pixels
 
+(defparameter *fred-default-font-spec* (list "profont" 9 :PLAIN))
+
 (defun font-info (font-spec)
   (values (guard-!null-ptr (#/ascender font-spec))
           (abs (guard-!null-ptr (#/descender font-spec)))))

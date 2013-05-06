@@ -12,7 +12,7 @@
                             (make-point 100 100)
                             "foo" 
                             (lambda (item) (beep))
-                            :view-font '("Monaco" 9 :srcor :plain)
+                            :view-font *fred-default-font-spec*
                             :table-sequence (list "}}}" "--" "*")
                             :cell-size (make-point 100 20)
                             :view-nick-name :sdi
