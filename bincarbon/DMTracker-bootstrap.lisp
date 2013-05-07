@@ -36,8 +36,12 @@
   (provide :cfbundle)
   (provide "cfbundle"))
 
+(defparameter *path-separator*
+  #+:digitool ":"
+  #+:clozure "/")
+
 (let ((dmtracker-path
-        (format nil "~a/" (path-as-lst ".." "submodules" "DMTracker"))))
+        (format nil "~a~a~a" (directory-namestring *load-truename*) "DMTracker" *path-separator*)))
   (let ((*module-search-path*
           (cons (pathname dmtracker-path) *module-search-path*))) 
     (setf (logical-pathname-translations "DMTracker") `(("**;*.*" ,(pathname dmtracker-path))))
