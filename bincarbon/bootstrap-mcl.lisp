@@ -1,6 +1,4 @@
-(defmacro with-continue (&body body)
-  `(handler-bind ((error #'continue))
-     ,@body))
+(require :chil-utilities)
 
 (with-continue
   (defconstant #$tejustleft :left)
@@ -13,6 +11,7 @@
 (set-dispatch-macro-character 
   #\# #\/
   (defun |#/-reader| (stream char arg)
+    (declare (ignore stream char arg))
     nil))
 
 (in-package "CCL")
