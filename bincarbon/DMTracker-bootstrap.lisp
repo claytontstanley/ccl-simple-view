@@ -1,4 +1,6 @@
+
 #+:clozure (require :ccl-simple-view)
+#+:digitool (require :bootstrap-mcl)
 
 #+:clozure
 (defmacro ccl::ppc-ff-call (name &rest args)
@@ -8,7 +10,8 @@
 (defmacro ccl::with-rectangle-arg ((var left &optional top right bottom) &body body)
   `(with-rectangle-arg (,var ,left ,top ,right ,bottom)
      ,@body))
-  
+
+
 ; defsystem.lisp in ccl/tools overwrites default #'require function
 ; with a broken version. There is a global variable that
 ; you can set in this file to not redefine require, but #'require is
@@ -29,7 +32,7 @@
           (setf (symbol-function 'require) orig-require))
         (copy-readtable read-table *readtable*)))))
 
-#+:clozure (load-defsystem)
+(load-defsystem)
 
 #+:clozure
 (progn
