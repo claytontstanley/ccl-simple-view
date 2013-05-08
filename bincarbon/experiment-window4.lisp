@@ -387,8 +387,7 @@
       (cond ((osx-p)
              (launch-url url-str))
             (t
-             #+:digitool (ccl::msie-activate-url url-str)
-             #+:clozure (error "should not ever get here"))))))
+             (error "should not ever get here"))))))
 
 
 (defmethod make-data-path ((wind experiment-window) type)

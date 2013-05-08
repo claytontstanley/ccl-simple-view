@@ -11,6 +11,10 @@
   `(with-rectangle-arg (,var ,left ,top ,right ,bottom)
      ,@body))
 
+#+:clozure
+(defun %put-long (ptr data &optional (offset 0))
+    (setf (%get-long (%inc-ptr ptr offset)) data)) 
+
 ; defsystem.lisp in ccl/tools overwrites default #'require function
 ; with a broken version. There is a global variable that
 ; you can set in this file to not redefine require, but #'require is

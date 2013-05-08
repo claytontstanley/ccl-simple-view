@@ -5,6 +5,7 @@
       (funcall
         (case symb
           (defun #'fboundp)
+          (defgeneric #'fboundp)
           (defmacro #'macro-function)
           (defvar #'boundp))
         name)
