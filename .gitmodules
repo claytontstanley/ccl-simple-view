@@ -43,3 +43,6 @@
 [submodule "submodules/DMTracker"]
 	path = submodules/DMTracker
 	url = ssh://chil/srv/git/DMTracker
+[submodule "submodules/stanley-thesis"]
+	path = submodules/stanley-thesis
+	url = ssh://raid@raid/srv/git/thesis
