@@ -116,6 +116,9 @@
     :view-size (make-point 200 200)
     :contained-view-specifically 'contained-view))
 
+(defun process-active-p (p)
+  (ccl::process-active-p p))
+
 ; Give each window a maintenance thread. In that thread,
 ; periodically check if the window is the frontmost window.
 ; If it is, call window-null-event-handler on the window. 
@@ -1244,6 +1247,15 @@
   (color-symbol->system-color
     (guard-!nil
       (cond ((eq pattern *black-pattern*) 'black)))))
+
+(defmethod paint-polygon ((view simple-view) polygon)
+  (with-fallback-focused-view view
+    (fill-polygon view (pen-pattern view) polygon)))
+
+(defmethod erase-polygon ((view simple-view) polygon)
+  (with-fallback-focused-view view 
+    (with-fore-color (get-back-color (content-view view))
+      (fill-polygon view (pen-pattern view) polygon))))
 
 (defmethod fill-polygon ((view simple-view) pattern polygon)
   #-:sv-dev (declare (ignore polygon pattern))
