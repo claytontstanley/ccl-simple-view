@@ -517,11 +517,11 @@
 (ccl::register-character-name "ForwardArrow" #\U+F703)
 (ccl::register-character-name "CheckMark" #\t)
 
-(defparameter *arrow-cursor* (#/arrowCursor ns:ns-cursor))
-(defparameter *crosshair-cursor* (#/crosshairCursor ns:ns-cursor))
-(defparameter *i-beam-cursor* (#/IBeamCursor ns:ns-cursor))
-
-(defparameter *black-pattern* 'black-pattern-fixme)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defparameter *arrow-cursor* (#/arrowCursor ns:ns-cursor))
+  (defparameter *crosshair-cursor* (#/crosshairCursor ns:ns-cursor))
+  (defparameter *i-beam-cursor* (#/IBeamCursor ns:ns-cursor))
+  (defparameter *black-pattern* 'black-pattern-fixme))
 
 (defun make-point (x y)
   (easygui::point x y :allow-negative-p t))
