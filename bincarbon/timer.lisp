@@ -73,15 +73,9 @@
 
 (defclass timer () ())
 
-#+:digitool
 (defclass event-timer (timer)
   ((tickms :accessor tickms :initarg :tickms :initform 50/3)
    (start-time :accessor start-time :initarg :start-time :initform nil)
-   ))
-
-#+clozure
-(defclass event-timer (timer)
-  ((start-time :accessor start-time :initarg :start-time :initform nil)
    ))
 
 #+:digitool

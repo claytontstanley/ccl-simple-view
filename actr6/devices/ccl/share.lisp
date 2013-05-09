@@ -56,20 +56,26 @@
 (defclass view-text-mixin (easygui::view-text-mixin)
   ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
 
+; TODO: Should this default font spec be used for the default initarg to :view-font (as defined in view-mixin)?
+(defparameter *fred-default-font-spec* (list "profont" 9 :PLAIN))
+
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position :initform (make-point 0 0))
-   (easygui::font :initform (second (parse-mcl-initarg :view-font '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0)))))
    (temp-view-subviews :initarg :view-subviews)
    (easygui::foreground :initform (color-symbol->system-color 'black))
-   (easygui::background :initform (#/clearColor ns:ns-color))))
+   (easygui::background :initform (#/clearColor ns:ns-color)))
+  (:default-initargs :view-font '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0))))
 
 ; Try to keep the class hierarchy of the public interface the same as it is for MCL.
 ; So, simple-view is top; then view (allows subviews); then types that inherit from view,
 ; like, window, dialog stuff, etc.
 
 (defclass simple-view (easygui::simple-view view-mixin output-stream pen-mixin)
-  ((bezier-path :accessor bezier-path :initform nil)))
+  ((bezier-path :accessor bezier-path :initform nil)
+   (direction :initarg :direction)
+   (wptr :initarg :wptr)
+   (view-scroll-position :initarg :view-scroll-position)))
 
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
@@ -79,14 +85,53 @@
 ; So in order to make it so that the font slot is correct for easygui, shadow the :view-font
 ; initarg if it is provided by the equivalent ns-font value
 
-(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color view-font)
-  (if (or back-color view-font)
-    (let ((view-font-lst (if view-font
-                           (parse-mcl-initarg :view-font view-font)))
-          (back-color-lst (if back-color
-                            (parse-mcl-initarg :back-color back-color))))
-      (apply #'call-next-method view (nconc view-font-lst back-color-lst args)))
-    (call-next-method)))
+(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color view-font view-size view-position)
+  (let ((accum
+          (loop for keyword in (list :back-color :view-font :view-size :view-position) 
+                for value in (list back-color view-font view-size view-position)
+                when value append (parse-mcl-initarg keyword value))))
+    (apply #'call-next-method view (nconc accum args))))
+
+; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
+
+(defun convert-font (name pt)
+  (guard ((not (equal it1 ccl:+null-ptr+)) "font not found for font-name ~a" name)
+    (#/fontWithName:size: ns:ns-font
+     (objc:make-nsstring name)
+     pt)))
+
+(defun color-lst->color (lst)
+  (destructuring-bind (type val) lst
+    (ecase type
+      (:color (mcl-color->system-color val))
+      (:color-index
+        (unless (eq val 0)
+          (error "need to support this")
+          ; Default, so return nil
+          ())))))
+
+(defmethod parse-mcl-initarg ((keyword (eql :view-font)) font-lst)
+  (let ((name) (pt) (color))
+    (dolist (atom font-lst)
+      (etypecase atom
+        (string (setf name atom))
+        (integer (setf pt atom))
+        ; FIXME; Parse these style and transfer mode values
+        (keyword ())
+        (list (setf color (color-lst->color atom)))))
+    (nconc
+      (list :view-font (convert-font name pt))
+      (if color
+        (list :fore-color color)))))
+
+(defmethod parse-mcl-initarg ((keyword (eql :back-color)) back-color)
+  (list :back-color (mcl-color->system-color back-color)))
+
+(defmethod parse-mcl-initarg ((keyword (eql :view-size)) view-size)
+  (list :view-size (mcl-point->system-point view-size)))
+
+(defmethod parse-mcl-initarg ((keyword (eql :view-position)) view-position)
+  (list :view-position (mcl-point->system-point view-position)))
 
 (defclass view (simple-view)
   ()
@@ -110,7 +155,11 @@
    (close-requested-p :accessor close-requested-p :initform nil)
    (window-close-fct :reader window-close-fct :initform #'easygui:perform-close)
    (sema-finished-close :accessor sema-finished-close :initform (make-semaphore))
-   (sema-request-close :accessor sema-request-close :initform (make-semaphore)))
+   (sema-request-close :accessor sema-request-close :initform (make-semaphore))
+   (window-do-first-click :initarg :window-do-first-click)
+   (window-other-attributes :initarg :window-other-attributes)
+   (process :initarg :process)
+   (auto-position :initarg :auto-position))
   (:default-initargs 
     :view-position (make-point 200 200)
     :view-size (make-point 200 200)
@@ -545,6 +594,23 @@
     (destructuring-bind (x2 y2) (as-list p2)
       (and (eq x1 x2)
            (eq y1 y2)))))
+
+; This reverse engineering was done entirely by pattern matching.
+; I need to learn more about how bit shifting works if I want to 
+; be completely confident that this implementation is correct.
+
+(defun mcl-point-h (pt)
+  (logand (lsh pt 0) #xffff))
+
+(defun mcl-point-v (pt)
+  (logand (lsh pt -16) #xffff))
+
+(defun mcl-point->system-point (mcl-point)
+  (etypecase mcl-point
+    (integer (make-point
+               (mcl-point-h mcl-point)
+               (mcl-point-v mcl-point)))
+    (easygui::eg-point mcl-point)))
 
 (defmethod point-string ((point easygui::eg-point))
   (format nil "#@(~a ~a)" (point-x point) (point-y point)))
@@ -1326,49 +1392,12 @@
                          string)))))
       (draw-string string))))
 
-; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
-
-(defun convert-font (name pt)
-  (guard ((not (equal it1 ccl:+null-ptr+)) "font not found for font-name ~a" name)
-    (#/fontWithName:size: ns:ns-font
-     (objc:make-nsstring name)
-     pt)))
-
-(defun color-lst->color (lst)
-  (destructuring-bind (type val) lst
-    (ecase type
-      (:color (mcl-color->system-color val))
-      (:color-index
-        (unless (eq val 0)
-          (error "need to support this")
-          ; Default, so return nil
-          ())))))
-
-(defmethod parse-mcl-initarg ((keyword (eql :view-font)) font-lst)
-  (let ((name) (pt) (color))
-    (dolist (atom font-lst)
-      (etypecase atom
-        (string (setf name atom))
-        (integer (setf pt atom))
-        ; FIXME; Parse these style and transfer mode values
-        (keyword ())
-        (list (setf color (color-lst->color atom)))))
-    (nconc
-      (list :view-font (convert-font name pt))
-      (if color
-        (list :fore-color color)))))
-
-(defmethod parse-mcl-initarg ((keyword (eql :back-color)) back-color)
-  (list :back-color (mcl-color->system-color back-color)))
+; Handling fonts and string width/height in pixels
 
 (defmethod view-font ((view simple-view))
   (guard-!null-ptr
     (guard-!nil
       (easygui:view-font view))))
-
-; Handling fonts and string width/height in pixels
-
-(defparameter *fred-default-font-spec* (list "profont" 9 :PLAIN))
 
 (defun font-info (font-spec)
   (values (guard-!null-ptr (#/ascender font-spec))
