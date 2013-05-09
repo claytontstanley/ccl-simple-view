@@ -67,15 +67,28 @@
    (easygui::background :initform (#/clearColor ns:ns-color)))
   (:default-initargs :view-font '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0))))
 
+; MCL allows for subviews to be passed at object initialization. I tried shadowing the 'easygui::subviews :initargs symbol
+; with :view-subviews, so that MCL code cleanly initialized easygui's subviews slot, but it turns out that this slot isn't always 
+; where the subviews are supposed to go. If the view is a window, then the subviews go as subviews under the content-view slot.
+; easygui handles all of this in their add-subviews method, so the technique here is to use a temp slot on the view-mixin class,
+; make that :initarg :view-subviews, and then on object initialization, take any provided subviews and call easygui's add-subviews method
+; on them. Then clear the temp slot. It's a hack, but it seems to work, and requires minimal code additions and still uses
+; easygui's add-subviews machinery, etc.
+
+(defmethod initialize-instance :after ((view view-mixin) &key) 
+  (when (slot-boundp view 'temp-view-subviews)
+    (apply #'add-subviews view (slot-value view 'temp-view-subviews))
+    (slot-makunbound view 'temp-view-subviews)))
+
 ; Try to keep the class hierarchy of the public interface the same as it is for MCL.
 ; So, simple-view is top; then view (allows subviews); then types that inherit from view,
 ; like, window, dialog stuff, etc.
 
 (defclass simple-view (easygui::simple-view view-mixin output-stream pen-mixin)
   ((bezier-path :accessor bezier-path :initform nil)
-   (direction :initarg :direction)
-   (wptr :initarg :wptr)
-   (view-scroll-position :initarg :view-scroll-position)))
+   (direction :initarg :direction :initform :output)
+   (wptr :initarg :wptr :initform nil)
+   (view-scroll-position :initarg :view-scroll-position :initform (make-point 0 0))))
 
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
@@ -91,6 +104,13 @@
                 for value in (list back-color view-font view-size view-position)
                 when value append (parse-mcl-initarg keyword value))))
     (apply #'call-next-method view (nconc accum args))))
+
+(defmethod initialize-instance :after ((view simple-view) &key)
+  (with-slots (direction wptr view-scroll-position) view
+    (guard ((eq direction :output) "only :output for direction slot is allowed"))
+    (guard ((eq wptr nil) "only nil for wptr slot is allowed"))
+    (guard ((points-equal-p view-scroll-position
+                           (make-point 0 0)) "non-(0,0) view-scroll-position is not currently implemented"))))
 
 ; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
 
@@ -156,10 +176,10 @@
    (window-close-fct :reader window-close-fct :initform #'easygui:perform-close)
    (sema-finished-close :accessor sema-finished-close :initform (make-semaphore))
    (sema-request-close :accessor sema-request-close :initform (make-semaphore))
-   (window-do-first-click :initarg :window-do-first-click)
-   (window-other-attributes :initarg :window-other-attributes)
-   (process :initarg :process)
-   (auto-position :initarg :auto-position))
+   (window-do-first-click :initarg :window-do-first-click :initform nil)
+   (window-other-attributes :initarg :window-other-attributes :initform nil)
+   (process :initarg :process :initform nil)
+   (auto-position :initarg :auto-position :initform nil))
   (:default-initargs 
     :view-position (make-point 200 200)
     :view-size (make-point 200 200)
@@ -167,6 +187,13 @@
 
 (defun process-active-p (p)
   (ccl::process-active-p p))
+
+(defmethod initialize-instance :after ((win window) &key)
+  (with-slots (window-do-first-click window-other-attributes process auto-position) win
+    (guard ((null window-do-first-click) "non-nil window-do-first-click not currently implemented"))
+    (guard ((null window-other-attributes) "non-nil window-other-attributes not currently implemented"))
+    (guard ((null process) "process slot should be nil"))
+    (guard ((null auto-position) "non-nil auto-position not currently implemented"))))
 
 ; Give each window a maintenance thread. In that thread,
 ; periodically check if the window is the frontmost window.
@@ -1417,19 +1444,6 @@
     (ns:ns-size-width size)))
 
 ; Miscellaneous wrappers
-
-; MCL allows for subviews to be passed at object initialization. I tried shadowing the 'easygui::subviews :initargs symbol
-; with :view-subviews, so that MCL code cleanly initialized easygui's subviews slot, but it turns out that this slot isn't always 
-; where the subviews are supposed to go. If the view is a window, then the subviews go as subviews under the content-view slot.
-; easygui handles all of this in their add-subviews method, so the technique here is to use a temp slot on the view-mixin class,
-; make that :initarg :view-subviews, and then on object initialization, take any provided subviews and call easygui's add-subviews method
-; on them. Then clear the temp slot. It's a hack, but it seems to work, and requires minimal code additions and still uses
-; easygui's add-subviews machinery, etc.
-
-(defmethod initialize-instance :after ((view view-mixin) &key) 
-  (when (slot-boundp view 'temp-view-subviews)
-    (apply #'add-subviews view (slot-value view 'temp-view-subviews))
-    (slot-makunbound view 'temp-view-subviews)))
 
 ; Mock up the :quickdraw package and place it on *modules*. Keeps from having to comment out the (require :quickdraw) lines in the MCL code
 (defpackage quickdraw
