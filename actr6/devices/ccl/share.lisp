@@ -536,6 +536,16 @@
     (- (point-x p1) (point-x p2))
     (- (point-y p1) (point-y p2))))
 
+(defmethod as-list ((p easygui::eg-point))
+  (list (point-h p)
+        (point-v p)))
+
+(defmethod points-equal-p ((p1 easygui::eg-point) (p2 easygui::eg-point))
+  (destructuring-bind (x1 y1) (as-list p1)
+    (destructuring-bind (x2 y2) (as-list p2)
+      (and (eq x1 x2)
+           (eq y1 y2)))))
+
 (defmethod point-string ((point easygui::eg-point))
   (format nil "#@(~a ~a)" (point-x point) (point-y point)))
 
@@ -1156,10 +1166,11 @@
 
 (defmethod qd-move-to (x y)
   (let ((view *current-focused-view*))
-    (let ((position (make-point x y)))
-      (when (bezier-path view)
-        (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y)))
-      (setf (pen-position view) position))))
+    (unless (points-equal-p (pen-position view) (make-point x y))
+      (let ((position (make-point x y)))
+        (when (bezier-path view)
+          (#/moveToPoint: (bezier-path view) (ns:make-ns-point x y)))
+        (setf (pen-position view) position)))))
 
 (defmethod line ((view simple-view) x &optional (y nil))
   (with-fallback-focused-view view
@@ -1175,16 +1186,17 @@
 
 (defmethod qd-line-to (endx endy)
   (let ((view *current-focused-view*))
-    (destructuring-bind (startx starty) (list (point-x (pen-position view))
-                                              (point-y (pen-position view)))
-      (when (bezier-path view)
-        (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
-      (setf (pen-position view) (make-point endx endy))
-      (with-window-of-focused-view-fallback-fore-color
-        (#/strokeLineFromPoint:toPoint:
-         ns:ns-bezier-path
-         (ns:make-ns-point startx starty) 
-         (ns:make-ns-point endx endy))))))
+    (unless (points-equal-p (pen-position view) (make-point endx endy))
+      (destructuring-bind (startx starty) (list (point-x (pen-position view))
+                                                (point-y (pen-position view)))
+        (when (bezier-path view)
+          (#/lineToPoint: (bezier-path view) (ns:make-ns-point endx endy)))
+        (setf (pen-position view) (make-point endx endy))
+        (with-window-of-focused-view-fallback-fore-color
+          (#/strokeLineFromPoint:toPoint:
+           ns:ns-bezier-path
+           (ns:make-ns-point startx starty) 
+           (ns:make-ns-point endx endy)))))))
 
 (defmethod frame-oval ((view simple-view) left &optional top right bottom)
   (let* ((rect (make-rect :from-mcl-spec left top right bottom))
@@ -1258,23 +1270,23 @@
       (fill-polygon view (pen-pattern view) polygon))))
 
 (defmethod fill-polygon ((view simple-view) pattern polygon)
-  #-:sv-dev (declare (ignore polygon pattern))
+  #-:sv-dev (declare (ignore pattern))
   (with-fallback-focused-view view
     (with-window-of-focused-view-fallback-fore-color
-      (#/fill (bezier-path view)))))
+      (#/fill polygon))))
 
 (defmethod frame-polygon ((view simple-view) polygon)
-  #-:sv-dev (declare (ignore polygon))
   (with-fallback-focused-view view
     (with-window-of-focused-view-fallback-fore-color
-      (#/stroke (bezier-path view)))))
+      (#/stroke polygon))))
 
 (defmethod kill-polygon ((polygon ns:ns-bezier-path))
   (#/release polygon)
   (setf polygon nil))
 
 (defmethod get-polygon ((view simple-view))
-  (bezier-path view))
+  (prog1 (bezier-path view)
+    (start-polygon view)))
 
 ; FIXME: Currently it's expected that a format call to a view is done only once per view-draw-contents. So write
 ; a single string to the view, etc. But CCL calls write-char when the string has a negative sign at the beginning.

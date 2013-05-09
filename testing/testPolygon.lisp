@@ -32,3 +32,36 @@
 
 (add-subviews *win* *view*)
 
+(defparameter *new-view* nil)
+
+(defclass polygon-view (simple-view)
+  ((polygon :accessor polygon)))
+
+(setf *new-view* (make-instance 'polygon-view
+                                :view-size (make-point 50 50)
+                                :view-position (make-point 20 50)))
+
+(defmethod view-draw-contents ((self (eql *new-view*)))
+  (with-focused-view *win*
+    (with-fore-color (get-fore-color self)
+      (paint-polygon *win* (polygon self)))))
+
+(with-focused-view *win*
+  (move-to *new-view* 100 0)
+  (start-polygon *new-view*)
+  (line *new-view* 110 0)
+  (move-to *new-view* 110 0)
+  (line *new-view* 110 10)
+  (move-to *new-view* 110 10)
+  (line *new-view* 100 10)
+  (move-to *new-view* 100 10)
+  (line *new-view* 100 0)
+  (move-to *new-view* 100 0)
+  (setf (polygon *new-view*) (get-polygon *win*)))
+
+(sleep 2)
+(add-subviews *win* *new-view*)
+#|
+(inspect *new-view*)
+(invalidate-view *win*)
+|#
