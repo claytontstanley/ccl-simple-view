@@ -2,8 +2,11 @@
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
 (load-as-lst ".." "submodules" "stanley-thesis" "model.lisp")
+(load-as-lst ".." "submodules" "stanley-thesis" "experiment-replay.lisp")
+
 
 #|
+(thing2lisp)
 (begin-experiment
   :eyetracking nil
   :allowing-quit t

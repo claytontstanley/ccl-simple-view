@@ -98,10 +98,10 @@
 ; So in order to make it so that the font slot is correct for easygui, shadow the :view-font
 ; initarg if it is provided by the equivalent ns-font value
 
-(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color view-font view-size view-position)
+(defmethod initialize-instance :around ((view simple-view) &rest args &key back-color view-font view-size view-position view-scroll-position)
   (let ((accum
-          (loop for keyword in (list :back-color :view-font :view-size :view-position) 
-                for value in (list back-color view-font view-size view-position)
+          (loop for keyword in (list :back-color :view-font :view-size :view-position :view-scroll-position) 
+                for value in (list back-color view-font view-size view-position view-scroll-position)
                 when value append (parse-mcl-initarg keyword value))))
     (apply #'call-next-method view (nconc accum args))))
 
@@ -153,6 +153,9 @@
 (defmethod parse-mcl-initarg ((keyword (eql :view-position)) view-position)
   (list :view-position (mcl-point->system-point view-position)))
 
+(defmethod parse-mcl-initarg ((keyword (eql :view-scroll-position)) view-scroll-position)
+  (list :view-scroll-position (mcl-point->system-point view-scroll-position)))
+
 (defclass view (simple-view)
   ()
   (:documentation "Top-level class for views"))
@@ -177,7 +180,7 @@
    (sema-finished-close :accessor sema-finished-close :initform (make-semaphore))
    (sema-request-close :accessor sema-request-close :initform (make-semaphore))
    (window-do-first-click :initarg :window-do-first-click :initform nil)
-   (window-other-attributes :initarg :window-other-attributes :initform nil)
+   (window-other-attributes :initarg :window-other-attributes :initform 0)
    (process :initarg :process :initform nil)
    (auto-position :initarg :auto-position :initform nil))
   (:default-initargs 
@@ -191,9 +194,9 @@
 (defmethod initialize-instance :after ((win window) &key)
   (with-slots (window-do-first-click window-other-attributes process auto-position) win
     (guard ((null window-do-first-click) "non-nil window-do-first-click not currently implemented"))
-    (guard ((null window-other-attributes) "non-nil window-other-attributes not currently implemented"))
+    (guard ((eq 0 window-other-attributes) "non-zero window-other-attributes not currently implemented"))
     (guard ((null process) "process slot should be nil"))
-    (guard ((null auto-position) "non-nil auto-position not currently implemented"))))
+    (guard ((member auto-position (list nil :noAutoCenter)) "auto-position not currently implemented"))))
 
 ; Give each window a maintenance thread. In that thread,
 ; periodically check if the window is the frontmost window.
