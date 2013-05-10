@@ -66,6 +66,11 @@
 ;;; 2012.08.06 cts
 ;;;             : Ported the code to work with Clozure Common Lisp, while maintaining
 ;;;               backwards compatibility with RMCL
+;;; 2013.05.09 cts
+;;;             : Added a write-slot method in the write-readable code that allows
+;;;               customization of both the :initarg and the value of a slot value
+;;;               pair in an object. For example, printing of the pair can be suppressed
+;;;               by subclassing the method and printing nothing to the stream.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:clozure (require :ccl-simple-view)

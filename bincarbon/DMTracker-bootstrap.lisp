@@ -51,8 +51,8 @@
   (let ((*module-search-path*
           (cons (pathname dmtracker-path) *module-search-path*))) 
     (setf (logical-pathname-translations "DMTracker") `(("**;*.*" ,(pathname dmtracker-path))))
-    (require :dmtracker.system) 
-    (require :dmtracker-ff.system)))
+    (require :dmtracker) 
+    (require :dmtracker-ff)))
 
 (let ((mk::*tell-user-when-done* t)
       (mk::*load-source-if-no-binary* t)
