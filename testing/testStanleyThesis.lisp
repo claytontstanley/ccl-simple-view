@@ -3,7 +3,8 @@
 
 (load-file-list "file-lists" "StanleyThesis" "testStanleyThesis.txt")
 
-(thing2lisp)
+(let ((*path* (format nil "~a/" (path-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source"))))
+  (things2lisp :snums (list 50)))
 
 #|
 
