@@ -3,7 +3,7 @@
   (:metaclass ns:+ns-object))
 
 (defclass thermometer (view)
-  ((direction :reader direction :initarg :direction :initform :vertical)
+  ((thermometer-direction :reader thermometer-direction :initarg :thermometer-direction :initform :vertical)
    (pattern :initarg :pattern)
    (thermometer-value :reader thermometer-value :initarg :thermometer-value :initform 0)
    (max-value :initarg :max-value :initform 100
@@ -12,10 +12,10 @@
     :specifically 'cocoa-thermometer
     :fore-color (color-symbol->system-color 'black)))
 
-(defmethod (setf direction) (direction (self thermometer))
-  (unwind-protect (setf (slot-value self 'direction) direction)
+(defmethod (setf thermometer-direction) (thermometer-direction (self thermometer))
+  (unwind-protect (setf (slot-value self 'thermometer-direction) thermometer-direction)
     (#/setBoundsRotation: (cocoa-ref self)
-     (ecase direction
+     (ecase thermometer-direction
        (:horizontal 0.0)
        (:vertical 90.0))))
   (easygui::set-needs-display self t))
@@ -31,7 +31,7 @@
 (defmethod initialize-instance :after ((view thermometer) &key)
   (#/setLevelIndicatorStyle: (#/cell (cocoa-ref view))
    #$NSContinuousCapacityLevelIndicatorStyle)
-  (setf (direction view) (direction view))
+  (setf (thermometer-direction view) (thermometer-direction view))
   (setf (thermometer-value view) (thermometer-value view))
   (setf (thermometer-max-value view) (thermometer-max-value view)))
 
