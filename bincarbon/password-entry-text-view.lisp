@@ -86,7 +86,7 @@
     (#/replaceLayoutManager: (#/textContainer self)
      (#/init (#/alloc easygui::cocoa-password-entry-layout-manager)))
     (#/setFont: self
-     (convert-font "Courier" 12))))
+     (make-font "Courier" 12))))
 
 (objc:defmethod (#/drawGlyphsForGlyphRange:atPoint: :void) ((self easygui::cocoa-password-entry-layout-manager) (glyph-range #>NSRange) (at-point #>NSPoint))
   (let ((glyph-cnt (#/numberOfGlyphs self)))

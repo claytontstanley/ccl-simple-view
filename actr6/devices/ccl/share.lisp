@@ -64,7 +64,7 @@
    (easygui::position :initarg :view-position :initform (make-point 0 0))
    (temp-view-subviews :initarg :view-subviews)
    (easygui::foreground :initform (color-symbol->system-color 'black))
-   (easygui::background :initform (#/clearColor ns:ns-color)))
+   (easygui::background :initform (make-color 0 0 0 0.0)))
   (:default-initargs :view-font '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0))))
 
 ; MCL allows for subviews to be passed at object initialization. I tried shadowing the 'easygui::subviews :initargs symbol
@@ -114,7 +114,7 @@
 
 ; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
 
-(defun convert-font (name pt)
+(defun make-font (name pt)
   (guard ((not (equal it1 ccl:+null-ptr+)) "font not found for font-name ~a" name)
     (#/fontWithName:size: ns:ns-font
      (objc:make-nsstring name)
@@ -140,7 +140,7 @@
         (keyword ())
         (list (setf color (color-lst->color atom)))))
     (nconc
-      (list :view-font (convert-font name pt))
+      (list :view-font (make-font name pt))
       (if color
         (list :fore-color color)))))
 
@@ -1445,6 +1445,12 @@
                 dict))
          (size (#/size attr)))
     (ns:ns-size-width size)))
+
+(defun font-point (font)
+  (#/pointSize font))
+
+(defun font-name (font)
+  (objc:lisp-string-from-nsstring (#/fontName font)))
 
 ; Miscellaneous wrappers
 

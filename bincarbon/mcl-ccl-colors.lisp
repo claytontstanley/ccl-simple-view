@@ -190,12 +190,9 @@
                (when (equal cur-rgb rgb)
                  (return-from rgb->color-symbol cur-symb))))))
 
-(defun rgb->system-color (red green blue)
-  (easygui:make-rgb :red red :green green :blue blue))
-
 (defun color-symbol->system-color (symb)
   (destructuring-bind (red green blue) (color-symbol->rgb symb)
-    (rgb->system-color red green blue)))
+    (make-color red green blue)))
 
 (defun system-color->symbol (color)
   (let ((red (easygui:rgb-red color))
@@ -228,37 +225,48 @@
                      (the fixnum g)
                      (the fixnum (ash b -8))))))
 
-(defun make-color (red green blue)
-  (mcl-color->system-color 
-    (make-mcl-color red green blue)))
+(defun make-color (red green blue &optional (opacity 1.0))
+  (easygui:make-rgb :red red :green green :blue blue :opacity opacity))
 
-(defun color-red (color &optional (component (logand (the fixnum (lsh color -16)) #xff)))
+(defun color-red (color)
+  (easygui:rgb-red color))
+
+(defun color-green (color)
+  (easygui:rgb-green color))
+
+(defun color-blue (color)
+  (easygui:rgb-blue color))
+
+(defun color-opacity (color)
+  (easygui:rgb-opacity color))
+
+(defun mcl-color-red (color &optional (component (logand (the fixnum (lsh color -16)) #xff)))
   "Returns the red portion of the color"
   (declare (fixnum component))
   (the fixnum (+ (the fixnum (ash component 8)) component)))
 
-(defun color-green (color &optional (component (logand (the fixnum (lsh color -8)) #xff)))
+(defun mcl-color-green (color &optional (component (logand (the fixnum (lsh color -8)) #xff)))
   "Returns the green portion of the color"
   (declare (fixnum component))
   (the fixnum (+ (the fixnum (ash component 8)) component)))
 
-(defun color-blue (color &optional (component (logand color #xff)))
+(defun mcl-color-blue (color &optional (component (logand color #xff)))
   "Returns the blue portion of the color"
   (declare (fixnum component))
   (the fixnum (+ (the fixnum (ash component 8)) component)))
 
-(defun color-values (color)
+(defun mcl-color-values (color)
   "Given an encoded color, returns the red, green, and blue components"
   (values
-    (ceiling (* (/ (float (color-red color)) (float 65535)) 255))
-    (ceiling (* (/ (float (color-green color)) (float 65535)) 255))
-    (ceiling (* (/ (float (color-blue color)) (float 65535)) 255))))
+    (ceiling (* (/ (float (mcl-color-red color)) (float 65535)) 255))
+    (ceiling (* (/ (float (mcl-color-green color)) (float 65535)) 255))
+    (ceiling (* (/ (float (mcl-color-blue color)) (float 65535)) 255))))
 
 (defun mcl-color->system-color (color)
   "Converts an MCL color to a CCL system color"
   (etypecase color
-    (integer (multiple-value-bind (r g b) (color-values color)
-               (rgb->system-color r g b)))
+    (integer (multiple-value-bind (r g b) (mcl-color-values color)
+               (make-color r g b)))
     (ns:ns-color color)))
 
 (defparameter *black-color* (color-symbol->system-color 'black))

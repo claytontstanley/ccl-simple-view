@@ -648,6 +648,26 @@
   (princ ")" strm)
   thing)
 
+(defmethod write-readable ((thing ns:ns-color) &optional (strm t))
+  (format strm "~%(make-color ~a ~a ~a ~,10f)"
+          (color-red thing)
+          (color-green thing)
+          (color-blue thing)
+          (color-opacity thing)))
+
+(defmethod write-readable ((thing ns:ns-font) &optional (strm t))
+  (format strm "~%(make-font ~S ~,3f)"
+          (font-name thing)
+          (font-point thing)))
+
+(defmethod write-slot :around (thing initarg-name slot-name &optional (strm 1))
+  (declare (ignore initarg-name strm))
+  (when (slot-boundp thing slot-name)
+    (call-next-method)))
+
+(defmethod write-slot (thing (initarg-name (eql :cocoa-ref)) slot-name &optional (strm t))
+  (declare (ignore thing slot-name strm)))
+
 (defmethod write-slot (thing initarg-name slot-name &optional (strm t))
   (format strm " ~S " initarg-name) 
   (write-readable (slot-value thing slot-name) strm))

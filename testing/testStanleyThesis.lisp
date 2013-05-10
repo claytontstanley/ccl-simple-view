@@ -3,8 +3,17 @@
 
 (load-file-list "file-lists" "StanleyThesis" "testStanleyThesis.txt")
 
-#|
 (thing2lisp)
+
+#|
+
+(load-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source" "subj050.lisp")
+
+(with-open-file (strm "foo.lisp" :direction :output :if-exists :supersede) 
+  (write-readable *library-experiment-window* strm))
+
+(load "~/foo.lisp")
+
 (begin-experiment
   :eyetracking nil
   :allowing-quit t
