@@ -621,40 +621,36 @@
 (defgeneric write-readable (thing &optional strm)
   (:documentation "Write THING to STRM in a way that it can be re-read."))
 
-
 (defmethod write-readable ((thing readable-writer) &optional (strm t))
+  (break)
   (let* ((slot-desc (class-instance-slots (class-of thing))))
     (write-mk-in thing)
     (dolist (sname (slot-lst thing))
-      (format strm " ~S " (caar (last (assoc sname slot-desc))))
-      (write-readable (slot-value thing sname)))
+      (write-slot thing 
+                  (caar (last (assoc sname slot-desc)))
+                  sname
+                  strm))
     (princ ")" strm)
     thing))
 
-#-mcl-common-mop-subset
 (defmethod write-readable ((thing standard-object) &optional (strm t))
   (write-mk-in thing strm)
   (dolist (sdesc (class-instance-slots (class-of thing)))
-    (format strm " ~S " (caar (last sdesc)))
-    (write-readable (slot-value thing (first sdesc)) strm))
+    (write-slot thing
+                (first (slot-definition-initargs sdesc))
+                (slot-definition-name sdesc)
+                strm))
   (princ ")" strm)
   thing)
 
-#+mcl-common-mop-subset
-(defmethod write-readable ((thing standard-object) &optional (strm t))
-  (write-mk-in thing strm)
-  (dolist (sdesc (class-instance-slots (class-of thing)))
-    (format strm " ~S " (first (slot-definition-initargs sdesc)))
-    (write-readable (slot-value thing (slot-definition-name sdesc)) strm))
-  (princ ")" strm)
-  thing)
-
+(defmethod write-slot (thing initarg-name slot-name &optional (strm t))
+  (format strm " ~S " initarg-name) 
+  (write-readable (slot-value thing slot-name) strm))
 
 (defmethod write-mk-in ((thing standard-object) &optional (strm t))
   (format strm "~%(make-instance ")
   (write-readable (class-name (class-of thing)) strm)
   (terpri strm))
-
 
 (defmethod write-readable ((thing list) &optional (strm t))
   (if (listp (rest thing))

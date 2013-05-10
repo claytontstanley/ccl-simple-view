@@ -1,1 +1,3 @@
 -contents-of-directory should be in utils
+-add test that loads .lisp file and writes result file.
+-separate CI from unit tests
