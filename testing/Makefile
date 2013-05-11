@@ -1,3 +1,5 @@
+SHELL := /usr/bin/env bash
+
 # Think text substitution / template programming. I don't use Make to compile C files. I use it
 # as a templating language to manipulate Bash commands.
 

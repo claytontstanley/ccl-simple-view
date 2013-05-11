@@ -124,3 +124,5 @@
                                        value line
                                        color ,(get-fore-color self)
                                        ))))))))
+
+(provide :device-extensions)

@@ -1,4 +1,9 @@
+bincarbon/device-extensions.lisp
 testing/testCCLDevice.lisp
+testing/testWindow.lisp
+testing/testIcons.lisp
+testing/testButtons.lisp
 testing/testImages.lisp
 testing/testLiner.lisp
 testing/testModalDialog.lisp
+testing/testEnsureDefined.lisp

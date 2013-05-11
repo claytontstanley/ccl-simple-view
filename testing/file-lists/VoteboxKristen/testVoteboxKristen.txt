@@ -1,4 +1,5 @@
 bincarbon/misc-lib.lisp
 bincarbon/pict-svm.lisp
+bincarbon/device-extensions.lisp
 submodules/kristenVotebox/x98 KG_VBEmulator058.lisp
 submodules/kristenVotebox/x98model vers11_19_10 v01.lisp

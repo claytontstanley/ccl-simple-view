@@ -2,7 +2,7 @@
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
 (setf *image-path*
-      (format nil "~a~a/~a" (directory-namestring *load-truename*) "data" "voteboxbg.aif"))
+      (format nil "~a~a/~a" (directory-namestring *load-truename*) "data" "voteboxbg.tiff"))
 
 (add-resource (create-resource 'image *image-path*) "voteboxbg")
 
@@ -15,12 +15,19 @@
                              :view-size (make-point 20 20)
                              :view-nick-name :image))
 
-(inspect *win*)
 
 (view-window (view-named :image *win*))
 
+(defparameter *clicked* nil)
+
 (defmethod view-click-event-handler ((view icon-dialog-item) location)
-  (beep))
+  (setf *clicked* t))
+
+(destructuring-bind (x y) (as-list (add-points (view-position *win*) (make-point 10 10)))
+  (left-mouse-click (make-point x y))
+  (left-mouse-click (make-point x y)))
+
+(check *clicked*)
 
 #|
 (make-instance 'image-view)

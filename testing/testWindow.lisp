@@ -3,9 +3,9 @@
 
 (setf *win* (make-instance 'window))
 
-(make-instance 'windoid)
-
-(inspect *win*)
+(let ((win (make-instance 'windoid)))
+  (sleep 1)
+  (window-close win))
 
 (#/level (cocoa-ref *win*))
 
@@ -28,15 +28,8 @@
                                    :view-position (make-point 0 0)))
 
 (remove-subviews *win* (view-named :remove *win*))
-
+(apply #'remove-subviews *win* (subviews *win*))
 (print 5)
 
-
-(inspect *win*)
-
-(make-instance 'contained-view)
-
-(inspect *)
-
-
+(window-close *win*)
 

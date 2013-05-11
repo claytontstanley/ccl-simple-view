@@ -1,7 +1,7 @@
 testing/testSequenceDialog.lisp
 testing/testNSFMotor.lisp
 testing/testLevelIndicator.lisp
-testing/testMCLInterFaceBuilder.lisp
+testing/testMCLInterfaceBuilder.lisp
 testing/testFormat.lisp
 testing/testPolygon.lisp
 testing/testSound.lisp
@@ -10,3 +10,4 @@ testing/testTutorials.lisp
 testing/testVotebox.lisp
 testing/testVoteboxKristen.lisp
 testing/testTamboDisModel.lisp
+testing/testStanleyThesis.lisp

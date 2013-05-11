@@ -32,3 +32,19 @@
 
 (proc-display)
 (print-visicon)
+
+(check
+  (equal '((oval oval light-gray)
+           (text text red)
+           (visual-object box light-gray)
+           (text text orange)
+           (oval oval light-gray)
+           (text text black))
+         (print
+         (mapcar (lambda (chunk)
+                   (list 
+                     (chunk-slot-value-fct  chunk 'kind) 
+                     (chunk-slot-value-fct  chunk 'value)
+                     (chunk-slot-value-fct  chunk 'color) 
+                     ))
+                 (visicon-chunks (get-module :vision) t)))))

@@ -7,7 +7,7 @@
   (defvar *foobar* 5)
   (defmacro lsls ()
     ())
-  (defun a (b)
+  (defun aaaaaaaa (b)
     ())
   (defmacro aaaaa ()
     ()))
