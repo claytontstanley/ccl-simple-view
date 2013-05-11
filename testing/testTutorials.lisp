@@ -35,11 +35,4 @@
 
 (mapc #'do-tutorial (list  "unit2" "unit3" "unit5" "unit6" "unit8"))
 
-; These 3 functions are defined only in the tutorials (not part of main act-r functions), and they 
-; collide with functions defined in chil library utilities, so once done with running tutorials, be nice and clean
-; up after ourselves, so that collisions don't occur if you run other tests after this one
-
-(fmakunbound 'reset-display) 
-(fmakunbound 'run-block)
-(fmakunbound 'print-results)
 

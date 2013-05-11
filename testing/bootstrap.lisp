@@ -60,7 +60,10 @@
           (cond ((search "load-act-r-6.lisp" file)
                  #-:act-r-6.0 (load file))
                 (t
-                 (load file))))))))
+                 (load-file file))))))))
+
+(defmethod load-file (file)
+  (load file))
 
 ; Bootstrap script/logic starts here
 
