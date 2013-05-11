@@ -2,11 +2,11 @@
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
 (defmethod load-file :after (file)
-  (declare (ignore file))
-  (dolist (symbol (list 'begin-experiment 'reset-display 'run-block
-                        'print-results))
-    (when (fboundp symbol)
-      (fmakunbound symbol))))
+  (when (search "testTutorials" file)
+    (dolist (symbol (list 'print-results 'reset-display 'run-block))
+      (fmakunbound symbol)))
+  (when (search "testTamboDisModel" file)
+    (fmakunbound 'begin-experiment)))
 
 ; Don't reload ccl-simple-view code anymore; already loaded.
 (let ((*load-sv-dev-files-p* nil))
