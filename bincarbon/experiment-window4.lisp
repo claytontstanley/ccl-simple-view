@@ -649,16 +649,16 @@
   thing)
 
 (defmethod write-readable ((thing ns:ns-color) &optional (strm t))
-  (format strm "~%(make-color ~a ~a ~a ~,10f)"
+  (format strm "~%(make-color ~a ~a ~a ~a)"
           (color-red thing)
           (color-green thing)
           (color-blue thing)
-          (color-opacity thing)))
+          (coerce (color-opacity thing) 'single-float)))
 
 (defmethod write-readable ((thing ns:ns-font) &optional (strm t))
-  (format strm "~%(make-font ~S ~,3f)"
+  (format strm "~%(make-font ~S ~a)"
           (font-name thing)
-          (font-point thing)))
+          (coerce (font-point thing) 'single-float)))
 
 (defmethod write-slot :around (thing initarg-name slot-name &optional (strm 1))
   (declare (ignore initarg-name strm))

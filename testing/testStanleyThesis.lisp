@@ -6,14 +6,15 @@
 (let ((*path* (format nil "~a/" (path-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source"))))
   (things2lisp :snums (list 50)))
 
+(load-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source" "subj050 combined.lisp")
+
+(window-close *library-experiment-window*)
 #|
 
 (load-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source" "subj050.lisp")
 
 (with-open-file (strm "foo.lisp" :direction :output :if-exists :supersede) 
   (write-readable *library-experiment-window* strm))
-
-(load "~/foo.lisp")
 
 (begin-experiment
   :eyetracking nil
