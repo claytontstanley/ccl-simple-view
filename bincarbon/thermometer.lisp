@@ -1,3 +1,5 @@
+#-:clozure (error "This file only works with Clozure Common Lisp and not RMCL")
+
 (defclass cocoa-thermometer (easygui::cocoa-extension-mixin ns:ns-level-indicator)
   ()
   (:metaclass ns:+ns-object))
