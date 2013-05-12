@@ -66,3 +66,4 @@ deploy:
 	cd ${depdir} && make -C build all
 	cd ${depdir} && make -C docs/README
 	cd ${depdir} && make -C testing continuous-integration
+	ssh ${server} 'cd ${depdir} && ${git-is-clean}'

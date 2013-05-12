@@ -21,7 +21,6 @@ unit: clean-actr-compiled-files
 # All of the tests are pretty-much regression CI tests anyways. Don't really have unit tests (yet) for this repo
 continuous-integration: unit
 	${ccl} -e '(require :cocoa)' -l testCI.lisp ${cclQuit}
-	[[ -z "$$(git status --porcelain)" ]]
 
 clean-actr-compiled-files:
 	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' ${binaryFileStr} | while read line; do rm "$$line"; done
