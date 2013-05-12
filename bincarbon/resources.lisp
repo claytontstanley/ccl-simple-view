@@ -13,6 +13,8 @@
 ; added to the pool. If you want to alloc all resources currently in the pool (for pre-caching), 
 ; call #'alloc-resources
 
+#-:clozure (error "This file only works with Clozure Common Lisp and not RMCL")
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (require :cocoa))
 

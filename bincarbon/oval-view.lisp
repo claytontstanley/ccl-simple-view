@@ -1,3 +1,5 @@
+#-:clozure (error "This file only works with Clozure Common Lisp and not RMCL")
+
 (defclass oval-view (view)
   ((draw-offset :accessor draw-offset :initarg :draw-offset :initform 1))
   (:default-initargs

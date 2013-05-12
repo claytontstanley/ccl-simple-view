@@ -1,3 +1,5 @@
+#-:clozure (error "This file only works with Clozure Common Lisp and not RMCL")
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (require :ccl-simple-view))
 

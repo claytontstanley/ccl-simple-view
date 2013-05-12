@@ -57,6 +57,8 @@
 ;;; 2013.02.28 cts 
 ;;;             : Creation
 
+#-:clozure (error "This file only works with Clozure Common Lisp and not RMCL")
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (require :chil-ccl-utilities)
   (require :text-view))
