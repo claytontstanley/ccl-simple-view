@@ -37,11 +37,6 @@
 
 (load-defsystem)
 
-#+:clozure
-(progn
-  (provide :cfbundle)
-  (provide "cfbundle"))
-
 (defparameter *path-separator*
   #+:digitool ":"
   #+:clozure "/")
