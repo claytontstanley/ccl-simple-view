@@ -1454,14 +1454,11 @@
 
 ; Miscellaneous wrappers
 
-; Mock up the :quickdraw package and place it on *modules*. Keeps from having to comment out the (require :quickdraw) lines in the MCL code
-(defpackage quickdraw
-  (:use "COMMON-LISP")
-  (:nicknames :quickdraw))
+; Provide the :quickdraw package on *modules*. Keeps from having to comment out the (require :quickdraw) lines in the MCL code.
+; Also since the file here implements the quickdraw interface, it makes since to announce that the quickdraw library is available to use.
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (provide :quickdraw)
-  (provide "Quickdraw"))
+  (provide :quickdraw))
 
 ; To implement event-dispatch for Clozure, send a dummy function over to
 ; the main Cocoa thread to be evaluated, and block until that function is 
