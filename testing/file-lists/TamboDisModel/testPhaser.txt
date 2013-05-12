@@ -1,3 +1,4 @@
+bincarbon/thermometer.lisp
 bincarbon/device-extensions.lisp
 bincarbon/misc-lib.lisp
 bincarbon/timer.lisp
