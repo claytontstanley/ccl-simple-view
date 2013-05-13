@@ -1,45 +1,45 @@
 [submodule "submodules/actr6"]
 	path = submodules/actr6
-	url = git://cstanley.no-ip.biz/actr6
+	url = ssh://chil/srv/git/actr6
 [submodule "submodules/ccl"]
 	path = submodules/ccl
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/ccl
+	url = ssh://chil/srv/git/ccl
 [submodule "submodules/rmcl"]
 	path = submodules/rmcl
-	url = git://cstanley.no-ip.biz/rmcl.git
+	url = ssh://chil/srv/git/rmcl
 [submodule "submodules/lisp-dev"]
 	path = submodules/lisp-dev
-	url = git://cstanley.no-ip.biz/lisp-dev
+	url = ssh://raid@raid/srv/git/lisp-dev
 [submodule "submodules/ACT-R-VoteBox-Models"]
 	path = submodules/ACT-R-VoteBox-Models
-	url = git://cstanley.no-ip.biz/ACT-R-VoteBox-Models
+	url = ssh://chil/srv/git/ACT-R-VoteBox-Models
 [submodule "submodules/X83-Frank-Trek-11"]
 	path = submodules/X83-Frank-Trek-11
-	url = git://cstanley.no-ip.biz/X83-Frank-Trek-11
+	url = ssh://chil/srv/git/X83-Frank-Trek-11
 [submodule "submodules/kristenVotebox"]
 	path = submodules/kristenVotebox
-	url = git://cstanley.no-ip.biz/kristenVotebox
+	url = ssh://chil/srv/git/kristenVotebox
 [submodule "submodules/nextGen"]
 	path = submodules/nextGen
-	url = git://cstanley.no-ip.biz/nextGen
+	url = ssh://chil/srv/git/nextGen
 [submodule "submodules/tambo-diss"]
 	path = submodules/tambo-diss
-	url = git://cstanley.no-ip.biz/tambo-diss
+	url = ssh://chil/srv/git/tambo-diss
 [submodule "submodules/gallagher"]
 	path = submodules/gallagher
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/gallagher.git
+	url = ssh://chil/srv/git/gallagher.git
 [submodule "submodules/NSFMotor"]
 	path = submodules/NSFMotor
-	url = ssh://clayton@chil.rice.edu/srv/git/NSFMotor
+	url = ssh://chil/srv/git/NSFMotor
 [submodule "submodules/FittsErrorModel"]
 	path = submodules/FittsErrorModel
-	url = ssh://clayton@chil.rice.edu/srv/git/FittsErrorModel
+	url = ssh://chil/srv/git/FittsErrorModel
 [submodule "submodules/ccl-1.9"]
 	path = submodules/ccl-1.9
-	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/ccl-1.9
+	url = ssh://chil/srv/git/ccl-1.9
 [submodule "submodules/actr6mcl"]
 	path = submodules/actr6mcl
-	url = ssh://raid@raid/~/F/root/clayton.stanley/srv/git/actr6mcl
+	url = ssh://chil/srv/git/actr6mcl
 [submodule "submodules/DMTracker"]
 	path = submodules/DMTracker
 	url = ssh://chil/srv/git/DMTracker
