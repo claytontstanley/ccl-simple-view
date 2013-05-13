@@ -112,7 +112,7 @@
     (guard ((eq direction :output) "only :output for direction slot is allowed"))
     (guard ((eq wptr nil) "only nil for wptr slot is allowed"))
     (guard ((points-equal-p view-scroll-position
-                           (make-point 0 0)) "non-(0,0) view-scroll-position is not currently implemented"))))
+                            (make-point 0 0)) "non-(0,0) view-scroll-position is not currently implemented"))))
 
 ; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
 
@@ -213,16 +213,16 @@
           (lambda ()
             (setf (initialized-p win) t)
             (while (wptr win)
-                   (cond ((close-requested-p win)
-                          (sv-log "closing ~a on thread ~a~%" win *current-process*)
-                          ; easygui's perform-close currently runs on current thread; maintenance thread does 
-                          ; not have an autorelease-pool set up; so explicitly create one for the close
-                          (easygui::with-autorelease-pool
-                            (funcall (window-close-fct win) win))
-                          (signal-semaphore (sema-finished-close win)))
-                         ((aand (front-window) (eq win it))
-                          (window-null-event-handler win)))
-                   (timed-wait-on-semaphore (sema-request-close win) .1))))))
+              (cond ((close-requested-p win)
+                     (sv-log "closing ~a on thread ~a~%" win *current-process*)
+                     ; easygui's perform-close currently runs on current thread; maintenance thread does 
+                     ; not have an autorelease-pool set up; so explicitly create one for the close
+                     (easygui::with-autorelease-pool
+                       (funcall (window-close-fct win) win))
+                     (signal-semaphore (sema-finished-close win)))
+                    ((aand (front-window) (eq win it))
+                     (window-null-event-handler win)))
+              (timed-wait-on-semaphore (sema-request-close win) .1))))))
 
 ; Give each window a maintenance thread. In that thread,
 ; periodically check if the window is the frontmost window.
@@ -456,7 +456,7 @@
     (do-array (cell (#/selectedCells (cocoa-ref view)) selected-cells)
       (push-to-end (get-location-of-cell view cell)
                    selected-cells))))
-    
+
 (defmethod get-location-of-cell ((view sequence-dialog-item) (cell ns:ns-cell))
   (rlet ((rownum #>NSInteger)
          (colnum #>NSInteger))

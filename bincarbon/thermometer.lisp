@@ -47,27 +47,27 @@
   ; class and use a custom drawing method for the thermometer.
 
   (objc:defmethod (#/drawRect: :void) ((self cocoa-thermometer) (rect :<NSR>ect))
-                  (let ((view (easygui::easygui-view-of self))
-                        (bounds (#/bounds self)))
-                    (destructuring-bind (point-x point-y width height) (list (ns:ns-rect-x bounds)
-                                                                             (ns:ns-rect-y bounds)
-                                                                             (ns:ns-rect-width bounds)
-                                                                             (ns:ns-rect-height bounds))
-                      (with-focused-view view
-                                         (with-fore-color (get-fore-color view)
-                                                          (frame-rect view point-x point-y (+ point-x width) (+ point-y height)))
-                                         (let ((fraction-full (/ (thermometer-value view)
-                                                                 (thermometer-max-value view))))
-                                           ; Due to how the NSLevelIndicator is drawn, width of the cocoa object will always be the
-                                           ; dimension of the value of the thermometer, so no case statement is necessary here to figure
-                                           ; out if the thermometer is being displayed horizontally or vertically. This is a nicety from having
-                                           ; #/bounds and #/frame attributes for Cocoa objects.
-                                           (with-fore-color (get-fore-color view)
-                                                            (paint-rect view
-                                                                        point-x
-                                                                        point-y
-                                                                        (+ point-x (* width fraction-full))
-                                                                        (+ point-y height))))))))
+    (let ((view (easygui::easygui-view-of self))
+          (bounds (#/bounds self)))
+      (destructuring-bind (point-x point-y width height) (list (ns:ns-rect-x bounds)
+                                                               (ns:ns-rect-y bounds)
+                                                               (ns:ns-rect-width bounds)
+                                                               (ns:ns-rect-height bounds))
+        (with-focused-view view
+          (with-fore-color (get-fore-color view)
+            (frame-rect view point-x point-y (+ point-x width) (+ point-y height)))
+          (let ((fraction-full (/ (thermometer-value view)
+                                  (thermometer-max-value view))))
+            ; Due to how the NSLevelIndicator is drawn, width of the cocoa object will always be the
+            ; dimension of the value of the thermometer, so no case statement is necessary here to figure
+            ; out if the thermometer is being displayed horizontally or vertically. This is a nicety from having
+            ; #/bounds and #/frame attributes for Cocoa objects.
+            (with-fore-color (get-fore-color view)
+              (paint-rect view
+                          point-x
+                          point-y
+                          (+ point-x (* width fraction-full))
+                          (+ point-y height))))))))
 
   (eval-when (:compile-toplevel :load-toplevel :execute)
     (provide :thermometer))

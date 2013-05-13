@@ -2,6 +2,13 @@
   (require :cocoa)
   (require :easygui))
 
+; Redefining to use the &body body pairing instead of &rest body, so that Slime auto indenting works properly
+(defmacro easygui::running-on-this-thread ((&key (waitp t)) &body body)
+  ;; The purpose of this trivial macro is to mark places where it is thought possible that
+  ;; it may be preferable to use running-on-main-thread.
+  (declare (ignore waitp))
+  `(progn ,@body))
+
 (defun easygui::point-from-ns-point (point)
   (easygui::point 
     (ns:ns-point-x point)
