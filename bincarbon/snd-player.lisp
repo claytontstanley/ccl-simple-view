@@ -69,7 +69,7 @@
 ;;; 
 ;;; Bugs        : None known yet, but it's still early.
 ;;; 
-;;; Todo        : Use a hash table instead of an a-list.
+;;; Todo        : Use a hash table instead of a-list.
 ;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

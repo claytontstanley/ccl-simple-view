@@ -131,7 +131,7 @@
 ;;;           : Removed stray commented out code that is no longer necessary.
 ;;;           : Now spell checking comments and strings in the code.
 ;;; 2013.04.27 cts
-;;;           : Removed unecessary code duplication when building visual objects for lines
+;;;           : Removed unnecessary code duplication when building visual objects for lines
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)

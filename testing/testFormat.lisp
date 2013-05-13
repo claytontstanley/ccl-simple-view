@@ -14,10 +14,10 @@
 (defmethod view-draw-contents ((view (eql *sv*)))
   (move-to *sv* 10 10)
   (with-fore-color *red-color*
-    (format *sv* "pello"))
+    (format *sv* "hello"))
   (move-to *sv* 10 30)
   (with-font-focused-view view
-    (#_drawstring (objc:make-nsstring "yello")))
+    (#_drawstring (objc:make-nsstring "yellow")))
   )
 
 

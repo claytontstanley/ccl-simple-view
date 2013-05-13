@@ -24,7 +24,7 @@
   (load (apply #'path-as-lst lst)))
 
 (defun replace-all (string part replacement &key (test #'char-equal))
-  "Returns a new string in which all the occurences of the part is replaced with replacement."
+  "Returns a new string in which all the occurrences of the part is replaced with replacement."
   (with-output-to-string (out)
     (loop with part-length = (length part)
           for old-pos = 0 then (+ pos part-length)
@@ -52,7 +52,7 @@
   "Loads each file in file-list, where the location of 
    file-list is a relative path from the load file's directory
    and the location of each file in file-list is a relative path from
-   the base repo's directory"
+   the base repository's directory"
   (let ((base-repo-namestring
           (format nil "~a~a~a" (directory-namestring *load-truename*) ".." *path-separator*)))
     (dolist (file (file-lines (apply #'path-as-lst file-list)))

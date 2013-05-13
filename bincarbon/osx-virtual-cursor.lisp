@@ -16,7 +16,7 @@
 ;;; 
 ;;; Description : Provides a view-based virtual cursor for RPM.  This appears
 ;;;             : to work differently in OS X, where so far it doesn't seem
-;;;             : necessary to actualy move the real mouse cursor to get 
+;;;             : necessary to actually move the real mouse cursor to get 
 ;;;             : clicks to process correctly.
 ;;;
 ;;; Bugs        : Cosmetic:  the virtual cursor isn't very pretty. 
@@ -27,7 +27,7 @@
 ;;; 
 ;;; ----- History -----
 ;;; 2009.05.29 mdb [r3]
-;;;             : Now plays nicely with ACT6.
+;;;             : Now plays nicely with ACTR-6.
 ;;; 2004.04.03 mdb [r2]
 ;;;             : * Now uses RPM-OVERLAY class.
 ;;;             : * Fixed calls to CURRENT-CURSOR.
@@ -71,7 +71,7 @@
 
 (defmethod cursor-to-feature ((wind window))
   (when (equal (view-window *virtual-cursor*) wind)
-    ; (let ((loc (true-cursor-loc (device-interface *mp*))))  delta for act6
+    ; (let ((loc (true-cursor-loc (device-interface *mp*))))  delta for ACTR-6 
     (let ((loc (true-cursor-loc (current-device))))
       (make-instance 'cursor-feature
                      :x (px loc) :y (py loc) :value 'POINTER))))
@@ -126,7 +126,7 @@
 
 (defmethod device-update :after ((device window) time)
   (declare (ignore time))
-  ; (pm-set-cursor-position-fct (true-cursor-loc (device-interface *mp*)))  delta for act6
+  ; (pm-set-cursor-position-fct (true-cursor-loc (device-interface *mp*)))  delta for ACTR-6
   (set-cursor-position-fct (true-cursor-loc (current-device-interface)))
   (unless (equal (view-window *virtual-cursor*) device)
     (add-subviews device *virtual-cursor*)))

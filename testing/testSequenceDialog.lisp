@@ -33,7 +33,7 @@
   (add-subviews *win* *view*)
   (#/mode (cocoa-ref *view*))
   (#/cellSize (cocoa-ref *view*))
-  (set-table-sequence *view* (list "kdkd" "..." "--" "*"))
+  (set-table-sequence *view* (list "alpha" "..." "--" "*"))
   (invalidate-view *view*)
   (#/autorecalculatesCellSize (cocoa-ref *view*))
   (#/autosizesCells (cocoa-ref *view*))

@@ -28,7 +28,7 @@
 (multiple-value-bind (a b c) (modal-dialog (task-window *experiment*))
   ())
 
-(feedback *experiment* "kakak")
+(feedback *experiment* "kayak")
 
 (current-btn *experiment*)
 
