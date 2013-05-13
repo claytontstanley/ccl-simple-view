@@ -9,7 +9,7 @@
 	url = ssh://chil/srv/git/rmcl
 [submodule "submodules/lisp-dev"]
 	path = submodules/lisp-dev
-	url = ssh://raid@raid/srv/git/lisp-dev
+	url = ssh://chil/srv/git/lisp-dev
 [submodule "submodules/ACT-R-VoteBox-Models"]
 	path = submodules/ACT-R-VoteBox-Models
 	url = ssh://chil/srv/git/ACT-R-VoteBox-Models
@@ -45,4 +45,4 @@
 	url = ssh://chil/srv/git/DMTracker
 [submodule "submodules/stanley-thesis"]
 	path = submodules/stanley-thesis
-	url = ssh://raid@raid/srv/git/thesis
+	url = ssh://chil/srv/git/thesis
