@@ -4,18 +4,15 @@
 (load-file-list "file-lists" "DMTracker" "testDMTracker.txt")
 
 #|
-(require :tracker-experiment-window)
 (progn
   #@(5 4)
   )
 (prog1 5)
 (full-pathname "dmtracker:Tracker Source")
 *module-search-path*
-(require :defsystem)
 ;(MAKE-PATHNAME :HOST :UNSPECIFIC :DEVICE NIL :DIRECTORY '(:RELATIVE :DMTracker) :NAME "dmtracker" :TYPE "system" :VERSION NIL :DEFAULTS NIL :CASE NIL)
 *features*
 *modules*
-(require "Quickdraw")
 *features*
 (mk:find-system :dmtracker) 
 (setf (logical-pathname-translations "DMTracker")

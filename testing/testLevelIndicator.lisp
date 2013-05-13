@@ -1,7 +1,7 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-(require :thermometer)
+(load-file-list "file-lists" "LevelIndicator" "loaded.txt")
 
 (setf *win* (make-instance 'window
                            :view-size (make-point 500 500)))
