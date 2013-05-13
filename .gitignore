@@ -2,3 +2,4 @@
 *.lisp.swp
 *.tex.swp
 *.dx64fsl
+/scratch
