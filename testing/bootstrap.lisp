@@ -1,6 +1,7 @@
 #+:clozure (setf ccl:*default-external-format* :utf-8)
 #+:clozure (pushnew :sv-dev *features*)
 #+:clozure (defvar *load-sv-dev-files-p* t)
+#+:clozure (require :cocoa)
 
 (defparameter *path-separator*
   #+:digitool ":"
