@@ -63,7 +63,9 @@
                :x 10
                :y 100
                :text "bute"
-               :action (lambda (obj) (sleep .5))))
+               :action (lambda (obj)
+                         (declare (ignore obj))
+                         (sleep .5))))
 (add-visual-items-to-rpm-window *win* *view*)
 (sleep .5)
 
@@ -163,6 +165,7 @@
 (#/selectedRanges
  (#/fieldEditor:forObject: (cocoa-ref *win*) #$YES (cocoa-ref (view-named :et *win*))))
 
+(setf *features* (remove-if (lambda (f) (eq f :sv-dev)) *features*))
 (setf *cocoa-win* (easygui:cocoa-ref *win*))
 (compute-class-precedence-list (find-class 'contained-view))
 (inspect *win*)
