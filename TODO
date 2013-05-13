@@ -1,3 +1,1 @@
-allow single files in file-list folder
-	remove the requires that make sense
 contents-of-directory should be in utils
