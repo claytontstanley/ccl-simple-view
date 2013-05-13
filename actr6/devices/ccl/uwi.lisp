@@ -63,6 +63,9 @@
 ;;;           : Added make-liner-from-points utility function that can create a 
 ;;;             liner object or subclassed liner object.
 ;;;             Refactored make-line-for-rpm-window to call the utility function
+;;; 2013.05.13 cts
+;;;           : Supressed compiler warning in make-button-for-rpm-window when not
+;;;             in development mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)

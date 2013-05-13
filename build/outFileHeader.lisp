@@ -31,9 +31,9 @@
 ;;;
 ;;;		
 ;;;
-;;; Bugs        : many
+;;; Bugs        : []
 ;;; 
-;;; Todo        : [] 
+;;; Todo        : Lots
 ;;;             : 
 ;;; 
 ;;; ----- History -----
@@ -47,22 +47,30 @@
 ;;;               view-position on the window works correctly both before and after
 ;;;               the window position is moved with a mouse drag on the window pane.
 ;;; 2013.02.11 cts
-;;;            : Removed easygui::drawing-view dependency in codebase.
-;;;              Simplifies OO hierarchy, removes unecessary cruft, and decreases technical debt
+;;;             : Removed easygui::drawing-view dependency in codebase.
+;;;               Simplifies OO hierarchy, removes unecessary cruft, and decreases technical debt
 ;;; 2013.02.16 cts
-;;;            : Changes to ensure code is compatible with CCL 1.8 thru CCL 1.9rc2
+;;;             : Changes to ensure code is compatible with CCL 1.8 thru CCL 1.9rc2
 ;;; 2013.04.10 cts
-;;;            : Added feature: You can now change the color of the text shown for button objects
-;;;              (button-dialog-item, check-box-dialog-item, radio-button-dialog-item) in the usual
-;;;              MCL way for dialog items (passing :fore-color #color# or :part-color (list :text #color#)
-;;;              to initialize-instance)
+;;;             : Added feature: You can now change the color of the text shown for button objects
+;;;               (button-dialog-item, check-box-dialog-item, radio-button-dialog-item) in the usual
+;;;               MCL way for dialog items (passing :fore-color #color# or :part-color (list :text #color#)
+;;;               to initialize-instance)
 ;;; 2013.04.20 cts
-;;;           : #@ read macro no longer clobbers CCL's original version that created NSString objects.
-;;;             The #@ read macro now creates MCL points when provided with a list, and an NSString object
-;;;             when provided with a string.
-;;;           : Reordered loading a few subcomponent files and renamed a few subcomponent files.
-;;;           : Removed stray commented out code that is no longer necessary.
-;;;           : Now spell checking comments and strings in the code.
+;;;             : #@ read macro no longer clobbers CCL's original version that created NSString objects.
+;;;               The #@ read macro now creates MCL points when provided with a list, and an NSString object
+;;;               when provided with a string.
+;;;             : Reordered loading a few subcomponent files and renamed a few subcomponent files.
+;;;             : Removed stray commented out code that is no longer necessary.
+;;;             : Now spell checking comments and strings in the code.
+;;; 2013.05.13 cts
+;;;             : Added implementation for sequence-dialog-item.
+;;;             : Added quickdraw functions for paint-polygon and fill-polygon.
+;;;             : Removed extra cruft from file: no longer including thermometer.lisp since
+;;;               this library code is not part of the core MCL GUI interface.
+;;;             : Added MCL's :centered keyword for windows.
+;;;             : Fixed quickdraw polygon functions to use the polygon provided as input to the function, 
+;;;               instead of using the polygon stored within the view. This change matches the MCL spec.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
