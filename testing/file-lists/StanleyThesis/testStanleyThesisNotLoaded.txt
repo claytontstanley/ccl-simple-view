@@ -1,4 +1,6 @@
-testing/testDMTracker.lisp
+testing/testStanleyThesis.lisp
 submodules/DMTracker
 bincarbon/DMTracker
-testing/file-lists/DMTracker/testDMTracker.txt
+testing/file-lists/StanleyThesis/testStanleyThesis.txt
+submodules/stanley-thesis/participant data/eye-tracked participants/source/subj050-track.dat
+submodules/stanley-thesis/participant data/eye-tracked participants/source/subj050.lisp
