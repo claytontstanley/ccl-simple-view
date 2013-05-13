@@ -68,6 +68,7 @@
 ;;;             : Added quickdraw functions for paint-polygon and fill-polygon.
 ;;;             : Removed extra cruft from file: no longer including thermometer.lisp since
 ;;;               this library code is not part of the core MCL GUI interface.
+;;;             : Also removed unused code (all of the pandoric functions) from lol-subset.lisp
 ;;;             : Added MCL's :centered keyword for windows.
 ;;;             : Fixed quickdraw polygon functions to use the polygon provided as input to the function, 
 ;;;               instead of using the polygon stored within the view. This change matches the MCL spec.
