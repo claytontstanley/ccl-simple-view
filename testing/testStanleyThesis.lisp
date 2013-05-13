@@ -3,11 +3,27 @@
 
 (load-file-list "file-lists" "StanleyThesis" "testStanleyThesis.txt")
 
+; opens and closes *library-experiment-window*
 (let ((*path* (format nil "~a/" (path-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source"))))
   (things2lisp :snums (list 50)))
 
+; *library-experiment-window* is currently set to subject 50 source lisp file
+(let ((prop (make-instance 'analysis-properties))) 
+  (play-expt :prop prop
+             :win *library-experiment-window*
+             :constraints (list
+                            (make-instance 'trial-constraint :index 7)
+                            (make-instance 'trial-constraint :index 9)
+                            ))
+  (window-close
+    (replay-win
+      (replay-mod prop))))
+
+; overwrites *library-experiment-window* with subject 50 combined file; just checking that this file can be read in
+; opens *library-experiment-window*
 (load-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source" "subj050 combined.lisp")
 
+; close it afterwards
 (window-close *library-experiment-window*)
 #|
 

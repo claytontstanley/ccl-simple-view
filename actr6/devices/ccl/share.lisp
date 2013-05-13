@@ -43,6 +43,8 @@
 (defconstant $tejustleft :left)
 (defconstant $tejustcenter :center)
 (defconstant $tejustright :right)
+(defparameter *screen-width* (easygui::screen-width))
+(defparameter *screen-height* (easygui::screen-height))
 
 (defclass view-text-via-title-mixin (easygui::view-text-via-title-mixin)
   ((easygui::text :initarg :window-title)))
@@ -150,6 +152,14 @@
 (defmethod parse-mcl-initarg ((keyword (eql :view-size)) view-size)
   (list :view-size (mcl-point->system-point view-size)))
 
+(defmethod parse-mcl-initarg ((keyword (eql :view-position)) (view-position list))
+  (list :view-position
+        (destructuring-bind (keyword size) view-position
+          (guard ((eq keyword :centered)))
+          (destructuring-bind (sizex sizey) (as-list (mcl-point->system-point size))
+            (make-point (/ (- *screen-width* sizex) 2)
+                        (/ (- *screen-height* sizey) 2))))))
+
 (defmethod parse-mcl-initarg ((keyword (eql :view-position)) view-position)
   (list :view-position (mcl-point->system-point view-position)))
 
@@ -196,7 +206,23 @@
     (guard ((null window-do-first-click) "non-nil window-do-first-click not currently implemented"))
     (guard ((eq 0 window-other-attributes) "non-zero window-other-attributes not currently implemented"))
     (guard ((null process) "process slot should be nil"))
-    (guard ((member auto-position (list nil :noAutoCenter)) "auto-position not currently implemented"))))
+    (guard ((member auto-position (list nil :noAutoCenter)) "auto-position not currently implemented")))
+  (setf (maintenance-thread win)
+        (process-run-function 
+          (format nil "maintenance thread for win ~a" win)
+          (lambda ()
+            (setf (initialized-p win) t)
+            (while (wptr win)
+                   (cond ((close-requested-p win)
+                          (sv-log "closing ~a on thread ~a~%" win *current-process*)
+                          ; easygui's perform-close currently runs on current thread; maintenance thread does 
+                          ; not have an autorelease-pool set up; so explicitly create one for the close
+                          (easygui::with-autorelease-pool
+                            (funcall (window-close-fct win) win))
+                          (signal-semaphore (sema-finished-close win)))
+                         ((aand (front-window) (eq win it))
+                          (window-null-event-handler win)))
+                   (timed-wait-on-semaphore (sema-request-close win) .1))))))
 
 ; Give each window a maintenance thread. In that thread,
 ; periodically check if the window is the frontmost window.
@@ -205,24 +231,11 @@
 ; I took a sample of the refresh rate of MCL's
 ; calls to window-null-event-handler, and it
 ; was around 100ms. So using that rate here.
-(defmethod initialize-instance :around ((win window) &key)
-  (unwind-protect (call-next-method)
-    (setf (maintenance-thread win)
-          (process-run-function 
-            (format nil "maintenance thread for win ~a" win)
-            (lambda ()
-              (setf (initialized-p win) t)
-              (while (wptr win)
-                (cond ((close-requested-p win)
-                       (sv-log "closing ~a on thread ~a~%" win *current-process*)
-                       ; easygui's perform-close currently runs on current thread; maintenance thread does 
-                       ; not have an autorelease-pool set up; so explicitly create one for the close
-                       (easygui::with-autorelease-pool
-                         (funcall (window-close-fct win) win))
-                       (signal-semaphore (sema-finished-close win)))
-                      ((aand (front-window) (eq win it))
-                       (window-null-event-handler win)))
-                (timed-wait-on-semaphore (sema-request-close win) .1)))))))
+(defmethod initialize-instance :around ((win window) &rest args &key view-position view-size)
+  (let ((accum 
+          (when (and (eq view-position :centered) view-size)
+            (parse-mcl-initarg :view-position (list :centered view-size)))))
+    (apply #'call-next-method win (nconc accum args))))
 
 (objc:defmethod (#/close :void) ((self easygui::cocoa-window))
   (let ((win (easygui::easygui-window-of self)))

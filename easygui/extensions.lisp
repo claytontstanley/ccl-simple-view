@@ -236,3 +236,7 @@
 (defclass easygui::cocoa-matrix (easygui::cocoa-extension-mixin ns:ns-form)
   ()
   (:metaclass ns:+ns-object))
+
+(defun easygui::screen-width nil
+  (easygui::running-on-this-thread ()
+    (ns:ns-rect-width (dcc (#/frame (#/objectAtIndex: (#/screens ns:ns-screen) 0))))))
