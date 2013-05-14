@@ -14,6 +14,7 @@ commitID = $(shell git log -n 1 | grep '^commit' | awk '{print $$2}')
 
 outFiles = ccl-simple-view.lisp device.lisp uwi.lisp
 decompileTargets = ${outFiles:%=decompile-%}
+rrepos = remote-deployed-repositories.txt
 
 all: ${outFiles}
 
@@ -60,6 +61,7 @@ outFileHeader:
 deploy:
 	cd ${repo}/bincarbon && ${git-is-clean} && git push
 	cd ${repo} && ${git-is-clean} && git push
+	cat ./${rrepos} | while read repo; do ssh -n ${server} "cd \"$$repo\" && git ru && git rb origin/master && git su"; done
 	ssh ${server} 'cd ${depdir} && git remote update && git rebase origin/master && git submodule update --init --recursive'
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
 	ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
