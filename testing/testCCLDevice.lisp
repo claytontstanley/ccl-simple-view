@@ -62,7 +62,7 @@
                *win*
                :x 10
                :y 100
-               :text "brute"
+               :text "aha"
                :action (lambda (obj)
                          (declare (ignore obj))
                          (sleep .5))))
