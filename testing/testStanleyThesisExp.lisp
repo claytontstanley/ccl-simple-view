@@ -4,6 +4,7 @@
 (load-file-list "file-lists" "StanleyThesis" "testStanleyThesis.txt")
 
 (begin-experiment
+  :snum 1
   :eyetracking nil
   :allowing-quit t
   :short-stack 20)
