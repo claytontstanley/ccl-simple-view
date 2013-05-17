@@ -648,6 +648,7 @@
   (princ ")" strm)
   thing)
 
+#+:clozure
 (defmethod write-readable ((thing ns:ns-color) &optional (strm t))
   (format strm "~%(make-color ~a ~a ~a ~a)"
           (color-red thing)
@@ -655,6 +656,7 @@
           (color-blue thing)
           (coerce (color-opacity thing) 'single-float)))
 
+#+:clozure
 (defmethod write-readable ((thing ns:ns-font) &optional (strm t))
   (format strm "~%(make-font ~S ~a)"
           (font-name thing)
