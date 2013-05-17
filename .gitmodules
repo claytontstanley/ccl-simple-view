@@ -45,4 +45,4 @@
 	url = ssh://chil/srv/git/DMTracker
 [submodule "submodules/stanley-thesis"]
 	path = submodules/stanley-thesis
-	url = ssh://chil/srv/git/thesis
+	url = ssh://chil/srv/git/stanley-thesis
