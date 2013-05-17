@@ -46,10 +46,5 @@ reformat-all spelling-all: %-all:
 reformat-builds spelling-builds: %-builds:
 	make $* list-cmd="cat build/file-list*"
 
-# This is way experimental, but it did work for me. 
-convertToWriteRepo:
-	cd .git; find . -type f -name config -exec perl -pi -e 's|git://cstanley.no-ip.biz|ssh://raid\@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git|' '{}' \;
-
-
 coverage:
 	comm <(cat testing/file-lists/CI/testCI.txt testing/file-lists/Unit/testUnit.txt | sort) <(ls -1 testing/*.lisp | sort)
