@@ -90,6 +90,7 @@
   ((bezier-path :accessor bezier-path :initform nil)
    (direction :initarg :direction :initform :output)
    (wptr :initarg :wptr :initform nil)
+   (help-spec :initarg :help-spec :initform nil)
    (view-scroll-position :initarg :view-scroll-position :initform (make-point 0 0))))
 
 (defmethod view-default-size ((view simple-view))
@@ -152,16 +153,36 @@
 (defmethod parse-mcl-initarg ((keyword (eql :view-size)) view-size)
   (list :view-size (mcl-point->system-point view-size)))
 
+(defmethod parse-mcl-initarg ((keyword (eql :view-position)) view-position)
+  (list :view-position (mcl-point->system-point view-position)))
+
 (defmethod parse-mcl-initarg ((keyword (eql :view-position)) (view-position list))
   (list :view-position
         (destructuring-bind (keyword size) view-position
-          (guard ((eq keyword :centered)))
-          (destructuring-bind (sizex sizey) (as-list (mcl-point->system-point size))
-            (make-point (/ (- *screen-width* sizex) 2)
-                        (/ (- *screen-height* sizey) 2))))))
+          (parse-view-position-argument keyword size))))
 
-(defmethod parse-mcl-initarg ((keyword (eql :view-position)) view-position)
-  (list :view-position (mcl-point->system-point view-position)))
+(defmethod parse-view-position-argument ((keyword (eql :centered)) size)
+  (destructuring-bind (sizex sizey) (as-list (mcl-point->system-point size))
+    (make-point (/ (- *screen-width* sizex) 2)
+                (/ (- *screen-height* sizey) 2))))
+
+(defmethod parse-view-position-argument ((keyword list) size)
+  (guard ((eq t easygui::*screen-flipped*)))
+  (destructuring-bind (keyword offset) keyword
+    (destructuring-bind (x y) (as-list (parse-view-position-argument :centered size))
+      (destructuring-bind (sizex sizey) (as-list (mcl-point->system-point size))
+        (ecase keyword
+          (:top (setf y offset))
+          (:bottom (setf y (- *screen-height*
+                              (+ sizey offset))))
+          (:left (setf x offset))
+          (:right (setf x (- *screen-width*
+                             (+ sizex offset)))))
+        (make-point x y)))))
+
+(defmethod parse-view-position-argument ((keyword easygui::eg-point) size)
+  (declare (ignore size))
+  keyword)
 
 (defmethod parse-mcl-initarg ((keyword (eql :view-scroll-position)) view-scroll-position)
   (list :view-scroll-position (mcl-point->system-point view-scroll-position)))
@@ -233,8 +254,8 @@
 ; was around 100ms. So using that rate here.
 (defmethod initialize-instance :around ((win window) &rest args &key view-position view-size)
   (let ((accum 
-          (when (and (eq view-position :centered) view-size)
-            (parse-mcl-initarg :view-position (list :centered view-size)))))
+          (when (and view-position view-size)
+            (parse-mcl-initarg :view-position (list view-position view-size)))))
     (apply #'call-next-method win (nconc accum args))))
 
 (objc:defmethod (#/close :void) ((self easygui::cocoa-window))
@@ -419,11 +440,12 @@
 (defclass sequence-dialog-item (table-dialog-item)
   ((table-sequence :reader table-sequence :initarg :table-sequence)
    (columns :reader columns :initform 1)
-   (table-print-function :reader table-print-function :initarg :table-print-function :initform #'princ)
+   (table-print-function :accessor table-print-function :initarg :table-print-function :initform nil)
    (rows :reader rows)
    (cell-size :reader cell-size :initarg :cell-size)
    (table-hscrollp :reader table-hscrollp :initarg :table-hscrollp :initform nil)
-   (table-vscrollp :reader table-vscrollp :initarg :table-vscrollp :initform t))
+   (table-vscrollp :reader table-vscrollp :initarg :table-vscrollp :initform t)
+   (selection-type :initarg :selection-type))
   (:default-initargs :specifically 'easygui::cocoa-matrix))
 
 (defmethod (setf rows) (new-rows (view sequence-dialog-item))
@@ -437,6 +459,11 @@
       (unwind-protect (setf cell-size (make-point h v))
         (#/setCellSize: (cocoa-ref view)
          (ns:make-ns-size h v)))))) 
+
+(defmethod cell-contents ((view sequence-dialog-item) h &optional v)
+  (destructuring-bind (h v) (canonicalize-point h v)
+    (guard ((eq h 0)))
+    (nth v (table-sequence view))))
 
 (defmethod set-table-sequence ((view sequence-dialog-item) new-sequence)
   (with-slots (table-sequence table-print-function) view
@@ -464,12 +491,29 @@
     (make-point (pref colnum #>NSInteger)
                 (pref rownum #>NSInteger))))
 
+(defclass easygui::cocoa-matrix-cell (easygui::cocoa-extension-mixin ns:ns-text-field-cell)
+  ((title-width :accessor title-width))
+  (:metaclass ns:+ns-object))
+
+(objc:defmethod (#/setTitleWidth: void) ((self easygui::cocoa-matrix-cell) (width :<CGF>LOAT))
+  (setf (title-width self) width))
+
+(objc:defmethod (#/titleWidth: :<CGF>LOAT) ((self easygui::cocoa-matrix-cell) (size :<NSS>IZE))
+  (title-width self))
+
 (defmethod initialize-instance :after ((view sequence-dialog-item) &key)
   (let ((cocoa-matrix (cocoa-ref view))
-        (prototype (make-instance 'ns:ns-text-field-cell)))
-    (with-slots (table-hscrollp table-vscrollp) view
+        (prototype (#/init (#/alloc easygui::cocoa-matrix-cell))))
+    (with-slots (table-hscrollp table-vscrollp columns) view
       (guard (table-vscrollp "Sequence dialog item must allow vertical scrolling"))
-      (guard ((not table-hscrollp) "Sequence dialog item must not allow horizontal scrolling")))
+      (guard ((not table-hscrollp) "Sequence dialog item must not allow horizontal scrolling"))
+      (guard ((eq columns 1) "Only supporting a single column currently")))
+    (unless (table-print-function view)
+      (setf (table-print-function view)
+            (lambda (item strm) (format strm "~a" item))))
+    (unless (slot-boundp view 'cell-size)
+      (setf (slot-value view 'cell-size)
+            (make-point (point-h (view-size view)) 20)))
     (#/setPrototype: cocoa-matrix prototype)
     (#/setMode: cocoa-matrix #$NSListModeMatrix)
     (#/setIntercellSpacing: cocoa-matrix (ns:make-ns-size 0 0))
@@ -712,14 +756,35 @@
               (return-from find-window clos-win)))))))
   nil)
 
-(defun front-window ()
+(defun front-window (&key class include-invisibles include-windoids)
+  (guard ((null include-invisibles)))
+  (when class 
+    (when (symbolp class)
+      (setq class (find-class class)))
+    (when (class-inherit-from-p class (find-class 'windoid))
+      (setq include-windoids t)))
   (objc:with-autorelease-pool
     (let ((wins (gui::windows)))
-      (setf wins (remove-if-not #'easygui::cocoa-win-p wins))
-      (setf wins (mapcar #'easygui::easygui-window-of wins))
-      (setf wins (remove-if #'windoid-p wins))
-      (setf wins (remove-if-not #'initialized-p wins))
-      (car wins))))
+      (dolist (win wins)
+        (when (easygui::cocoa-win-p win)
+          (let ((wob (easygui::easygui-window-of win)))
+            (when (and wob
+                       (initialized-p wob)
+                       (or include-windoids
+                           (not (windoid-p wob)))
+                       (or (null class)
+                           (inherit-from-p wob class)))
+              (return wob))))))))
+
+(defun inherit-from-p (ob parent)
+  (ccl::inherit-from-p ob parent))
+
+(defun class-inherit-from-p (class parent-class)
+  (flet ((get-class (value)
+           (if (symbolp value) (find-class value nil) value)))
+    (let ((pclass (get-class parent-class)))
+      (memq pclass
+            (ccl::%inited-class-cpl (get-class class))))))
 
 ;FIXME: This looks very strange. Prob related to Phaser's floating window
 (defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))

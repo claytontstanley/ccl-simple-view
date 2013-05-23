@@ -149,3 +149,95 @@
     (if modal
       (modal-dialog new-dialog)
       new-dialog)))
+
+(with-continue
+  (defun select-item-from-list (the-list &key (window-title "Select an Item")
+                                         (selection-type :single)
+                                         table-print-function 
+                                         (action-function #'identity)
+                                         (default-button-text "OK")
+                                         (sequence-item-class 'sequence-dialog-item)
+                                         (view-size (make-point 400 (+ 80 (* (length the-list) 20))))
+                                         (view-position '(:top 90) pos-p)
+                                         (theme-background t)
+                                         dialog-class
+                                         modeless
+                                         (help-spec 14086)
+                                         (list-spec 14087)
+                                         (button-spec 14088))
+    "Displays the elements of a list, and returns the item chosen by the user"
+    (let (debutton dialog)
+      (flet ((act-on-items (item)
+               (let ((s-item (find-subview-of-type (view-container item)
+                                                   'sequence-dialog-item)))
+                 (funcall action-function 
+                          (mapcar #'(lambda (c) (cell-contents s-item c))
+                                  (selected-cells s-item))))))
+        (when (and dialog-class (not pos-p) modeless)
+          (let ((w (front-window :class 'select-dialog)))  ; or dialog-class?
+            (when w (setq view-position (add-points (view-position w) #@(15 15))))))
+        (setq debutton
+              (make-instance 
+                'default-button-dialog-item
+                :dialog-item-text default-button-text
+                :dialog-item-enabled-p the-list
+                :help-spec button-spec
+                :action
+                (cond 
+                  ((not modeless)
+                   #'(lambda ()
+                       (return-from-modal-dialog (act-on-items debutton))))
+                  (t
+                   (lambda () (act-on-items debutton))))))
+        (let* ((bsize (view-default-size debutton))
+               bpos)
+          (setq bsize (make-point (max 60 (point-h bsize)) (point-v bsize))
+            bpos (make-point (- (point-h view-size) 25 (point-h bsize))
+                             (- (point-v view-size) 7 (point-v bsize))))
+          (set-view-size debutton bsize)
+          (set-view-position debutton bpos)
+          (setq dialog
+            (make-instance
+              (or dialog-class 'select-dialog)
+              :window-type :document-with-grow
+              :close-box-p (if modeless t nil)
+              :window-title window-title
+              :view-size view-size
+              :view-position view-position
+              :window-show nil ;modeless
+              :back-color *tool-back-color*
+              :theme-background theme-background
+              :help-spec help-spec
+              :view-subviews
+              (list*
+                (make-instance
+                  sequence-item-class
+                  :view-position #@(4 4)
+                  :view-size (make-point (- (point-h view-size) 8)
+                                         (+ 50 (- (point-v view-size) (point-v bsize) 20)))
+                  ;:table-hscrollp nil
+                  :table-sequence the-list
+                  :table-print-function table-print-function
+                  :selection-type selection-type
+                  :help-spec list-spec)
+                debutton
+                (if (not modeless)
+                  (list
+                    (make-dialog-item 'button-dialog-item
+                                      (make-point (- (point-h bpos) 80)
+                                                  (point-v bpos))
+                                      (make-point (if t #|(osx-p)|# 74 60) (point-v bsize))
+                                      "Cancel"
+                                      #'return-cancel
+                                      :cancel-button t
+                                      :help-spec 15012))
+                  nil))))
+          ;(when the-list (cell-select sdi (index-to-cell sdi 0))) ; let arrow-dialog-item do this
+          (cond (modeless ; select first then show is prettier
+                  (window-show dialog)
+                  dialog)
+
+                (t ;(#_changewindowattributes (wptr dialog) 0 #$kWindowCollapseBoxAttribute)
+                 (modal-dialog dialog))))))))
+
+

@@ -18,6 +18,8 @@
                             :view-nick-name :sdi
                             ))))
 
+(select-item-from-list (list 'a 'b "c" "d" "hello" (list 4 3 2)))
+
 #|
 (invalidate-view *win*))
 (defun make-dialog-item (class position size text &optional action &rest attributes)
