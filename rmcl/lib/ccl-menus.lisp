@@ -1,6 +1,10 @@
 (defclass string-dialog (dialog)
   ((allow-empty-strings :initform nil :initarg :allow-empty-strings)))
 
+(defun return-cancel (i)
+  (declare (ignore i))
+  (return-from-modal-dialog :cancel))
+
 (defclass get-string-dialog (string-dialog)())
 
 (defmethod update-default-button ((obj string-dialog)) ())
@@ -149,6 +153,8 @@
     (if modal
       (modal-dialog new-dialog)
       new-dialog)))
+
+(defclass select-dialog (window) ())
 
 (with-continue
   (defun select-item-from-list (the-list &key (window-title "Select an Item")
