@@ -1338,7 +1338,11 @@
     (destructuring-bind (x y) (canonicalize-point x y)
       (qd-move-to x y))))
 
-(defmethod qd-move-to (x y)
+(defmethod qd-move-to ((val1 (eql :long)) (val2 easygui::eg-point))
+  (destructuring-bind (endx endy) (as-list val2)
+    (qd-move-to endx endy)))
+
+(defmethod qd-move-to ((x number) (y number))
   (let ((view *current-focused-view*))
     (unless (points-equal-p (pen-position view) (make-point x y))
       (let ((position (make-point x y)))
@@ -1358,7 +1362,11 @@
     (destructuring-bind (endx endy) (canonicalize-point x y)
       (qd-line-to endx endy))))
 
-(defmethod qd-line-to (endx endy)
+(defmethod qd-line-to ((val1 (eql :long)) (val2 easygui::eg-point))
+  (destructuring-bind (endx endy) (as-list val2)
+    (qd-line-to endx endy)))
+
+(defmethod qd-line-to ((endx number) (endy number))
   (let ((view *current-focused-view*))
     (unless (points-equal-p (pen-position view) (make-point endx endy))
       (destructuring-bind (startx starty) (list (point-x (pen-position view))
