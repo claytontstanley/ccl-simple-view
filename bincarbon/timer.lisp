@@ -74,7 +74,7 @@
 (defclass timer () ())
 
 (defclass event-timer (timer)
-  ((tickms :accessor tickms :initarg :tickms :initform 50/3)
+  ((tickms :accessor tickms :initarg :tickms :initform #+:digitool 50/3 #+:clozure 10)
    (start-time :accessor start-time :initarg :start-time :initform nil)
    ))
 
@@ -106,7 +106,7 @@
 (defgeneric spin-for (tmr ms-delay)
   (:documentation "Spins for ms-delay milliseconds."))
 
-(defun internal-real-time->ms (internal-real-time)
+(defun internal-real-time->ms (&optional (internal-real-time (get-internal-real-time)))
   (* 1000
      (/ internal-real-time
         internal-time-units-per-second)))
