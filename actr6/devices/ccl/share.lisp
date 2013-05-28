@@ -788,7 +788,7 @@
            (if (symbolp value) (find-class value nil) value)))
     (let ((pclass (get-class parent-class)))
       (memq pclass
-            (ccl::%inited-class-cpl (get-class class))))))
+        (ccl::%inited-class-cpl (get-class class))))))
 
 ;FIXME: This looks very strange. Prob related to Phaser's floating window
 (defun ccl::window-bring-to-front (w &optional (wptr (wptr w)))

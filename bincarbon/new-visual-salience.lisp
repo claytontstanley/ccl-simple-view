@@ -61,8 +61,8 @@
 (defun effective-salience (x)
   "Salience level must at least be that of bu activation"
   (if (< (chunk-tot-salience x) (chunk-bu-salience x))
-      (chunk-bu-salience x)
-      (chunk-tot-salience x)))
+    (chunk-bu-salience x)
+    (chunk-tot-salience x)))
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; Bottom-up salience
@@ -75,38 +75,38 @@
     (dolist (slotname (mapcar #'car *salience-slot-gammas*) lst)
       ;; if we're going to clip to range of POG, do it here
       (let ((val-lst (mapcar #'(lambda (x) 
-				 (chunk-slot-value-fct x slotname)) lst)))
-	(if (not (every #'numberp val-lst))
-	    (process-symbolic-slot lst slotname nfeats)
-	    (process-numeric-slot lst slotname nfeats))))))
+                                 (chunk-slot-value-fct x slotname)) lst)))
+        (if (not (every #'numberp val-lst))
+          (process-symbolic-slot lst slotname nfeats)
+          (process-numeric-slot lst slotname nfeats))))))
 
 (defun process-numeric-slot (lst slotname nfeats)
   "Increment bottum-up salience for a slot with all numeric values."
   (let ((z-scores (z-trans 
-		   lst :key #'(lambda (x) (chunk-slot-value-fct x slotname)))))
+                    lst :key #'(lambda (x) (chunk-slot-value-fct x slotname)))))
     (when z-scores
       (dotimes (i nfeats lst)
-	(incf (chunk-bu-salience (nth i lst))
-	      (* (rest (assoc slotname *salience-slot-gammas*))
-		 (prob->bits (z->prob (nth i z-scores)))))))))
+        (incf (chunk-bu-salience (nth i lst))
+              (* (rest (assoc slotname *salience-slot-gammas*))
+                 (prob->bits (z->prob (nth i z-scores)))))))))
 
 (defun process-symbolic-slot (lst slotname nfeats)
   "Increment bottum-salience for a slot with not all numeric values."
   (let ((val-alst nil) 
-	(featval nil))
+        (featval nil))
     (dolist (x lst)
       (setf featval (chunk-slot-value-fct x slotname))
       (when (stringp featval) (setf featval :text));; treat all strings as :TEXT
       (aif (assoc featval val-alst)
-	   (push x (rest it))
-	   (push (cons featval (list x)) val-alst)))
+        (push x (rest it))
+        (push (cons featval (list x)) val-alst)))
     (push (cons slotname val-alst) *sval-caches*)
     (dolist (fval val-alst)
       (let ((prob (/ (1- (length fval)) nfeats)))
-	(mapc #'(lambda (x)
-		  (incf (chunk-bu-salience x)
-			(* (rest (assoc slotname *salience-slot-gammas*))
-			   (prob->bits prob)))) (rest fval))))))
+        (mapc #'(lambda (x)
+                  (incf (chunk-bu-salience x)
+                        (* (rest (assoc slotname *salience-slot-gammas*))
+                           (prob->bits prob)))) (rest fval))))))
 
 (defmethod visicon-update :after ((vis-mod vision-module))
   "Resets activation and stuffs visloc-buffer"
@@ -114,7 +114,7 @@
   (compute-bottom-up-salience (visicon-chunks vis-mod))
   (mapc #'(lambda (x) (setf (chunk-td-salience x) 0)) (visicon-chunks vis-mod))
   (mapc #'(lambda (x) (setf (chunk-tot-salience x)
-			    (chunk-bu-salience x))) (visicon-chunks vis-mod))
+                            (chunk-bu-salience x))) (visicon-chunks vis-mod))
   (stuff-visloc-buffer vis-mod))
 
 ;;;; ---------------------------------------------------------------------- ;;;;
@@ -133,126 +133,126 @@
   (update-feature-matches vis-mod chunk-spec)
   ;; update tot-salience for all objects
   (mapc #'(lambda (x) 
-	    (setf (chunk-tot-salience x)
-		  (+ (chunk-bu-salience x) (chunk-td-salience x)
-		     (act-r-noise *salience-noise*)))) (visicon-chunks vis-mod))
+            (setf (chunk-tot-salience x)
+                  (+ (chunk-bu-salience x) (chunk-td-salience x)
+                     (act-r-noise *salience-noise*)))) (visicon-chunks vis-mod))
   ;; filter on the attended slot--
   ;; or should this be done before we do any salience computation?
   (let* ((attributes-available 
-	  (labels ((get-attributes (lst) 
-		     (if lst (cons (cons (act-r-slot-spec-name (car lst)) 
-					 (act-r-slot-spec-value (car lst)))
-				   (get-attributes (cdr lst))))))
-	    (get-attributes (act-r-chunk-spec-slots chunk-spec))))
-	 (lst
-	  (aif (first 
-		(member 
-		 ':attended attributes-available :key #'car :test #'equal))
-	       (remove-if-not 
-		#'(lambda (x) (test-attended (list '= (car it) (cdr it)) x))
-		(visicon-chunks vis-mod))
-	       (visicon-chunks vis-mod))))
+           (labels ((get-attributes (lst) 
+                      (if lst (cons (cons (act-r-slot-spec-name (car lst)) 
+                                          (act-r-slot-spec-value (car lst)))
+                                    (get-attributes (cdr lst))))))
+             (get-attributes (act-r-chunk-spec-slots chunk-spec))))
+         (lst
+           (aif (first 
+                  (member 
+                    ':attended attributes-available :key #'car :test #'equal))
+             (remove-if-not 
+               #'(lambda (x) (test-attended (list '= (car it) (cdr it)) x))
+               (visicon-chunks vis-mod))
+             (visicon-chunks vis-mod))))
     ;; if anything's left, add noise and find highest-salience items
     (setf lst (objs-max-val
-	       lst #'(lambda (x) (chunk-tot-salience x))))
+                lst #'(lambda (x) (chunk-tot-salience x))))
     (aif (if lst (if (> (chunk-tot-salience (first lst)) *salience-thresh*)
-		     (construct-location
-		      vis-mod
-		      (random-item (objs-max-val lst 'chunk-visual-tstamp))
-		      chunk-spec)))
-	 (progn
-	   (setf (loc-failure vis-mod) nil)
-	   (schedule-set-buffer-chunk 'visual-location it 0 
-				      :module :vision :priority 10)
-	   (if (auto-attend vis-mod)
-	       (schedule-event-relative .05 'move-attention 
-					:params (list :location it) 
-					:destination :vision :output 'medium
-					:module :vision :details 
-					(concatenate 'string "Move-attention " 
-						     (symbol-name it))))
-	   it)
-	 (progn
-	   (setf (loc-failure vis-mod) t)
-	   (schedule-event-relative 0 'find-loc-failure :module :vision 
-				    :output 'medium)
-	   nil))))
+                   (construct-location
+                     vis-mod
+                     (random-item (objs-max-val lst 'chunk-visual-tstamp))
+                     chunk-spec)))
+      (progn
+        (setf (loc-failure vis-mod) nil)
+        (schedule-set-buffer-chunk 'visual-location it 0 
+                                   :module :vision :priority 10)
+        (if (auto-attend vis-mod)
+          (schedule-event-relative .05 'move-attention 
+                                   :params (list :location it) 
+                                   :destination :vision :output 'medium
+                                   :module :vision :details 
+                                   (concatenate 'string "Move-attention " 
+                                                (symbol-name it))))
+        it)
+      (progn
+        (setf (loc-failure vis-mod) t)
+        (schedule-event-relative 0 'find-loc-failure :module :vision 
+                                 :output 'medium)
+        nil))))
 
 (defmethod update-spatial-matches ((vis-mod vision-module) chunk-spec)
   "Increments td activation for spatial matches (spatial guidance)"
   (let ((attributes-to-check 
-	 (list 'screen-x 'screen-y 'distance ':nearest))
-	(orig-slot-specs (act-r-chunk-spec-slots chunk-spec))
-	(match-lst nil)
-	(fprob nil))
+          (list 'screen-x 'screen-y 'distance ':nearest))
+        (orig-slot-specs (act-r-chunk-spec-slots chunk-spec))
+        (match-lst nil)
+        (fprob nil))
     (labels ((redefine-chunk-spec (chunk-spec params-toset)
-	       (let ((cur-slot-specs (act-r-chunk-spec-slots chunk-spec))
-		     (mod-slot-specs nil))
-		 (dolist (slot-spec cur-slot-specs)
-		   (if (not (set-difference 
-			     (list (act-r-slot-spec-name slot-spec)) 
-			     params-toset))
-		       (push slot-spec mod-slot-specs)))
-		 (setf (act-r-chunk-spec-slots chunk-spec) mod-slot-specs))))
+               (let ((cur-slot-specs (act-r-chunk-spec-slots chunk-spec))
+                     (mod-slot-specs nil))
+                 (dolist (slot-spec cur-slot-specs)
+                   (if (not (set-difference 
+                              (list (act-r-slot-spec-name slot-spec)) 
+                              params-toset))
+                     (push slot-spec mod-slot-specs)))
+                 (setf (act-r-chunk-spec-slots chunk-spec) mod-slot-specs))))
       ;strips spec of everything but items listed in 'attributes-to-check'
       (redefine-chunk-spec chunk-spec attributes-to-check))
     (if (act-r-chunk-spec-slots chunk-spec) 
-	;returns objects matching this spec
-	(setf match-lst (find-current-locs-with-spec vis-mod chunk-spec)))
+      ;returns objects matching this spec
+      (setf match-lst (find-current-locs-with-spec vis-mod chunk-spec)))
     (when match-lst
       (setf fprob (/ (length match-lst) (length (visicon-chunks vis-mod))))
       (mapc #'(lambda (x) 
-		(incf (chunk-td-salience x) (prob->bits fprob))) match-lst))
+                (incf (chunk-td-salience x) (prob->bits fprob))) match-lst))
     ;resets spec to original value
     (setf (act-r-chunk-spec-slots chunk-spec) orig-slot-specs)))
 
 (defmethod update-feature-matches ((vis-mod vision-module) chunk-spec)
   "Increments td activation for feature matches (value guidance)"
   (let ((possible-slots-to-check 
-	 (list 'kind 'color 'value 'size 'height 'width))
-	(attributes-to-check nil)
-	(slotact nil)
-	(attributes-available
-	 (labels ((get-attributes (lst) 
-		    (if lst (cons (cons (act-r-slot-spec-name (car lst)) 
-					(act-r-slot-spec-value (car lst)))
-				  (get-attributes (cdr lst))))))
-	   (get-attributes (act-r-chunk-spec-slots chunk-spec)))))
+          (list 'kind 'color 'value 'size 'height 'width))
+        (attributes-to-check nil)
+        (slotact nil)
+        (attributes-available
+          (labels ((get-attributes (lst) 
+                     (if lst (cons (cons (act-r-slot-spec-name (car lst)) 
+                                         (act-r-slot-spec-value (car lst)))
+                                   (get-attributes (cdr lst))))))
+            (get-attributes (act-r-chunk-spec-slots chunk-spec)))))
     (dolist (slot possible-slots-to-check)
       (aif (first (member slot attributes-available :key #'car :test #'equal))
-	   ;check only available slots included in possible-slots-to-check
-	   (push it attributes-to-check)))
+        ;check only available slots included in possible-slots-to-check
+        (push it attributes-to-check)))
     (when (>  (length attributes-to-check) 0)
       (setf slotact (/ *salience-source-act*  (length attributes-to-check)))
       (dolist (cur-attribute attributes-to-check)
-	(proc-slot-matches (visicon-chunks vis-mod) 
-			   (car cur-attribute) (cdr cur-attribute) slotact)))))
+        (proc-slot-matches (visicon-chunks vis-mod) 
+                           (car cur-attribute) (cdr cur-attribute) slotact)))))
 
 (defun proc-slot-matches (lst slotname criterion activ)
   "Process salience for features which match a criterion on a particular slot."
   ;; if there's a hook function, use that
   (aif *salience-sji-hook*
-       (dolist (x lst lst)
-	 (incf (chunk-td-salience x)
-	       (* activ (funcall *salience-sji-hook*
-				 slotname criterion
-				 (chunk-slot-value-fct x slotname)))))
-       ;; there's no hook function. 
-       ;; Try fast symbol matching using the stored value caches
-       (progn
-	 (when (symbolp criterion)
-	   (awhen (assoc slotname *sval-caches*)
-		  (awhen (assoc criterion (rest it))
-			 (mapc #'(lambda (x)
-				   (incf (chunk-td-salience x) activ)) (rest it))
-			 (return-from proc-slot-matches lst))))
+    (dolist (x lst lst)
+      (incf (chunk-td-salience x)
+            (* activ (funcall *salience-sji-hook*
+                              slotname criterion
+                              (chunk-slot-value-fct x slotname)))))
+    ;; there's no hook function. 
+    ;; Try fast symbol matching using the stored value caches
+    (progn
+      (when (symbolp criterion)
+        (awhen (assoc slotname *sval-caches*)
+          (awhen (assoc criterion (rest it))
+            (mapc #'(lambda (x)
+                      (incf (chunk-td-salience x) activ)) (rest it))
+            (return-from proc-slot-matches lst))))
       ;;ok so no dice there
       ;;do it the slow way by walking through tht entire list and matching stuff
-	 (dolist (x lst lst)
-	   (incf (chunk-td-salience x)
-		 (* activ (default-l-sji
-			      criterion (chunk-slot-value-fct x slotname))))))))
-			      
+      (dolist (x lst lst)
+        (incf (chunk-td-salience x)
+              (* activ (default-l-sji
+                         criterion (chunk-slot-value-fct x slotname))))))))
+
 (defun default-l-sji (criterion value)
   "If the value matches the criterion, return the max Sji, otherwise 0."
   (if (equal criterion value) *max-salience-sji* 0))
@@ -264,25 +264,25 @@
 (defun print-visicon ()
   "Print the Vision Module's visicon. For debugging."
   (awhen (get-module :vision)  ;; Test that there is a vision module
-	 (format t "~%Loc        Att   Kind           Value             Color           ID		    BU-L   TD-L")
-	 (format t "~%---------  ---   -------------  ----------------  --------------  ----------	    ----   ----")
-	 (dolist (x (visicon-chunks it))
-	   (print-icon-feature x))))
+    (format t "~%Loc        Att   Kind           Value             Color           ID		    BU-L   TD-L")
+    (format t "~%---------  ---   -------------  ----------------  --------------  ----------	    ----   ----")
+    (dolist (x (visicon-chunks it))
+      (print-icon-feature x))))
 
 (defun print-icon-feature (x)
   (format t "~%(~3D ~3D)~11T~A~17T~A~32T~S~50T~A~66T~A~79T~5,2F~87T~5,2F"
           (chunk-slot-value-fct x 'screen-x)
-	  (chunk-slot-value-fct x 'screen-y) 
+          (chunk-slot-value-fct x 'screen-y) 
           (feat-attended x ;(vis-m *mp*))
-			 (get-module :vision))
-	  (chunk-slot-value-fct x 'kind)
-	  (if (null (chunk-real-visual-value x))
-	      (chunk-slot-value-fct x 'value) 
-	      (chunk-real-visual-value x))
-	  (chunk-slot-value-fct x 'color) 
-	  (chunk-visicon-entry x)
-	  (chunk-bu-salience x)
-	  (chunk-td-salience x)
+                         (get-module :vision))
+          (chunk-slot-value-fct x 'kind)
+          (if (null (chunk-real-visual-value x))
+            (chunk-slot-value-fct x 'value) 
+            (chunk-real-visual-value x))
+          (chunk-slot-value-fct x 'color) 
+          (chunk-visicon-entry x)
+          (chunk-bu-salience x)
+          (chunk-td-salience x)
           ))
 
 ;;;; ---------------------------------------------------------------------- ;;;;
@@ -293,8 +293,8 @@
 (defun prob->bits (p)
   "Convert a probability to a bit value via Hick-Hyman computation."
   (if (or (> p 1) (< p 0))
-      (error "Illegal probability ~S passed to PROB->BITS." p)
-      (log (/ 1 p) 2)))
+    (error "Illegal probability ~S passed to PROB->BITS." p)
+    (log (/ 1 p) 2)))
 
 
 (defun z->prob (z)
@@ -306,13 +306,13 @@
 (defun z-trans (seq &key key)
   "Returns a sequence of z-scores based on input sequence."
   (multiple-value-bind (mean stdev)
-      (seq-mean-stdev seq :key key)
+    (seq-mean-stdev seq :key key)
     (if (zerop stdev)
-	nil
-	(map (type-of seq) #'(lambda (n) (/ (- 
-					     (if key (funcall key n)
-						 n)
-					     mean) stdev)) seq))))
+      nil
+      (map (type-of seq) #'(lambda (n) (/ (- 
+                                            (if key (funcall key n)
+                                              n)
+                                            mean) stdev)) seq))))
 
 (defgeneric seq-mean-stdev (seq &key key)
   (:documentation "Returns the mean and the standard deviation of a sequence of numbers.  Returns nil when passed an empty sequence."))
@@ -360,9 +360,9 @@
 ;;;
 (defun horner-coef-list-1 (as e)
   (if (null as)
-      nil
-      (cons (horner-m (car as) e)
-	    (horner-coef-list-1 (cdr as) (1+ e)))))
+    nil
+    (cons (horner-m (car as) e)
+          (horner-coef-list-1 (cdr as) (1+ e)))))
 
 (defun horner-coef-list (as)
   (horner-coef-list-1 as 0))
@@ -372,17 +372,17 @@
 ;;;
 (defun horner-lookup (e dict)
   (if (assoc e (cdr dict) :test #'equal)
-      (cdr (assoc e (cdr dict) :test #'equal))
-      (let ((var (gensym (1- e))))
-	(setf (cdr dict)
-	      (cons (cons e var) (cdr dict)))
-	var)))
+    (cdr (assoc e (cdr dict) :test #'equal))
+    (let ((var (gensym (1- e))))
+      (setf (cdr dict)
+            (cons (cons e var) (cdr dict)))
+      var)))
 
 (defmacro horner-polynomial (exp . coeffs)
   (let* ((c-list (horner-knock-out (horner-coef-list coeffs)))
-	 (diffs  (horner-deltas 0 c-list '()))
-	 (dict   (list 'dict))
-	 (maker  (horner-var-maker exp diffs '() dict)))
+         (diffs  (horner-deltas 0 c-list '()))
+         (dict   (list 'dict))
+         (maker  (horner-var-maker exp diffs '() dict)))
     `(let* ,maker
        ;; (DECLARE (FLOAT ,@(horner-dict-vars dict)))
        ,(horner-body 0 c-list dict))))
@@ -392,11 +392,11 @@
 ;;;
 (defun horner-knock-out (horner-list)
   (cond ((null horner-list) nil)
-	((zerop (horner-c (car horner-list)))
-	 (horner-knock-out (cdr horner-list)))
-	(t
-	 (cons (car horner-list)
-	       (horner-knock-out (cdr horner-list))))))
+        ((zerop (horner-c (car horner-list)))
+         (horner-knock-out (cdr horner-list)))
+        (t
+         (cons (car horner-list)
+               (horner-knock-out (cdr horner-list))))))
 
 ;;; find a list of all the differences in exponents
 ;;;
@@ -413,8 +413,8 @@
 
 (defun horner-adjoin (x set)
   (if (member x set :test #'equal)
-      set
-      (sort (cons x set) #'>)))
+    set
+    (sort (cons x set) #'>)))
 
 
 ;;;; Construct LET* Variable List and the LET* Body
@@ -423,56 +423,56 @@
 ;;;
 (defun horner-var-maker (exp d-list v-list dict)
   (if (null d-list)	      ; if all done
-      v-list	              ; return the variable and dictionary
-      (let ((d (car d-list)))
-	(if (= d 1)
-	    (horner-var-maker exp
-			      (cdr d-list)
-			      (cons `(,(horner-lookup 1 dict) ,exp) v-list)
-			      dict)
-	    (let* ((d0 (floor d 2))
-		   (d1 (- d d0)))
-	      (horner-var-maker exp
-				(horner-adjoin d1 
-					       (horner-adjoin d0 (cdr d-list)))
-				(cons `(,(horner-lookup d dict)
-					 (* ,(horner-lookup d1 dict)
-					    ,(horner-lookup d0 dict)))
-				      v-list)
-				dict))))
-      ))
+    v-list	              ; return the variable and dictionary
+    (let ((d (car d-list)))
+      (if (= d 1)
+        (horner-var-maker exp
+                          (cdr d-list)
+                          (cons `(,(horner-lookup 1 dict) ,exp) v-list)
+                          dict)
+        (let* ((d0 (floor d 2))
+               (d1 (- d d0)))
+          (horner-var-maker exp
+                            (horner-adjoin d1 
+                                           (horner-adjoin d0 (cdr d-list)))
+                            (cons `(,(horner-lookup d dict)
+                                     (* ,(horner-lookup d1 dict)
+                                        ,(horner-lookup d0 dict)))
+                                  v-list)
+                            dict))))
+    ))
 
 ;;; return an expression that when multiplied by x^e
 ;;;   evaluates the polynomial specified by coeffs
 ;;;
 (defun horner-body (e coeffs dict)
   (if (null coeffs)
-      0.0					; empty expression
-      (let ((coef (car coeffs)))
-	(if (= (horner-e coef) e)		; time to add in a term?
-	    (if (null (cdr coeffs))		; eg, 7x^12 and e=12
-		`,(horner-c coef)
-		`(+ ,(horner-c coef)
-		    ,(horner-body e (cdr coeffs) dict)))
-	    `(* ,(horner-lookup (- (horner-e coef) e) dict)
-		,(horner-body (horner-e coef) coeffs dict)))
-	)))
+    0.0					; empty expression
+    (let ((coef (car coeffs)))
+      (if (= (horner-e coef) e)		; time to add in a term?
+        (if (null (cdr coeffs))		; eg, 7x^12 and e=12
+          `,(horner-c coef)
+          `(+ ,(horner-c coef)
+              ,(horner-body e (cdr coeffs) dict)))
+        `(* ,(horner-lookup (- (horner-e coef) e) dict)
+            ,(horner-body (horner-e coef) coeffs dict)))
+      )))
 
 
 (defun normal-cumulative (x)
   (flet ((nctail (x)				; eps < 7.5e-8
-	   (declare (ftype (function (float) float) nctail))
-	   (let ((z (/ 1.0 (1+ (* 0.2316419 x)))))
-	     (declare (float z))
-	     (* (NORMAL-DENSITY x)
-		(horner-polynomial z
-				   0.0
-				   0.319381530
-				   -.356563782
-				   1.781477937
-				   -1.821255978
-				   1.330274429)))))
+           (declare (ftype (function (float) float) nctail))
+           (let ((z (/ 1.0 (1+ (* 0.2316419 x)))))
+             (declare (float z))
+             (* (NORMAL-DENSITY x)
+                (horner-polynomial z
+                                   0.0
+                                   0.319381530
+                                   -.356563782
+                                   1.781477937
+                                   -1.821255978
+                                   1.330274429)))))
     (if (< x 0.0)
-	(nctail (- x))
-	(- 1.0 (nctail x)))))
+      (nctail (- x))
+      (- 1.0 (nctail x)))))
 

@@ -74,7 +74,7 @@
 
 #+:clozure (when (sv-dev-env-p)
              (load-file-list ".." "build" "file-list.txt"))
-       
+
 (defparameter *actr6-dir-name* #+:clozure "actr6" #+:digitool "actr6mcl")
 #-:act-r-6.0 (load-as-lst ".." "submodules" *actr6-dir-name* "load-act-r-6.lisp")
 
