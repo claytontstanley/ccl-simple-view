@@ -23,8 +23,6 @@
 (find-bsd-serial-ports)
 (inspect (tracker-get-datum (eyetracker *foo*) nil))
 (setf *s* (tracker-data-source (eyetracker *foo*)))
-(setf *mouse-down-p* nil)
-*mouse-down-p*
 (progn
   (stream-clear-input *s*)
   (sleep .011)

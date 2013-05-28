@@ -1071,23 +1071,13 @@
 
 ; Handling mouse movement/interaction
 
-(defparameter *mouse-down-p* nil)
-
-(defun mouse-down-p ()
-  *mouse-down-p*)
-
 (defmethod easygui::mouse-down :after ((view simple-view) &key location &allow-other-keys)
   (let ((win (guard-!nil
                (guard-!null-ptr
                  (view-window view)))))
-    (setf *mouse-down-p* t)
     (view-click-event-handler view location)
     (view-click-event-handler win location)
     (post-view-click-event-handler win location)))
-
-(defmethod easygui::mouse-up :after ((view simple-view) &key location &allow-other-keys)
-  (declare (ignore location))
-  (setf *mouse-down-p* nil))
 
 (defmethod post-view-click-event-handler ((view window) position)
   (declare (ignore position))
