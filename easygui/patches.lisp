@@ -1,8 +1,4 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (require :cocoa)
-  (require :easygui))
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
   (shadowing-import 'easygui:cocoa-ref)
   (shadowing-import 'easygui:dcc)
   (shadowing-import 'easygui::running-on-main-thread))
