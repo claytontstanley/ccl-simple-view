@@ -255,6 +255,5 @@
 (objc:defmethod (#/makeKeyAndOrderFront: :void) ((cocoa-win easygui::cocoa-window) (id :id))
   (call-next-method id)
   (let ((win (easygui::easygui-window-of cocoa-win)))
-    (with-slots (position) win
-      (setf (easygui::view-position win) position))))
+    (setf (easygui::view-position win) (easygui::view-position win))))
 
