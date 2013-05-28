@@ -247,3 +247,14 @@
 (defun easygui::screen-width nil
   (easygui::running-on-this-thread ()
     (ns:ns-rect-width (dcc (#/frame (#/objectAtIndex: (#/screens ns:ns-screen) 0))))))
+
+; Default makeKeyAndOrderFront: zeros views with negative coordinates. This behavior is 
+; undesirable, and does not match the MCL spec. The fix is to ensure the views desired coordinates
+; (even if negative) are set for the window by changing the window's position to those coordinates
+; after the default makeKeyAndOrderFront: method is called
+(objc:defmethod (#/makeKeyAndOrderFront: :void) ((cocoa-win easygui::cocoa-window) (id :id))
+  (call-next-method id)
+  (let ((win (easygui::easygui-window-of cocoa-win)))
+    (with-slots (position) win
+      (setf (easygui::view-position win) position))))
+

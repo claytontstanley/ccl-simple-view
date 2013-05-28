@@ -33,3 +33,8 @@
 
 (window-close *win*)
 
+(setf *win* (make-instance 'window :view-position (make-point -30 50)))
+(check (equalp (as-list (view-position *win*))
+              (list -30 50)))
+(window-close *win*)
+
