@@ -14,7 +14,6 @@
 
 #|
 *modules*
-(require :chil-utilities)
 (warning "foo")
 (internal-real-time->ms) 
 (make-instance 'window :view-position (make-point 1900 0))
