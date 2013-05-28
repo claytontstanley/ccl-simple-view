@@ -184,6 +184,10 @@
   (declare (ignore size))
   keyword)
 
+(defmethod parse-view-position-argument ((keyword integer) size)
+  (declare (ignore size))
+  keyword)
+
 (defmethod parse-mcl-initarg ((keyword (eql :view-scroll-position)) view-scroll-position)
   (list :view-scroll-position (mcl-point->system-point view-scroll-position)))
 

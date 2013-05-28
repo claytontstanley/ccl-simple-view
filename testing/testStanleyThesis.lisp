@@ -3,7 +3,7 @@
 
 (load-file-list "file-lists" "StanleyThesis" "testStanleyThesis.txt")
 
-; opens and closes *library-experiment-window*
+; opens a window, sets contents to *library-experiment-window*, and closes window when done
 (let ((*path* (format nil "~a/" (path-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source"))))
   (things2lisp :snums (list 50)))
 
@@ -26,6 +26,9 @@
 ; close it afterwards
 (window-close *library-experiment-window*)
 #|
+
+(let ((*path* "/Volumes/claytonstanley/Desktop/")) 
+  (things2lisp :snums (list 2)))
 
 (load-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source" "subj050.lisp")
 

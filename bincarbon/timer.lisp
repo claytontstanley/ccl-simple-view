@@ -51,6 +51,7 @@
 
 
 (require :misc-lib)
+(require :sv-utilities)
 
 (unless (boundp '*acr-enabled-p*)
   (defvar *actr-enabled-p*)
@@ -106,21 +107,8 @@
 (defgeneric spin-for (tmr ms-delay)
   (:documentation "Spins for ms-delay milliseconds."))
 
-(defun internal-real-time->ms (&optional (internal-real-time (get-internal-real-time)))
-  (* 1000
-     (/ internal-real-time
-        internal-time-units-per-second)))
-
 (defmethod spin-for ((tmr timer) ms-delay)
   (spin-for-fct ms-delay))
-
-(defun spin-for-fct (ms-delay)
-  (without-interrupts
-     (let ((start (internal-real-time->ms
-                    (get-internal-real-time))))
-       (while (> ms-delay (- (internal-real-time->ms
-                               (get-internal-real-time))
-                             start))))))
 
 (defgeneric dispose-timer (tmr)
   (:documentation "Releases any resources used by the timer."))

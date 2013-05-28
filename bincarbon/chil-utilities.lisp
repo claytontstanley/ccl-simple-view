@@ -1,29 +1,10 @@
-(defmacro %ensure-defined (form)
-  (destructuring-bind (symb name (&rest arglist) &body body) form
-    (declare (ignore arglist body))
-    (unless
-      (funcall
-        (case symb
-          (defun #'fboundp)
-          (defgeneric #'fboundp)
-          (defmacro #'macro-function)
-          (defvar #'boundp))
-        name)
-      form)))
+#+:clozure (require :ccl-simple-view)
 
-(defmacro ensure-defined (&body body)
-  `(eval-when (:compile-toplevel :load-toplevel :execute)
-     ,@(mapcar (lambda (form)
-                 `(%ensure-defined ,form))
-               body)))
-
-(defmacro with-continue (&body body)
-  `(handler-bind ((error #'continue))
-     ,@body))
-
-(ensure-defined
-  (defmacro push-to-end (item place)
-    "analogous to the push macro; just places 'item' at the end of 'place', instead of the front"
-    `(setf ,place (nconc ,place (list ,item)))))
+(defun warning (string &key (cursor nil) 
+                       (size #@(400 200)))
+  "Displays a warning dialog, with a cursor."
+  (when cursor (#_ShowCursor))
+  (message-dialog string :title "Message" :size size :position #@(300 250))
+  (when cursor (#_HideCursor)))
 
 (provide :chil-utilities)

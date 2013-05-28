@@ -68,16 +68,19 @@
 
 ; Bootstrap script/logic starts here
 
+(defun sv-dev-env-p ()
+  (and (member "swank-repl" *modules* :test #'string-equal)
+       *load-sv-dev-files-p*))
+
+#+:clozure (when (sv-dev-env-p)
+             (load-file-list ".." "build" "file-list.txt"))
+       
 (defparameter *actr6-dir-name* #+:clozure "actr6" #+:digitool "actr6mcl")
 #-:act-r-6.0 (load-as-lst ".." "submodules" *actr6-dir-name* "load-act-r-6.lisp")
 
-#+:clozure
-(cond ((and (member "swank-repl" *modules* :test #'string-equal)
-            *load-sv-dev-files-p*)
-       (load-file-list ".." "build" "file-list.txt")
-       (load-file-list ".." "build" "file-list-device.txt")
-       (load-file-list ".." "build" "file-list-uwi.txt"))
-      (t nil))
+#+:clozure (when (sv-dev-env-p)
+             (load-file-list ".." "build" "file-list-device.txt")
+             (load-file-list ".." "build" "file-list-uwi.txt"))
 
 #+:clozure (setf *resource-pool* (init-pool))
 
