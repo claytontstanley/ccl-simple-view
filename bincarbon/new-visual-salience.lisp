@@ -81,7 +81,7 @@
           (process-numeric-slot lst slotname nfeats))))))
 
 (defun process-numeric-slot (lst slotname nfeats)
-  "Increment bottum-up salience for a slot with all numeric values."
+  "Increment bottom-up salience for a slot with all numeric values."
   (let ((z-scores (z-trans 
                     lst :key #'(lambda (x) (chunk-slot-value-fct x slotname)))))
     (when z-scores
@@ -91,7 +91,7 @@
                  (prob->bits (z->prob (nth i z-scores)))))))))
 
 (defun process-symbolic-slot (lst slotname nfeats)
-  "Increment bottum-salience for a slot with not all numeric values."
+  "Increment bottom-salience for a slot with not all numeric values."
   (let ((val-alst nil) 
         (featval nil))
     (dolist (x lst)
@@ -152,7 +152,7 @@
                #'(lambda (x) (test-attended (list '= (car it) (cdr it)) x))
                (visicon-chunks vis-mod))
              (visicon-chunks vis-mod))))
-    ;; if anything's left, add noise and find highest-salience items
+    ;; if anything is left, add noise and find highest-salience items
     (setf lst (objs-max-val
                 lst #'(lambda (x) (chunk-tot-salience x))))
     (aif (if lst (if (> (chunk-tot-salience (first lst)) *salience-thresh*)
@@ -246,8 +246,8 @@
             (mapc #'(lambda (x)
                       (incf (chunk-td-salience x) activ)) (rest it))
             (return-from proc-slot-matches lst))))
-      ;;ok so no dice there
-      ;;do it the slow way by walking through tht entire list and matching stuff
+      ;;OK so no dice there
+      ;;do it the slow way by walking through the entire list and matching stuff
       (dolist (x lst lst)
         (incf (chunk-td-salience x)
               (* activ (default-l-sji
@@ -450,7 +450,7 @@
     0.0					; empty expression
     (let ((coef (car coeffs)))
       (if (= (horner-e coef) e)		; time to add in a term?
-        (if (null (cdr coeffs))		; eg, 7x^12 and e=12
+        (if (null (cdr coeffs))		; e.g., 7x^12 and e=12
           `,(horner-c coef)
           `(+ ,(horner-c coef)
               ,(horner-body e (cdr coeffs) dict)))
