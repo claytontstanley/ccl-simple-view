@@ -30,9 +30,9 @@
   (without-interrupts
     (let ((start (internal-real-time->ms
                    (get-internal-real-time))))
-      (while (> ms-delay (- (internal-real-time->ms
-                              (get-internal-real-time))
-                            start))))))
+      (loop until (< ms-delay (- (internal-real-time->ms
+                                   (get-internal-real-time))
+                                 start))))))
 
 (defun internal-real-time->ms (&optional (internal-real-time (get-internal-real-time)))
   (* 1000
