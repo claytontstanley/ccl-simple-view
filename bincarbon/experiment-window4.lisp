@@ -372,8 +372,9 @@
   (#_showcursor)
   (when (and (base-path wind) (member (write-type wind) '(:SS :BOTH)))
     (let ((path (make-data-path wind "txt")))
-      (set-mac-file-creator path :|R*ch|)
-      (lock-file path)))
+      (when (probe-file path)
+        (set-mac-file-creator path :|R*ch|)
+        (lock-file path))))
   (when (member (write-type wind) '(:LISP :BOTH))
     (with-open-file (strm (make-data-path wind "lisp") :direction :output 
                           :if-exists :append :if-does-not-exist :create)
@@ -667,6 +668,9 @@
   (declare (ignore initarg-name strm))
   (when (slot-boundp thing slot-name)
     (call-next-method)))
+
+(defmethod write-slot (thing (initarg-name (eql nil)) slot-name &optional (strm t))
+  (declare (ignore thing slot-name strm)))
 
 (defmethod write-slot (thing (initarg-name (eql :cocoa-ref)) slot-name &optional (strm t))
   (declare (ignore thing slot-name strm)))
