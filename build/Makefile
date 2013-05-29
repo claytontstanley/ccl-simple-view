@@ -58,10 +58,13 @@ file-list:
 outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g'
 
+update-remote-repositories:
+	cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} "cd \"$$repo\" && git ru && git rb origin/master && git su"; done
+
 deploy:
 	cd ${repo}/bincarbon && ${git-is-clean} && git push
 	cd ${repo} && ${git-is-clean} && git push
-	cat ./${rrepos} | while read repo; do ssh -n ${server} "cd \"$$repo\" && git ru && git rb origin/master && git su"; done
+	make update-remote-repositories
 	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule sync && git submodule update --init --recursive'
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
 	ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
