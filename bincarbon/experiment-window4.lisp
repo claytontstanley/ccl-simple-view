@@ -343,14 +343,18 @@
 (defmethod run-experiment ((wind timed-exp-window))
   (menubar-hide)
   (when (member (write-type wind) '(:LISP :BOTH))
-    (with-open-file (strm (make-data-path wind "lisp") :direction :output 
-                          :if-exists :append :if-does-not-exist :create)
-      (format strm "(list ")))
+    (with-open-file (strm (make-data-path wind "lisp") :direction :output :if-exists :append :if-does-not-exist :create)
+      (write-experiment-opener wind strm)))
   (setup-experiment wind)
   (dolist (block (block-lst wind))
     (run-block wind block))
   (finish-experiment wind))
 
+(defmethod write-experiment-opener ((wind experiment-window) (strm stream))
+  (format strm "(list "))
+
+(defmethod write-experiment-closer ((wind experiment-window) (strm stream))
+  (format strm ")"))
 
 ;;; RUN-EXPERIMENT      [Method]
 ;;; Date        : 00.06.06
@@ -376,9 +380,8 @@
         (set-mac-file-creator path :|R*ch|)
         (lock-file path))))
   (when (member (write-type wind) '(:LISP :BOTH))
-    (with-open-file (strm (make-data-path wind "lisp") :direction :output 
-                          :if-exists :append :if-does-not-exist :create)
-      (format strm ")")))
+    (with-open-file (strm (make-data-path wind "lisp") :direction :output :if-exists :append :if-does-not-exist :create)
+      (write-experiment-closer wind strm)))
   (menubar-show)
   ;; if there's no URL stored, then there's no questionnaire, so just bail.
   (if (null (url wind))
