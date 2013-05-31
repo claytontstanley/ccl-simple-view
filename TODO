@@ -1,3 +1,5 @@
 connect :dialog-item-action initarg to :action initarg
 contents-of-directory should be in utils
 plug memory leaks
+check collect-calibration method
+check tracker-calibrate method

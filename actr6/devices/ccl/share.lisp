@@ -1717,6 +1717,11 @@
   (#_CGDisplayShowCursor
    (#_CGMainDisplayID)))
 
+(defun cursor-is-visible-p ()
+  (ecase (#_CGCursorIsVisible)
+    (0 nil)
+    (1 t)))
+
 ; Running on main GUI thread is required for the menubar functions. Otherwise Cocoa crashes fairly often when these are called.
 
 (defun hide-menubar ()
