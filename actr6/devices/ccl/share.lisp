@@ -347,6 +347,9 @@
 (defclass dialog-item (view view-text-mixin action-view-mixin)
   ((easygui::dialog-item-enabled-p :initarg :enabled-p)
    (part-color-list :reader part-color-list :initarg :part-color-list)
+   (dialog-item-handle :accessor dialog-item-handle :initarg :dialog-item-handle :initform nil)
+   (dialog-item-action :accessor dialog-item-action :initarg :dialog-item-action :initform nil)
+   (compress-text :accessor compress-text :initarg :compress-text :initform nil)
    (text-truncation :initarg :text-truncation :reader text-truncation :initform #$NSLineBreakByTruncatingTail))
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
@@ -363,6 +366,9 @@
     (call-next-method)))
 
 (defmethod initialize-instance :after ((view dialog-item) &key)
+  (guard ((null (dialog-item-handle view)) "Not utilizing dialog-item-handle"))
+  (guard ((null (dialog-item-action view)) "Not yet mapping :dialog-item-action to CCL's :action initarg"))
+  (guard ((null (compress-text view)) "Not utilizing compress-text"))
   (awhen (text-truncation view)
     (#/setLineBreakMode: (#/cell (cocoa-ref view)) it))
   (when (and (slot-boundp view 'easygui::text)
@@ -413,11 +419,14 @@
 
 ; Cocoa doesn't automatically determine the value of drawsbackground dependent on the background color.
 ; If the back color is clear, drawsbackground should be nil, otherwise t. So if a back-color is passed in
-; as an initform, inform easygui that the background should be drawn by passing a t for :drawsbackground keyword.
+; as an initform, and that color is not clear, inform easygui that the background should be drawn by passing
+; a t for :draws-background keyword.
 
 (defmethod initialize-instance :around ((view easygui::background-coloring-mixin) &rest args &key back-color)
-  (if back-color
-    (apply #'call-next-method view :drawsbackground t args)
+  (if (and back-color
+           (not (equalp (color-opacity (mcl-color->system-color back-color))
+                        0)))
+    (apply #'call-next-method view :draws-background t args)
     (call-next-method)))
 
 (defmethod (setf bordered-p) (bordered-p (view static-text-dialog-item))
@@ -814,6 +823,7 @@
 
 (defun convert-justification (justification)
   (let ((mapping (list (cons $tejustleft #$NSLeftTextAlignment)
+                       (cons nil #$NSLeftTextAlignment)
                        (cons $tejustcenter #$NSCenterTextAlignment)
                        (cons $tejustright #$NSRightTextAlignment))))
     (guard (it1 "No mapping found for justification ~a" justification)
