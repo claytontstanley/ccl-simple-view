@@ -1,4 +1,4 @@
-testing/testDMTracker.lisp
+testing/testReplayExperimentWindow.lisp
 submodules/DMTracker
 bincarbon/DMTracker
-testing/file-lists/DMTracker/testDMTracker.txt
+testing/file-lists/ReplayExperimentWindow/loaded.txt
