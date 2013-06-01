@@ -7,4 +7,4 @@ testing/testImages.lisp
 testing/testLiner.lisp
 testing/testModalDialog.lisp
 testing/testEnsureDefined.lisp
-testParseMCLInitargs.lisp
+testing/testParseMCLInitargs.lisp
