@@ -16,6 +16,8 @@ outFiles = ccl-simple-view.lisp device.lisp uwi.lisp
 decompileTargets = ${outFiles:%=decompile-%}
 rrepos = remote-deployed-repositories.txt
 
+deploy-test = continuous-integration
+
 all: ${outFiles}
 
 ccl-simple-view.lisp : fileList = file-list.txt
@@ -70,5 +72,5 @@ deploy:
 	ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
 	cd ${depdir} && make -C build all
 	cd ${depdir} && make -C docs/README
-	cd ${depdir} && make -C testing continuous-integration
+	cd ${depdir} && make -C testing ${deploy-test} 
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
