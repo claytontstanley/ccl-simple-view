@@ -54,3 +54,10 @@
                                     :flipped (slot-value view 'easygui::flipped))))
       (setf (slot-value view 'easygui::content-view) containee
             (slot-value containee 'easygui::parent) view))))
+
+; Redefining to use the &body body pairing instead of &rest body, so that Slime auto indenting works properly
+(defmacro easygui::running-on-this-thread ((&key (waitp t)) &body body)
+  ;; The purpose of this trivial macro is to mark places where it is thought possible that
+  ;; it may be preferable to use running-on-main-thread.
+  (declare (ignore waitp))
+  `(progn ,@body))
