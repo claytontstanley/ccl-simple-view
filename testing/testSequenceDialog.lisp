@@ -1,6 +1,7 @@
 (setf *win*
       (make-instance
         'window
+        :view-position (make-point 10 10)
         :view-subviews
         (list
           (make-dialog-item 'static-text-dialog-item

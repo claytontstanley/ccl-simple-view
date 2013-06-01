@@ -516,7 +516,7 @@
 
 (defmethod initialize-instance :after ((view sequence-dialog-item) &key)
   (let ((cocoa-matrix (cocoa-ref view))
-        (prototype (#/init (#/alloc easygui::cocoa-matrix-cell))))
+        (prototype (make-instance 'easygui::cocoa-matrix-cell)))
     (with-slots (table-hscrollp table-vscrollp columns) view
       (guard (table-vscrollp "Sequence dialog item must allow vertical scrolling"))
       (guard ((not table-hscrollp) "Sequence dialog item must not allow horizontal scrolling"))
