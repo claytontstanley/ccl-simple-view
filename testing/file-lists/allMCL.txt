@@ -1,4 +1,5 @@
+bincarbon/sv-language-layer.lisp
+bincarbon/lol-subset.lisp
 bincarbon/sv-utilities.lisp
-submodules/lisp-dev/lol-subset.lisp
 bincarbon/bootstrap-mcl.lisp
 bincarbon/device-patches-mcl.lisp

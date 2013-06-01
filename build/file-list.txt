@@ -1,6 +1,6 @@
+bincarbon/sv-language-layer.lisp
+bincarbon/lol-subset.lisp
 bincarbon/sv-utilities.lisp
-submodules/lisp-dev/lol-subset.lisp
-submodules/lisp-dev/extras-late.lisp
 bincarbon/logger.lisp
 easygui/patches.lisp
 easygui/extensions.lisp
