@@ -17,7 +17,6 @@
         (sleep .1)
         (remove-visual-items-from-rpm-window *win* view)))))
 
-
 (defclass test-rpm-real-window (rpm-real-window)
   ())
 

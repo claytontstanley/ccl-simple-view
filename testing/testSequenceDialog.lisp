@@ -19,27 +19,27 @@
                             :view-nick-name :sdi
                             ))))
 
-(select-item-from-list (list 'a 'b "c" "d" "hello" (list 4 3 2)))
+(print (select-item-from-list (list 'a 'b "c" "d" "hello" (list 4 3 2))))
 
 #|
 (invalidate-view *win*))
-(defun make-dialog-item (class position size text &optional action &rest attributes)
-  (dialog-item-text *view*)
-  (print (cocoa-ref *view*))
-  (#/stringValue (cocoa-ref *view*))
-  (selected-cells *view*)
-  (#/title
-   (index-to-cell *view* 2))
-  (#/setIntercellSpacing: (cocoa-ref *view*) (ns:make-ns-size 50 50))
-  (#/setCellSize: (cocoa-ref *view*) (ns:make-ns-size 20 20))
-  (setf *win* (make-instance 'window))
-  (add-subviews *win* *view*)
-  (#/mode (cocoa-ref *view*))
-  (#/cellSize (cocoa-ref *view*))
-  (set-table-sequence *view* (list "alpha" "..." "--" "*"))
-  (invalidate-view *view*)
-  (#/autorecalculatesCellSize (cocoa-ref *view*))
-  (#/autosizesCells (cocoa-ref *view*))
-  (#/setAutosizesCells: (cocoa-ref *view*) #$YES)
-  (#/sizeToCells (cocoa-ref *view*))
-  |#
+(setf *sv-log-level* 0)
+(dialog-item-text *view*)
+(print (cocoa-ref *view*))
+(#/stringValue (cocoa-ref *view*))
+(selected-cells *view*)
+(#/title
+ (index-to-cell *view* 2))
+(#/setIntercellSpacing: (cocoa-ref *view*) (ns:make-ns-size 50 50))
+(#/setCellSize: (cocoa-ref *view*) (ns:make-ns-size 20 20))
+(setf *win* (make-instance 'window))
+(add-subviews *win* *view*)
+(#/mode (cocoa-ref *view*))
+(#/cellSize (cocoa-ref *view*))
+(set-table-sequence *view* (list "alpha" "..." "--" "*"))
+(invalidate-view *view*)
+(#/autorecalculatesCellSize (cocoa-ref *view*))
+(#/autosizesCells (cocoa-ref *view*))
+(#/setAutosizesCells: (cocoa-ref *view*) #$YES)
+(#/sizeToCells (cocoa-ref *view*))
+|#

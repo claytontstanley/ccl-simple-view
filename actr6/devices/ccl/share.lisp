@@ -344,6 +344,14 @@
 
 (defclass action-view-mixin (easygui::action-view-mixin) ())
 
+(defmethod initialize-instance :around ((view action-view-mixin) &rest args &key action)
+  (let ((accum
+          (if action (list :action (lambda ()
+                                     (sv-log-n 1 "calling action for ~a" view)
+                                     (funcall action)
+                                     (sv-log-n 1 "finished calling action for ~a" view))))))
+    (apply #'call-next-method view (nconc accum args))))
+                           
 (defclass dialog-item (view view-text-mixin action-view-mixin)
   ((easygui::dialog-item-enabled-p :initarg :enabled-p)
    (part-color-list :reader part-color-list :initarg :part-color-list)
@@ -354,20 +362,29 @@
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
 
-(defun convert-text-truncation (val)
-  (etypecase val
-    (keyword (ecase val
-               (:end #$NSLineBreakByTruncatingTail)))
-    (integer val)))
+(defmethod parse-mcl-initarg ((keyword (eql :text-truncation)) val)
+  (list
+    :text-truncation
+    (etypecase val
+      (keyword (ecase val
+                 (:end #$NSLineBreakByTruncatingTail)))
+      (integer val))))
 
-(defmethod initialize-instance :around ((view dialog-item) &rest args &key text-truncation)
-  (if text-truncation
-    (apply #'call-next-method view :text-truncation (convert-text-truncation text-truncation) args)
-    (call-next-method)))
+(defmethod parse-mcl-initarg ((keyword (eql :dialog-item-action)) (val list))
+  (destructuring-bind (view action) val
+    (list :action (lambda () (funcall action view)))))
 
+(defmethod initialize-instance :around ((view dialog-item) &rest args &key text-truncation dialog-item-action)
+  (let ((accum
+          (loop for keyword in (list :text-truncation :dialog-item-action) 
+                for value in (list text-truncation dialog-item-action)
+                when value append (parse-mcl-initarg keyword (if (eq keyword :dialog-item-action)
+                                                               (list view value)
+                                                               value)))))
+    (apply #'call-next-method view (nconc accum args))))
+ 
 (defmethod initialize-instance :after ((view dialog-item) &key)
   (guard ((null (dialog-item-handle view)) "Not utilizing dialog-item-handle"))
-  (guard ((null (dialog-item-action view)) "Not yet mapping :dialog-item-action to CCL's :action initarg"))
   (guard ((null (compress-text view)) "Not utilizing compress-text"))
   (awhen (text-truncation view)
     (#/setLineBreakMode: (#/cell (cocoa-ref view)) it))
@@ -608,14 +625,10 @@
                          :view-position position
                          :view-size size
                          :text text)
-                       (if action
-                         (list
-                           :action (lambda ()
-                                     (sv-log-n 1 "calling action for ~a" obj)
-                                     (funcall action obj)
-                                     (sv-log-n 1 "finished calling action for ~a" obj))))
+                       (if action (list :dialog-item-action action))
                        attributes)))
     obj))
+
 
 (defclass menu-view (easygui::menu-view view view-text-via-title-mixin easygui::decline-menu-mixin)
   ((easygui::text :initarg :menu-title)
