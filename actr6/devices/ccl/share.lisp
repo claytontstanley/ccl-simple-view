@@ -96,16 +96,22 @@
 (defmethod view-default-size ((view simple-view))
   (make-point 100 100))
 
+(defmethod parse-mcl-initargs (&rest list)
+  (loop for (keyword val . rest) in list
+        when keyword append (apply #'parse-mcl-initarg keyword val rest)))
+
 ; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
 ; same slot name and expects the font slot to be initialized with a font spec as a list.
 ; So in order to make it so that the font slot is correct for easygui, shadow the :view-font
 ; initarg if it is provided by the equivalent ns-font value
 
 (defmethod initialize-instance :around ((view simple-view) &rest args &key back-color view-font view-size view-position view-scroll-position)
-  (let ((accum
-          (loop for keyword in (list :back-color :view-font :view-size :view-position :view-scroll-position) 
-                for value in (list back-color view-font view-size view-position view-scroll-position)
-                when value append (parse-mcl-initarg keyword value))))
+  (let ((accum (parse-mcl-initargs
+                 (list :back-color back-color)
+                 (list :view-font view-font)
+                 (list :view-size view-size)
+                 (list :view-position view-position)
+                 (list :view-scroll-position view-scroll-position))))
     (apply #'call-next-method view (nconc accum args))))
 
 (defmethod initialize-instance :after ((view simple-view) &key)
@@ -133,7 +139,7 @@
           ; Default, so return nil
           ())))))
 
-(defmethod parse-mcl-initarg ((keyword (eql :view-font)) font-lst)
+(defmethod parse-mcl-initarg ((keyword (eql :view-font)) font-lst &key)
   (let ((name) (pt) (color))
     (dolist (atom font-lst)
       (etypecase atom
@@ -147,19 +153,17 @@
       (if color
         (list :fore-color color)))))
 
-(defmethod parse-mcl-initarg ((keyword (eql :back-color)) back-color)
+(defmethod parse-mcl-initarg ((keyword (eql :back-color)) back-color &key)
   (list :back-color (mcl-color->system-color back-color)))
 
-(defmethod parse-mcl-initarg ((keyword (eql :view-size)) view-size)
+(defmethod parse-mcl-initarg ((keyword (eql :view-size)) view-size &key)
   (list :view-size (mcl-point->system-point view-size)))
 
-(defmethod parse-mcl-initarg ((keyword (eql :view-position)) view-position)
-  (list :view-position (mcl-point->system-point view-position)))
-
-(defmethod parse-mcl-initarg ((keyword (eql :view-position)) (view-position list))
+(defmethod parse-mcl-initarg ((keyword (eql :view-position)) view-position &key size)
   (list :view-position
-        (destructuring-bind (keyword size) view-position
-          (parse-view-position-argument keyword size))))
+        (if size
+          (parse-view-position-argument view-position size)
+          (mcl-point->system-point view-position))))
 
 (defmethod parse-view-position-argument ((keyword (eql :centered)) size)
   (destructuring-bind (sizex sizey) (as-list (mcl-point->system-point size))
@@ -188,7 +192,7 @@
   (declare (ignore size))
   keyword)
 
-(defmethod parse-mcl-initarg ((keyword (eql :view-scroll-position)) view-scroll-position)
+(defmethod parse-mcl-initarg ((keyword (eql :view-scroll-position)) view-scroll-position &key)
   (list :view-scroll-position (mcl-point->system-point view-scroll-position)))
 
 (defclass view (simple-view)
@@ -257,9 +261,8 @@
 ; calls to window-null-event-handler, and it
 ; was around 100ms. So using that rate here.
 (defmethod initialize-instance :around ((win window) &rest args &key view-position view-size)
-  (let ((accum 
-          (when (and view-position view-size)
-            (parse-mcl-initarg :view-position (list view-position view-size)))))
+  (let ((accum (when (and view-position view-size)
+                 (parse-mcl-initarg :view-position view-position :size view-size))))
     (apply #'call-next-method win (nconc accum args))))
 
 (objc:defmethod (#/close :void) ((self easygui::cocoa-window))
@@ -345,13 +348,17 @@
 (defclass action-view-mixin (easygui::action-view-mixin) ())
 
 (defmethod initialize-instance :around ((view action-view-mixin) &rest args &key action)
-  (let ((accum
-          (if action (list :action (lambda ()
-                                     (sv-log-n 1 "calling action for ~a" view)
-                                     (funcall action)
-                                     (sv-log-n 1 "finished calling action for ~a" view))))))
+  (let ((accum (parse-mcl-initargs (list :action action :view view))))
     (apply #'call-next-method view (nconc accum args))))
-                           
+
+(defmethod parse-mcl-initarg ((keyword (eql :action)) action &key view)
+  (guard ((not (null view)) "view must associated with an action"))
+  (list :action
+        (lambda ()
+          (sv-log-n 1 "calling action for ~a" view)
+          (funcall action)
+          (sv-log-n 1 "finished calling action for ~a" view))))
+
 (defclass dialog-item (view view-text-mixin action-view-mixin)
   ((easygui::dialog-item-enabled-p :initarg :enabled-p)
    (part-color-list :reader part-color-list :initarg :part-color-list)
@@ -362,7 +369,7 @@
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
 
-(defmethod parse-mcl-initarg ((keyword (eql :text-truncation)) val)
+(defmethod parse-mcl-initarg ((keyword (eql :text-truncation)) val &key)
   (list
     :text-truncation
     (etypecase val
@@ -370,19 +377,16 @@
                  (:end #$NSLineBreakByTruncatingTail)))
       (integer val))))
 
-(defmethod parse-mcl-initarg ((keyword (eql :dialog-item-action)) (val list))
-  (destructuring-bind (view action) val
-    (list :action (lambda () (funcall action view)))))
+(defmethod parse-mcl-initarg ((keyword (eql :dialog-item-action)) action &key view)
+  (guard ((not (null view)) "dialog item action must be associated with a view"))
+  (list :action (lambda () (funcall action view))))
 
 (defmethod initialize-instance :around ((view dialog-item) &rest args &key text-truncation dialog-item-action)
-  (let ((accum
-          (loop for keyword in (list :text-truncation :dialog-item-action) 
-                for value in (list text-truncation dialog-item-action)
-                when value append (parse-mcl-initarg keyword (if (eq keyword :dialog-item-action)
-                                                               (list view value)
-                                                               value)))))
+  (let ((accum (parse-mcl-initargs
+                 (list :text-truncation text-truncation)
+                 (list :dialog-item-action dialog-item-action :view view))))
     (apply #'call-next-method view (nconc accum args))))
- 
+
 (defmethod initialize-instance :after ((view dialog-item) &key)
   (guard ((null (dialog-item-handle view)) "Not utilizing dialog-item-handle"))
   (guard ((null (compress-text view)) "Not utilizing compress-text"))
