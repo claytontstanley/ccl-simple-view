@@ -17,6 +17,7 @@ decompileTargets = ${outFiles:%=decompile-%}
 rrepos = remote-deployed-repositories.txt
 
 deploy-test = continuous-integration
+rebuild-kernel-p = true
 
 all: ${outFiles}
 
@@ -63,13 +64,16 @@ outFileHeader:
 update-remote-repositories:
 	cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} "cd \"$$repo\" && git ru && git rb origin/master && git su"; done
 
+rebuild-kernel:
+	[[ "${rebuild-kernel-p}" != "true" ]] || ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
+
 deploy:
 	cd ${repo}/bincarbon && ${git-is-clean} && git push
 	cd ${repo} && ${git-is-clean} && git push
 	make update-remote-repositories
 	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule sync && git submodule update --init --recursive'
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
-	ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
+	make rebuild-kernel
 	cd ${depdir} && make -C build all
 	cd ${depdir} && make -C docs/README
 	cd ${depdir} && make -C testing ${deploy-test} 
