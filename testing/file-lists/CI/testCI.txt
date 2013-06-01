@@ -11,3 +11,4 @@ testing/testVotebox.lisp
 testing/testVoteboxKristen.lisp
 testing/testTamboDisModel.lisp
 testing/testStanleyThesis.lisp
+testing/testReplayExperimentWindow.lisp
