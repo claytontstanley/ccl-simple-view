@@ -98,7 +98,7 @@
 
 (defmethod parse-mcl-initargs (&rest list)
   (loop for (keyword val . rest) in list
-        when keyword append (apply #'parse-mcl-initarg keyword val rest)))
+        when val append (apply #'parse-mcl-initarg keyword val rest)))
 
 ; easygui expects the font slot to be initialized with an ns-font type. However, MCL uses the
 ; same slot name and expects the font slot to be initialized with a font spec as a list.
