@@ -6,13 +6,12 @@
 ; opens a window, sets contents to *library-experiment-window*, and closes window when done
 (let ((*path* (format nil "~a/" (path-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source"))))
   (things2lisp :snums (list 50)))
-(break)
 
 (defmethod play-expt-with-window ((window window) &optional (constraints))
   (let ((prop (make-instance 'analysis-properties))) 
     (play-expt :prop prop
                :win window 
-               :constraints constraints)))
+               :constraints constraints)
     (window-close
       (replay-win
         (replay-mod prop)))))
