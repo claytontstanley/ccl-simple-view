@@ -369,6 +369,12 @@
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
 
+(defmethod initialize-instance :around ((view dialog-item) &rest args &key text-truncation dialog-item-action)
+  (let ((accum (parse-mcl-initargs
+                 (list :text-truncation text-truncation)
+                 (list :dialog-item-action dialog-item-action :view view))))
+    (apply #'call-next-method view (nconc accum args))))
+
 (defmethod parse-mcl-initarg ((keyword (eql :text-truncation)) val &key)
   (list
     :text-truncation
@@ -380,12 +386,6 @@
 (defmethod parse-mcl-initarg ((keyword (eql :dialog-item-action)) action &key view)
   (guard ((not (null view)) "dialog item action must be associated with a view"))
   (list :action (lambda () (funcall action view))))
-
-(defmethod initialize-instance :around ((view dialog-item) &rest args &key text-truncation dialog-item-action)
-  (let ((accum (parse-mcl-initargs
-                 (list :text-truncation text-truncation)
-                 (list :dialog-item-action dialog-item-action :view view))))
-    (apply #'call-next-method view (nconc accum args))))
 
 (defmethod initialize-instance :after ((view dialog-item) &key)
   (guard ((null (dialog-item-handle view)) "Not utilizing dialog-item-handle"))
