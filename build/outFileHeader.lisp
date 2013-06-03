@@ -72,6 +72,9 @@
 ;;;             : Added MCL's :centered keyword for windows.
 ;;;             : Fixed quickdraw polygon functions to use the polygon provided as input to the function, 
 ;;;               instead of using the polygon stored within the view. This change matches the MCL spec.
+;;; 2013.06.02 cts
+;;;             : Added MCL's :top and :bottom list arguments to :view-position for windows
+;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
