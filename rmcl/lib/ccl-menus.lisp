@@ -1,13 +1,11 @@
-(defclass string-dialog (dialog)
-  ((allow-empty-strings :initform nil :initarg :allow-empty-strings)))
-
 (defun return-cancel (i)
   (declare (ignore i))
   (return-from-modal-dialog :cancel))
 
-(defclass get-string-dialog (string-dialog)())
+(defclass string-dialog (dialog)
+  ((allow-empty-strings :initform nil :initarg :allow-empty-strings)))
 
-(defmethod update-default-button ((obj string-dialog)) ())
+(defclass get-string-dialog (string-dialog)())
 
 (defmethod set-view-size ((dialog get-string-dialog) h &optional v)
   (declare (ignore h v))
@@ -109,6 +107,8 @@
             (t (window-show dialog)
              dialog)))))
 
+
+(defmethod update-default-button ((obj string-dialog)) ())
 
 ; need close box if modal nil 
 (defun message-dialog (message &key (ok-text "OK")
