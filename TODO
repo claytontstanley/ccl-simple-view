@@ -1,4 +1,3 @@
-connect :dialog-item-action initarg to :action initarg
 plug memory leaks
 check collect-calibration method
 check tracker-calibrate method
