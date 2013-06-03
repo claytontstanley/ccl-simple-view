@@ -74,6 +74,10 @@
 ;;;               instead of using the polygon stored within the view. This change matches the MCL spec.
 ;;; 2013.06.02 cts
 ;;;             : Added MCL's :top and :bottom list arguments to :view-position for windows
+;;;             : Enabled :dialog-item-action initarg from MCL spec to work, and map correctly to 
+;;;               :action initarg for CCL spec.
+;;;             : Cleaned up :parse-mcl-initarg methods. Created a proper generic method signature for the
+;;;               methods, so that they have the needed flexibility to work in all cases.
 ;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
