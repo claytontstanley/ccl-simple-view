@@ -145,8 +145,7 @@
                             ok-text
                             #'(lambda (item)
                                 (declare (ignore item))
-                                (return-from-modal-dialog t))
-                            :view-nick-name :db)))))))
+                                (return-from-modal-dialog t)))))))))
     (if modal
       (modal-dialog new-dialog)
       new-dialog)))
@@ -185,13 +184,13 @@
                 :dialog-item-text default-button-text
                 :dialog-item-enabled-p the-list
                 :help-spec button-spec
-                :action
+                :dialog-item-action
                 (cond 
                   ((not modeless)
-                   #'(lambda ()
-                       (return-from-modal-dialog (act-on-items debutton))))
+                   #'(lambda (item)
+                       (return-from-modal-dialog (act-on-items item))))
                   (t
-                   (lambda () (act-on-items debutton))))))
+                   #'act-on-items ))))
         (let* ((bsize (view-default-size debutton))
                bpos)
           (setq bsize (make-point (max 60 (point-h bsize)) (point-v bsize))
