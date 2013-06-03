@@ -8,3 +8,4 @@ testing/testLiner.lisp
 testing/testModalDialog.lisp
 testing/testEnsureDefined.lisp
 testing/testParseMCLInitargs.lisp
+testing/testEditableTextDialogItem.lisp
