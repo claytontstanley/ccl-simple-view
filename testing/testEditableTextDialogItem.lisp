@@ -1,9 +1,9 @@
 (setf *win* (make-instance
               'window
               :view-subviews
-                (list (make-instance
-                        'editable-text-dialog-item
-                        :dialog-item-text "fo"))))
+              (list (make-instance
+                      'editable-text-dialog-item
+                      :dialog-item-text "fo"))))
 
 (check (equal
          (list 0 2)

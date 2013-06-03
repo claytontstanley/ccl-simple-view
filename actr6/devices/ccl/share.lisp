@@ -466,7 +466,7 @@
   (destructuring-bind (start end) (multiple-value-list (selection-range view))
     (when (eq start end)
       (set-selection-range view 0 (length (dialog-item-text view))))))
-    
+
 (defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-button-title-mixin dialog-item)
   ((easygui::cluster :initarg :radio-button-cluster)
    (easygui::selected :initarg :radio-button-pushed-p))

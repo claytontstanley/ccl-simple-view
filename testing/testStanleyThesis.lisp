@@ -38,7 +38,7 @@
 
 (let ((*library-experiment-window* *library-experiment-window-2*))
   (play-expt-with-window *library-experiment-window*))
-  
+
 (load-as-lst ".." "submodules" "stanley-thesis" "participant data" "eye-tracked participants" "source" "subj050.lisp")
 
 (with-open-file (strm "foo.lisp" :direction :output :if-exists :supersede) 
