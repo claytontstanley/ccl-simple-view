@@ -369,6 +369,10 @@
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
 
+; easygui's action slot takes a lambda with zero arguments. MCL's dialog-item-action slots take a lambda 
+; with the object/view as an argument. So to enable this feature, wrap a :dialog-item-action 
+; initarg function in a closure that takes zero arguments, and assign that clozure to the :action initarg
+
 (defmethod initialize-instance :around ((view dialog-item) &rest args &key text-truncation dialog-item-action)
   (let ((accum (parse-mcl-initargs
                  (list :text-truncation text-truncation)
@@ -427,7 +431,6 @@
 
 (defmethod initialize-instance :after ((view view-text-via-button-title-mixin) &key)
   (set-fore-color view (slot-value view 'easygui::foreground)))
-
 
 (defclass default-button-dialog-item (button-dialog-item)
   ()
@@ -620,24 +623,14 @@
   (provide :icon-dialog-item))
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
-  ; easygui's action slot takes a lambda with zero arguments; MCL's action slots take a lambda 
-  ; with the object/view as an argument. So to enable this feature in easygui, wrap the provided lambda
-  ; in a closure that takes zero arguments. 
-  ;
-  ; To build the closure, allocate storage for a variable first, then set the value of that variable to the created 
-  ; instance, but within that instance, use the reference to the value before the value is actually updated. 
-  ; This technique is actually wrapped up in a macro called alet in Hoyte's book, but I'm not using the macro here.
-  (let ((obj))
-    (setf obj (apply #'make-instance class
-                     (nconc
-                       (list
-                         :view-position position
-                         :view-size size
-                         :text text)
-                       (if action (list :dialog-item-action action))
-                       attributes)))
-    obj))
-
+  (apply #'make-instance class
+         (nconc
+           (list
+             :view-position position
+             :view-size size
+             :text text)
+           (if action (list :dialog-item-action action))
+           attributes)))
 
 (defclass menu-view (easygui::menu-view view view-text-via-title-mixin easygui::decline-menu-mixin)
   ((easygui::text :initarg :menu-title)
