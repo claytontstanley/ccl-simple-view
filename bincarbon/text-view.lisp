@@ -58,11 +58,10 @@
     (awhen (#/selectedRanges cocoa-text-view)
       (when (eq (#/count it) 1)
         (awhen (#/rangeValue (#/objectAtIndex: it 0))
-          (let ((pos (ns:ns-range-location it)))
-            (let ((length (ns:ns-range-length it)))
-              (when (eq length 0)
-                (when (eq pos (#/length (#/string cocoa-text-view)))
-                  t)))))))))
+          (destructuring-bind (pos length) (as-list it)
+            (when (eq length 0)
+              (when (eq pos (#/length (#/string cocoa-text-view)))
+                t))))))))
 
 ; Interface for programmatically adding/deleting text
 
@@ -78,12 +77,11 @@
   (#/insertText: (cocoa-text-view view) (objc:make-nsstring (subseq string (aif start it 0) (aif end it (length string))))))
 
 (defmethod keypress-on-view ((view text-view) (key (eql #\rubout)))
-  (let* ((range (#/selectedRange (cocoa-text-view view)))
-         (pos (ns:ns-range-location range))
-         (length (ns:ns-range-length range)))
-    (when (eq length 0)
-      (when (> pos 0)
-        (#/setSelectedRange: (cocoa-text-view view) (ns:make-ns-range (1- pos) (1+ length))))))
+  (let* ((range (#/selectedRange (cocoa-text-view view))))
+    (destructuring-bind (pos length) (as-list range)
+      (when (eq length 0)
+        (when (> pos 0)
+          (#/setSelectedRange: (cocoa-text-view view) (ns:make-ns-range (1- pos) (1+ length)))))))
   (#/delete: (cocoa-text-view view) ccl:+null-ptr+))
 
 (defmethod backspace-on-view ((view text-view))

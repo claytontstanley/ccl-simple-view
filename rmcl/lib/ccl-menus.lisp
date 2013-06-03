@@ -29,7 +29,7 @@
                                 &key
                                 initial-string
                                 (size #@(365 100))
-                                (position #@(140 140))
+                                (position '(:bottom 140))
                                 (ok-text "OK")
                                 (cancel-text "Cancel")
                                 (modeless nil)
@@ -49,7 +49,8 @@
                                         :view-position (make-point 6 (- (point-v size) 54 delta))
                                         :dialog-item-text message))
       (let* ((msize (view-size message-item))
-             (mh (min (point-h msize) 120)))
+             (mh (point-h msize)))  ;; would be nice if static text had a truncate option -now it does
+        (setq mh (min mh (- (point-h size) 100))) 
         (set-view-size message-item (make-point mh (point-v msize))))
       (setq message-len (+ 6 (point-h (view-size message-item)))))
     (flet ((act-on-text (item)
@@ -94,14 +95,10 @@
                                          :cancel-button t)
                        (make-dialog-item 'editable-text-dialog-item
                                          (make-point (+ 6 message-len) (- (point-v size) 54 delta))
-                                         (make-point (- (point-h size) delta message-len) 16)
-                                         initial-string
-                                         nil
-                                         :view-nick-name :et))))
+                                         (make-point (- (point-h size) delta message-len) 23)
+                                         initial-string))))
       (when message (add-subviews  dialog  message-item))
       (update-default-button dialog)
-      (let ((et (view-named :et dialog)))
-        (set-selection-range et 0 (length (dialog-item-text et))))
       (cond ((not modeless)         
               (modal-dialog dialog))
             (t (window-show dialog)

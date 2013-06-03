@@ -459,6 +459,11 @@
    (draw-outline :initarg :draw-outline))
   (:default-initargs :specifically 'easygui::cocoa-text-field))
 
+(defmethod easygui::add-1-subview :after ((view editable-text-dialog-item) (super-view view))
+  (destructuring-bind (start end) (multiple-value-list (selection-range view))
+    (when (eq start end)
+      (set-selection-range view 0 (length (dialog-item-text view))))))
+    
 (defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-button-title-mixin dialog-item)
   ((easygui::cluster :initarg :radio-button-cluster)
    (easygui::selected :initarg :radio-button-pushed-p))
@@ -706,6 +711,10 @@
   (list (point-h p)
         (point-v p)))
 
+(defmethod as-list ((r ns:ns-range))
+  (list (ns:ns-range-location r)
+        (ns:ns-range-length r)))
+
 (defmethod points-equal-p ((p1 easygui::eg-point) (p2 easygui::eg-point))
   (destructuring-bind (x1 y1) (as-list p1)
     (destructuring-bind (x2 y2) (as-list p2)
@@ -853,6 +862,15 @@
 (defmethod initialize-instance :after ((view view-text-mixin) &key)
   (set-text-justification view (text-justification view)))
 
+(defmethod get-field-editor ((view simple-view))
+  (#/fieldEditor:forObject: (cocoa-ref (guard-!nil (view-window view)))
+   #$YES 
+   (cocoa-ref view)))
+
+(defmethod selection-range ((view simple-view))
+  (destructuring-bind (start length) (as-list (#/selectedRange (get-field-editor view)))
+    (values start (+ start length))))
+
 (defmethod set-selection-range ((view view-text-mixin) &optional position cursorpos)
   (destructuring-bind (position cursorpos) (if position
                                              (list position cursorpos)
@@ -862,10 +880,7 @@
     ; text in the view. So, a bit of a kludge, but it seems to behave just fine.
     (#/selectText: (cocoa-ref view)
      ccl:+null-ptr+)
-    (#/setSelectedRange:
-     (#/fieldEditor:forObject: (cocoa-ref (guard-!nil (view-window view)))
-      #$YES 
-      (cocoa-ref view))
+    (#/setSelectedRange: (get-field-editor view)
      (ns:make-ns-range position (- cursorpos position)))))
 
 (defmethod dialog-item-enable ((view action-view-mixin))
