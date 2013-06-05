@@ -1,3 +1,4 @@
+build/pre-code.lisp
 bincarbon/sv-language-layer.lisp
 bincarbon/lol-subset.lisp
 bincarbon/sv-utilities.lisp
