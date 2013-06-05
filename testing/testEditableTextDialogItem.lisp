@@ -3,7 +3,7 @@
               :view-subviews
               (list (make-instance
                       'editable-text-dialog-item
-                      :dialog-item-text "fo"))))
+                      :dialog-item-text "so"))))
 
 (check (equal
          (list 0 2)

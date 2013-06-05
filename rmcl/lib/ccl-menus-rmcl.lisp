@@ -23,7 +23,7 @@
               (set-view-size sub (subtract-points (view-size sub) hdelta)))))))))
 
 ;; could be prettier, need a set-view-size method - move buttons, resize editable-text - done
-; 140 x 80 is about minumum useful size - neg size is invisible
+; 140 x 80 is about minimum useful size - neg size is invisible
 (defun get-string-from-user (message 
                              &key
                              initial-string
