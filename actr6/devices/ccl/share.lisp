@@ -241,13 +241,11 @@
           (format nil "maintenance thread for win ~a" win)
           (lambda ()
             (setf (initialized-p win) t)
+            (ccl::create-autorelease-pool)
             (while (wptr win)
               (cond ((close-requested-p win)
                      (sv-log "closing ~a on thread ~a~%" win *current-process*)
-                     ; easygui's perform-close currently runs on current thread; maintenance thread does 
-                     ; not have an autorelease-pool set up; so explicitly create one for the close
-                     (easygui::with-autorelease-pool
-                       (funcall (window-close-fct win) win))
+                     (funcall (window-close-fct win) win)
                      (signal-semaphore (sema-finished-close win)))
                     ((aand (front-window) (eq win it))
                      (window-null-event-handler win)))
@@ -795,18 +793,17 @@
       (setq class (find-class class)))
     (when (class-inherit-from-p class (find-class 'windoid))
       (setq include-windoids t)))
-  (objc:with-autorelease-pool
-    (let ((wins (gui::windows)))
-      (dolist (win wins)
-        (when (easygui::cocoa-win-p win)
-          (let ((wob (easygui::easygui-window-of win)))
-            (when (and wob
-                       (initialized-p wob)
-                       (or include-windoids
-                           (not (windoid-p wob)))
-                       (or (null class)
-                           (inherit-from-p wob class)))
-              (return wob))))))))
+  (let ((wins (gui::windows)))
+    (dolist (win wins)
+      (when (easygui::cocoa-win-p win)
+        (let ((wob (easygui::easygui-window-of win)))
+          (when (and wob
+                     (initialized-p wob)
+                     (or include-windoids
+                         (not (windoid-p wob)))
+                     (or (null class)
+                         (inherit-from-p wob class)))
+            (return wob)))))))
 
 (defun inherit-from-p (ob parent)
   (ccl::inherit-from-p ob parent))
