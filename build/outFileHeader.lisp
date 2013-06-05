@@ -78,6 +78,10 @@
 ;;;               :action initarg for CCL spec.
 ;;;             : Cleaned up :parse-mcl-initarg methods. Created a proper generic method signature for the
 ;;;               methods, so that they have the needed flexibility to work in all cases.
+;;;             : Plugged memory leaks by creating an autorelease pool at the beginning of this file.
+;;;               This ensures that any autoreleased objects during both compilation and runtime have 
+;;;               a pool to release to. This was only an issue when running CCL via SVN (e.g., with common SLIME setup),
+;;;               and not via the Clozure CL.app, because the App already has an autorelease pool set up on startup.
 ;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
