@@ -1,0 +1,3 @@
+[submodule "DMTracker"]
+	path = DMTracker
+	url = ssh://chil/srv/git/DMTracker
