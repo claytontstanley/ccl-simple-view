@@ -1,3 +1,5 @@
 submodules/NSFMotor/spring mass original/spring-target.lisp
+bincarbon/misc-lib.lisp
+bincarbon/timer.lisp
 submodules/NSFMotor/spring mass original/mcl-target-window.lisp
 submodules/NSFMotor/spring mass original/actr-imag-nolearn.lisp

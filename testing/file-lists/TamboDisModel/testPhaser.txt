@@ -9,6 +9,7 @@ submodules/tambo-diss/tamborello-dissertation-model/base-trek-tasks-actr.lisp
 bincarbon/seq-math.lisp
 bincarbon/launch-url.lisp
 bincarbon/menubar-hide.lisp
+bincarbon/chil-utilities.lisp
 bincarbon/experiment-window4.lisp
 bincarbon/blinker.lisp
 submodules/tambo-diss/tamborello-dissertation-model/X84-actr.lisp

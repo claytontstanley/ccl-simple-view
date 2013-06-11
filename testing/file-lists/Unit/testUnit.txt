@@ -1,3 +1,4 @@
+bincarbon/thermometer.lisp
 bincarbon/device-extensions.lisp
 testing/testCCLDevice.lisp
 testing/testWindow.lisp
@@ -9,3 +10,4 @@ testing/testModalDialog.lisp
 testing/testEnsureDefined.lisp
 testing/testParseMCLInitargs.lisp
 testing/testEditableTextDialogItem.lisp
+testing/testGetText.lisp

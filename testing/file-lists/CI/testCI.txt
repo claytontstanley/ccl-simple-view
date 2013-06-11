@@ -5,7 +5,6 @@ testing/testMCLInterfaceBuilder.lisp
 testing/testFormat.lisp
 testing/testPolygon.lisp
 testing/testSound.lisp
-testing/testGetText.lisp
 testing/testTutorials.lisp
 testing/testVotebox.lisp
 testing/testVoteboxKristen.lisp
