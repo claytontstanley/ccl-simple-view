@@ -1,4 +1,0 @@
-
-
-deploy:
-	git push
