@@ -27,8 +27,7 @@
 ;; so that slimv could handle auto-indenting properly. The behavior
 ;; of the code 'was not changed'.
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (require :sv-language-layer))
+(require :sv-language-layer)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (ensure-defined

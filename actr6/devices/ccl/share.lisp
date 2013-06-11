@@ -1,6 +1,5 @@
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (require :resources)
-  (require :mcl-ccl-colors))
+(require :resources)
+(require :mcl-ccl-colors)
 
 ; These are shorthand guard macros for usual cases. Only use these if you quickly want to add
 ; a guard statement with minimal useful error messages. Otherwise, use the guard macro and 
@@ -615,8 +614,7 @@
                                            (ns:ns-size-height ns-size))
         (setf (slot-value view 'easygui::size) (make-point width height))))))
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (provide :icon-dialog-item))
+(provide :icon-dialog-item)
 
 (defun make-dialog-item (class position size text &optional action &rest attributes)
   (apply #'make-instance class
@@ -665,11 +663,17 @@
 ; because they are an already-defined CCL method)
 ; ----------------------------------------------------------------------
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (setf (symbol-function 'point-v) #'easygui:point-y)
-  (setf (symbol-function 'point-h) #'easygui:point-x)
-  (shadowing-import 'easygui:point-x)
-  (shadowing-import 'easygui:point-y))
+(defun point-h (pt)
+  (easygui:point-x pt))
+
+(defun point-v (pt)
+  (easygui:point-y pt))
+
+(defun point-x (pt)
+  (easygui:point-x pt))
+
+(defun point-y (pt)
+  (easygui:point-y pt))
 
 (ccl::register-character-name "UpArrow" #\U+F700)
 (ccl::register-character-name "DownArrow" #\U+F701)
@@ -677,11 +681,10 @@
 (ccl::register-character-name "ForwardArrow" #\U+F703)
 (ccl::register-character-name "CheckMark" #\t)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defparameter *arrow-cursor* (#/arrowCursor ns:ns-cursor))
-  (defparameter *crosshair-cursor* (#/crosshairCursor ns:ns-cursor))
-  (defparameter *i-beam-cursor* (#/IBeamCursor ns:ns-cursor))
-  (defparameter *black-pattern* 'black-pattern-fixme))
+(defparameter *arrow-cursor* (#/arrowCursor ns:ns-cursor))
+(defparameter *crosshair-cursor* (#/crosshairCursor ns:ns-cursor))
+(defparameter *i-beam-cursor* (#/IBeamCursor ns:ns-cursor))
+(defparameter *black-pattern* 'black-pattern-fixme)
 
 (defun make-point (x y)
   (easygui::point x y :allow-negative-p t))
@@ -1567,8 +1570,7 @@
 ; Provide the :quickdraw package on *modules*. Keeps from having to comment out the (require :quickdraw) lines in the MCL code.
 ; Also since the file here implements the quickdraw interface, it makes since to announce that the quickdraw library is available to use.
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (provide :quickdraw))
+(provide :quickdraw)
 
 ; To implement event-dispatch for Clozure, send a dummy function over to
 ; the main Cocoa thread to be evaluated, and block until that function is 
@@ -1869,8 +1871,7 @@
   (qd-paint-oval rect))
 
 ; And the constants are here
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defconstant X86-Darwin64::|tejustleft| $tejustleft)
-  (defconstant X86-Darwin64::|tejustcenter| $tejustcenter)
-  (defconstant X86-Darwin64::|tejustright| $tejustright)
-  (defconstant X86-Darwin64::|crossCursor| *crosshair-cursor*))
+(defparameter X86-Darwin64::|tejustleft| $tejustleft)
+(defparameter X86-Darwin64::|tejustcenter| $tejustcenter)
+(defparameter X86-Darwin64::|tejustright| $tejustright)
+(defparameter X86-Darwin64::|crossCursor| *crosshair-cursor*)
