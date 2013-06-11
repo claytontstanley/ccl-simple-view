@@ -62,7 +62,7 @@ outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g'
 
 update-remote-repositories:
-	cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} "cd \"$$repo\" && git ru && git rb origin/master && git su && ${git-is-clean}"; done
+	cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} 'cd "$$repo" && git ru && git rb origin/master && git su && ${git-is-clean}'; done
 
 rebuild-kernel:
 	[[ "${rebuild-kernel-p}" != "true" ]] || ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
