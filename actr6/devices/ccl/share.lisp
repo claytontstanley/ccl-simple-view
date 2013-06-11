@@ -55,9 +55,6 @@
 (defclass view-text-mixin (easygui::view-text-mixin)
   ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
 
-; TODO: Should this default font spec be used for the default initarg to :view-font (as defined in view-mixin)?
-(defparameter *fred-default-font-spec* (list "profont" 9 :PLAIN))
-
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position :initform (make-point 0 0))
