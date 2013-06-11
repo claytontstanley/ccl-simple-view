@@ -2,4 +2,4 @@ bincarbon/DMTracker-bootstrap.lisp
 bincarbon/experiment-window4.lisp
 bincarbon/tracker-experiment-window.lisp
 bincarbon/replay-experiment-window.lisp
-submodules/DMTracker/simple-test.lisp
+bincarbon/DMTracker/simple-test.lisp
