@@ -40,9 +40,6 @@
 [submodule "submodules/actr6mcl"]
 	path = submodules/actr6mcl
 	url = ssh://chil/srv/git/actr6mcl
-[submodule "submodules/DMTracker"]
-	path = submodules/DMTracker
-	url = ssh://chil/srv/git/DMTracker
 [submodule "submodules/stanley-thesis"]
 	path = submodules/stanley-thesis
 	url = ssh://chil/srv/git/stanley-thesis
