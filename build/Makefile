@@ -68,7 +68,7 @@ rebuild-kernel:
 	[[ "${rebuild-kernel-p}" != "true" ]] || ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
 
 deploy-bincarbon:
-	cd ${repo}/bincarbon && git sf 'git ru && git rb && ${git-is-clean} && git push' && ${git-is-clean} && git push
+	cd ${repo}/bincarbon && ${git-is-clean} && git push
 
 deploy:
 	make deploy-bincarbon	
