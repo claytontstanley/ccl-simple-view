@@ -6,5 +6,5 @@
 
 (replay-experiment
   (load-eyetracking-experiment-window
-    :dat-file (path-as-lst ".." "submodules" "DMTracker" "ccl-dmtracker-data" "subj006-track.dat")
-    :lisp-file (path-as-lst ".." "submodules" "DMTracker" "ccl-dmtracker-data" "subj006.lisp")))
+    :dat-file (path-as-lst ".." "bincarbon" "DMTracker" "ccl-dmtracker-data" "subj006-track.dat")
+    :lisp-file (path-as-lst ".." "bincarbon" "DMTracker" "ccl-dmtracker-data" "subj006.lisp")))
