@@ -80,5 +80,5 @@ deploy:
 	make rebuild-kernel
 	cd ${depdir} && make -C build all
 	cd ${depdir} && make -C docs/README
-	ssh ${server} 'cd ${depdir} && make -C testing ${deploy-test} 
+	ssh ${server} 'cd ${depdir} && make -C testing ${deploy-test}'
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
