@@ -75,7 +75,7 @@ deploy:
 	make deploy-bincarbon	
 	cd ${repo} && ${git-is-clean} && git push
 	make update-remote-repositories
-	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule sync && git submodule update --init --recursive'
+	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule update --init --recursive && git submodule sync'
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
 	make rebuild-kernel
 	cd ${depdir} && make -C build all
