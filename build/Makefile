@@ -67,8 +67,11 @@ update-remote-repositories:
 rebuild-kernel:
 	[[ "${rebuild-kernel-p}" != "true" ]] || ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
 
+check-bincarbon:
+	cd ${repo}/bincarbon && git sf 'git ru && git rb && ${git-is-clean}' && ${git-is-clean}
+
 deploy:
-	cd ${repo}/bincarbon && ${git-is-clean} && git push
+	make check-bincarbon	
 	cd ${repo} && ${git-is-clean} && git push
 	make update-remote-repositories
 	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule sync && git submodule update --init --recursive'
