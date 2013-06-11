@@ -1,6 +1,4 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (require :cocoa)
-  (require :easygui)
   (require :resources)
   (require :mcl-ccl-colors))
 
