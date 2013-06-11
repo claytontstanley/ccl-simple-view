@@ -1,1 +1,1 @@
-../submodules/DMTracker/tracker-experiment-window.lisp
+DMTracker/tracker-experiment-window.lisp
