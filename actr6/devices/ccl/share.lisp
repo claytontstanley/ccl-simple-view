@@ -55,13 +55,15 @@
 (defclass view-text-mixin (easygui::view-text-mixin)
   ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
 
+(defparameter *fred-default-font-spec* '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0)))
+
 (defclass view-mixin (easygui:view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position :initform (make-point 0 0))
    (temp-view-subviews :initarg :view-subviews)
    (easygui::foreground :initform (color-symbol->system-color 'black))
    (easygui::background :initform (make-color 0 0 0 0.0)))
-  (:default-initargs :view-font '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0))))
+  (:default-initargs :view-font *fred-default-font-spec*))
 
 ; MCL allows for subviews to be passed at object initialization. I tried shadowing the 'easygui::subviews :initargs symbol
 ; with :view-subviews, so that MCL code cleanly initialized easygui's subviews slot, but it turns out that this slot isn't always 
