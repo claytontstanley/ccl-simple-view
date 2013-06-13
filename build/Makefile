@@ -1,5 +1,4 @@
 include ../include.mk
-TOP = ..
 
 repo = ~/src/mcl-migration
 actrPath = ../submodules/actr6
