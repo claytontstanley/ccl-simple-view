@@ -91,5 +91,3 @@
 #+:digitool (load-file-list "file-lists" "allMCL.txt") 
 
 (load-file-list "file-lists" "all.txt")
-
-(setf *break-on-fail-p* t)

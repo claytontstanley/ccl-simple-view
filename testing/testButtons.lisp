@@ -1,3 +1,6 @@
+; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
+(load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
+
 (setf *win*
       (make-instance 'rpm-real-window
                      :view-subviews

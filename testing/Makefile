@@ -14,9 +14,15 @@ binaryFileLst = ade adp bat chm cmd com cpl exe hta ins isp jse lib mde msc msp 
 
 binaryFileStr = ${binaryFileLst:%= -o -name '*.%'}
 
+test-file:
+	-@echo ""	
+	-@echo "Running tests for file ${testFile}"
+	${ccl} -l "../${testFile}" ${cclQuit}
+	-@echo ""
+
 unit: clean-actr-compiled-files
 	make -C ../build build-app
-	${ccl} -l testUnit.lisp ${cclQuit}
+	cat file-lists/Unit/testUnit.txt | while read file; do make test-file testFile="$$file"; done
 
 # FIXME: Should I do anything different for CI tests compared to unit tests.
 # All of the tests are pretty-much regression CI tests anyways. Don't really have unit tests (yet) for this repo
