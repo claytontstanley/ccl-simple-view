@@ -73,7 +73,7 @@ update-remote-repositories:
 rebuild-kernel:
 	[[ "${rebuild-kernel-p}" != "true" ]] || rlwrap ../testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"
 
-build-app:
+build-app: all
 	rlwrap ../testing/ccl -l build-app.lisp
 	ln -sf ../../../../darwin-x86-headers64 "${pathToCCL}/Clozure CL64.app/Contents/Resources/ccl/"
 
