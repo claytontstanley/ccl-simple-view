@@ -1,5 +1,7 @@
 include ../include.mk
+TOP = ..
 
+repo = ~/src/mcl-migration
 actrPath = ../submodules/actr6
 server = chil
 outFile = ccl-simple-view.lisp

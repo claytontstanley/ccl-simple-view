@@ -1,4 +1,5 @@
 include ../include.mk
+TOP = ..
 
 # Think text substitution / template programming. I don't use Make to compile C files. I use it
 # as a templating language to manipulate Bash commands.
@@ -20,7 +21,7 @@ test-file:
 	-@echo ""
 
 test-files:
-	testFiles=($$(cat ${testFiles})) && for file in "$${testFiles[@]}"; do make test-file testFile="$$file"; done
+	set -e && testFiles=($$(cat ${testFiles})) && for file in "$${testFiles[@]}"; do make test-file testFile="$$file"; done
 
 unit: clean-actr-compiled-files
 	make -C ../build build-app
