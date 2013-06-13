@@ -3,6 +3,7 @@
 (load (format nil "~a~a" *cpath* "../bincarbon/sv-language-layer.lisp"))
 (load (format nil "~a~a" *cpath* "../bincarbon/lol-subset.lisp"))
 (load (format nil "~a~a" *cpath* "../bincarbon/sv-utilities.lisp"))
+(load (format nil "~a~a" *cpath* "../bincarbon/defsystem-patched.lisp"))
 
 (defparameter *app-name* nil)
 

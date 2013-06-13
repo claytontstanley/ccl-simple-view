@@ -1,3 +1,10 @@
 submodules/lisp-dev/Lisp-Unit-Testing-Framework/unitTestFramework.lisp
 bincarbon/thermometer.lisp
 bincarbon/device-extensions.lisp
+bincarbon/misc-lib.lisp
+bincarbon/timer.lisp
+bincarbon/seq-math.lisp
+bincarbon/launch-url.lisp
+bincarbon/menubar-hide.lisp
+bincarbon/chil-utilities.lisp
+bincarbon/experiment-window4.lisp

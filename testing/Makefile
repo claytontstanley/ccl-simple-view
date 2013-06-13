@@ -24,10 +24,8 @@ unit: clean-actr-compiled-files
 	make -C ../build build-app
 	cat file-lists/Unit/testUnit.txt | while read file; do make test-file testFile="$$file"; done
 
-# FIXME: Should I do anything different for CI tests compared to unit tests.
-# All of the tests are pretty-much regression CI tests anyways. Don't really have unit tests (yet) for this repo
-continuous-integration: unit
-	${ccl} -l testCI.lisp ${cclQuit}
+continuous-integration:
+	cat file-lists/CI/testCI.txt | while read file; do make test-file testFile="$$file"; done
 
 clean-actr-compiled-files:
 	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' ${binaryFileStr} | while read line; do rm "$$line"; done
