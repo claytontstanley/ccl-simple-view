@@ -5,6 +5,12 @@ outFile = ccl-simple-view.lisp
 depdir = /Volumes/RedGiant/Projects/mcl-migration 
 repo = ~/src/mcl-migration
 
+# Defaults are to make changes to remote repo
+sshIP = ${server}
+sshDir = ${depdir}
+
+pathToCCL := $(shell dirname `readlink -f ../testing/ccl`)
+
 header = ; ----------------------------------------------------------------------\n; Begin file: $$file\n; ----------------------------------------------------------------------\n\n\n
 
 footer = \n\n\n; ----------------------------------------------------------------------\n; End file: $$file\n; ----------------------------------------------------------------------\n
@@ -64,21 +70,23 @@ outFileHeader:
 update-remote-repositories:
 	set -e && cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} "cd \"$$repo\" && git ru && git rb && git su"; done
 
-
 rebuild-kernel:
-	[[ "${rebuild-kernel-p}" != "true" ]] || ssh ${server} 'cd ${depdir} && rlwrap testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"'
+	[[ "${rebuild-kernel-p}" != "true" ]] || rlwrap ../testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"
+
+build-app:
+	rlwrap ../testing/ccl -l build-app.lisp
+	ln -sf ../../../../darwin-x86-headers64 "${pathToCCL}/Clozure CL64.app/Contents/Resources/ccl/"
 
 deploy-bincarbon:
-	cd ${repo}/bincarbon && ${git-is-clean} && git push
+	cd ../bincarbon && ${git-is-clean} && git push
 
 deploy:
 	make deploy-bincarbon	
-	cd ${repo} && ${git-is-clean} && git push
+	cd .. && ${git-is-clean} && git push
 	make update-remote-repositories
-	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule update --init --recursive && git submodule sync'
-	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
-	make rebuild-kernel
-	cd ${depdir} && make -C build all
-	cd ${depdir} && make -C docs/README
+	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule update --init --recursive && git submodule sync && ${git-is-clean}'
+	ssh ${server} 'cd ${depdir} && make -C build rebuild-kernel rebuild-kernel-p=true'
+	ssh ${server} 'cd ${depdir} && make -C build all
+	ssh ${server} 'cd ${depdir} && make -C docs/README
 	ssh ${server} 'cd ${depdir} && make -C testing ${deploy-test}'
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
