@@ -85,8 +85,8 @@ deploy:
 	cd .. && ${git-is-clean} && git push
 	make update-remote-repositories
 	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule update --init --recursive && git submodule sync && ${git-is-clean}'
-	ssh ${server} 'cd ${depdir} && make -C build rebuild-kernel rebuild-kernel-p=true'
-	ssh ${server} 'cd ${depdir} && make -C build all
-	ssh ${server} 'cd ${depdir} && make -C docs/README
+	ssh ${server} 'cd ${depdir} && make -C build rebuild-kernel rebuild-kernel-p=false'
+	ssh ${server} 'cd ${depdir} && make -C build all'
+	ssh ${server} 'cd ${depdir} && make -C docs/README'
 	ssh ${server} 'cd ${depdir} && make -C testing ${deploy-test}'
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
