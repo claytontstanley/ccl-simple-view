@@ -20,12 +20,15 @@ test-file:
 	${ccl} -l "../${testFile}" ${cclQuit}
 	-@echo ""
 
+test-files:
+	testFiles=($$(cat ${testFiles})) && for file in "$${testFiles[@]}"; do make test-file testFile="$$file"; done
+
 unit: clean-actr-compiled-files
 	make -C ../build build-app
-	cat file-lists/Unit/testUnit.txt | while read file; do make test-file testFile="$$file"; done
+	make test-files testFiles=file-lists/Unit/testUnit.txt
 
 continuous-integration:
-	cat file-lists/CI/testCI.txt | while read file; do make test-file testFile="$$file"; done
+	make test-files testFiles=file-lists/CI/testCI.txt
 
 clean-actr-compiled-files:
 	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' ${binaryFileStr} | while read line; do rm "$$line"; done
