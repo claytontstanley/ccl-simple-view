@@ -1,5 +1,5 @@
+include include.mk
 
-SHELL := /usr/bin/env bash
 TOP := $(shell pwd)
 
 zip-% : zipDir = .
