@@ -1,6 +1,5 @@
 bincarbon/osx-virtual-cursor.lisp
 bincarbon/misc-lib.lisp
 bincarbon/pict-svm.lisp
-bincarbon/device-extensions.lisp
 submodules/ACT-R-VoteBox-Models/Emulator Files/VBEmulator.lisp
 submodules/ACT-R-VoteBox-Models/VB Models/Bryan PSYC 543 Project (2009)/BryansVBModel (Navigation + Selection - Best Fit).lisp
