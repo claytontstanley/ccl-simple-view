@@ -9,7 +9,7 @@ repo = ~/src/mcl-migration
 sshIP = ${server}
 sshDir = ${depdir}
 
-pathToCCL := $(shell dirname `readlink -f ../testing/ccl`)
+pathToCCL := $(shell dirname `greadlink -f ../testing/ccl`)
 
 header = ; ----------------------------------------------------------------------\n; Begin file: $$file\n; ----------------------------------------------------------------------\n\n\n
 

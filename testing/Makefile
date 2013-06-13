@@ -7,7 +7,7 @@ actr6 = ../submodules/actr6
 
 cclQuit = -e '(quit)'
 
-pathToCCL := $(shell dirname `readlink -f ./ccl`)
+pathToCCL := $(shell dirname `greadlink -f ./ccl`)
 ccl = rlwrap "${pathToCCL}/Clozure CL64.app/Contents/MacOS/dx86cl64" -e '(gui::start-cocoa-ide)'
 
 binaryFileLst = ade adp bat chm cmd com cpl exe hta ins isp jse lib mde msc msp mst pif scr sct shb sys vb vbe vbs vxd wsc wsf wsh
