@@ -1,15 +1,14 @@
+include ../include.mk
+
 actrPath = ../submodules/actr6
 server = chil
 outFile = ccl-simple-view.lisp
 
 depdir = /Volumes/RedGiant/Projects/mcl-migration 
-repo = ~/src/mcl-migration
 
 # Defaults are to make changes to remote repo
 sshIP = ${server}
 sshDir = ${depdir}
-
-pathToCCL := $(shell dirname `greadlink -f ../testing/ccl`)
 
 header = ; ----------------------------------------------------------------------\n; Begin file: $$file\n; ----------------------------------------------------------------------\n\n\n
 
@@ -90,3 +89,4 @@ deploy:
 	ssh ${server} 'cd ${depdir} && make -C docs/README'
 	ssh ${server} 'cd ${depdir} && make -C testing ${deploy-test}'
 	ssh ${server} 'cd ${depdir} && ${git-is-clean}'
+
