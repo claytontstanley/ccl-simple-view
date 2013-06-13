@@ -1,5 +1,3 @@
-(require :sv-utilities)
-
 (defparameter *cpath* (directory-namestring *load-truename*))
 
 (load (format nil "~a~a" *cpath* "../bincarbon/sv-language-layer.lisp"))
