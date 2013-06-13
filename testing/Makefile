@@ -27,7 +27,7 @@ unit: clean-actr-compiled-files
 	make -C ../build build-app
 	make test-files testFiles=file-lists/Unit/testUnit.txt
 
-continuous-integration:
+continuous-integration: unit
 	make test-files testFiles=file-lists/CI/testCI.txt
 
 clean-actr-compiled-files:
