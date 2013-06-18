@@ -1,18 +1,11 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-(setf *sv*
-      (make-instance 'simple-view
-                     :view-size (make-point 100 100)
-                     :view-position (make-point 10 10)
-                     :view-nick-name :sv))
-
-(setf *win*
-      (make-instance 'window
-                     :fore-color *blue-color*
-                     :view-position (make-point 10 600)
-                     :view-subviews 
-                     (list *sv*)))
+(defparameter *sv*
+  (make-instance 'simple-view
+                 :view-size (make-point 100 100)
+                 :view-position (make-point 10 10)
+                 :view-nick-name :sv))
 
 (defmethod view-draw-contents ((view (eql *sv*)))
   (move-to *sv* 10 10)
@@ -23,7 +16,15 @@
     (#_drawstring (objc:make-nsstring "yellow")))
   )
 
+(defparameter *win*
+  (make-instance 'window
+                 :fore-color *blue-color*
+                 :view-position (make-point 10 600)
+                 :view-subviews 
+                 (list *sv*)))
 
+(sleep .5)
+(window-close *win*)
 #|
 (invalidate-view *win*)
 
