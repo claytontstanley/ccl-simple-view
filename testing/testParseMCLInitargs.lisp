@@ -1,3 +1,5 @@
+; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
+(load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
 (parse-mcl-initargs
   (list :dialog-item-action (lambda (obj) (print obj)) :view 'view)

@@ -1,5 +1,3 @@
-;#+:clozure (with-continue  (setf (macro-function 'rlet) *ccl-rlet*))
-
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
@@ -8,6 +6,8 @@
 (simulate-xplane 1 1000)
 
 #|
+;#+:clozure (with-continue  (setf (macro-function 'rlet) *ccl-rlet*))
+
 ;(view-draw-contents *win*)
 (view-draw-contents *speed*)
 (easygui::set-needs-display *speed* t)
