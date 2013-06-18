@@ -14,6 +14,4 @@
                    (setf *app-name* name)))
     (require :cocoa-application)))
 
-(load (format nil "~a~a" *cpath* "../testing/bootstrap.lisp"))
-
 (save-application *app-name*)

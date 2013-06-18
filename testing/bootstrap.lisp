@@ -77,9 +77,6 @@
 
 (defparameter *actr6-dir-name* #+:clozure "actr6" #+:digitool "actr6mcl")
 
-#+:clozure (unless (sv-dev-env-p)
-               (load-as-lst ".." "submodules" *actr6-dir-name* "support" "ccl-simple-view.lisp"))
-               
 #-:act-r-6.0 (load-as-lst ".." "submodules" *actr6-dir-name* "load-act-r-6.lisp")
 
 #+:clozure (when (sv-dev-env-p)
