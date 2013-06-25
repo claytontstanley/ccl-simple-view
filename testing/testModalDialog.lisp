@@ -34,10 +34,10 @@
 (sleep .2)
 (dotimes (i 2)
   (left-mouse-click
-      (add-points 
-        (view-position (front-window))
-        (view-center
-          (first (subviews (front-window))))))
+    (add-points 
+      (view-position (front-window))
+      (view-center
+        (first (subviews (front-window))))))
   (sleep .5))
 
 (while (not *t*)

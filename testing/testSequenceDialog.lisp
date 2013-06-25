@@ -40,8 +40,8 @@
               (view-subviews (front-window)))))))))
 
 (setf *a* (select-item-from-list (list 'a 'b "c" "d" "hello" (list 4 3 2))
-                              :view-position (make-point 10 200)))
-                   
+                                 :view-position (make-point 10 200)))
+
 (check (equalp *a* (list 'a)))
 
 #|

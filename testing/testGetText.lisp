@@ -10,14 +10,14 @@
     (keypress #\a)
     (sleep .3)
     (left-mouse-click
-        (add-points
-          (view-position (front-window))
-          (view-center
-            (first (remove-if-not
-                     (lambda (x)
-                       (equalp (class-name (class-of x))
-                               'default-button-dialog-item))
-                     (subviews (front-window)))))))))
+      (add-points
+        (view-position (front-window))
+        (view-center
+          (first (remove-if-not
+                   (lambda (x)
+                     (equalp (class-name (class-of x))
+                             'default-button-dialog-item))
+                   (subviews (front-window)))))))))
 
 (setf *str* (get-string-from-user
               "prompt"
