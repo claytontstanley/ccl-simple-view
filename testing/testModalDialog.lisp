@@ -7,6 +7,7 @@
 (setf *win* 
       (make-instance 
         'window
+        :view-position (make-point 10 10)
         :view-subviews
         (list
           (make-instance 
@@ -29,6 +30,16 @@
                                     (lambda ()
                                       (beep)
                                       (return-from-modal-dialog 5))))))))))))
+
+(dotimes (i 2)
+  (left-mouse-click
+    (add-points
+      (add-points 
+        (view-position (front-window))
+        (view-position
+          (first (subviews (front-window)))))
+      (make-point 10 10)))
+  (sleep .5))
 
 (while (not *t*)
   (spin-for-fct 100))

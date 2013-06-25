@@ -1,10 +1,33 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-(setf *str* (get-string-from-user "prompt"))
+(process-run-function
+  "foo"
+  (lambda ()
+    (sleep 1)
+    (left-mouse-click (view-position (front-window)))
+    (sleep .3)
+    (keypress #\a)
+    (sleep .3)
+    (left-mouse-click
+      (add-points
+        (make-point 10 10)
+        (add-points
+          (view-position (front-window))
+          (view-position
+            (first (remove-if-not
+                     (lambda (x)
+                       (equalp (class-name (class-of x))
+                               'default-button-dialog-item))
+                     (subviews (front-window))))))))
+      ))
 
-(print *str*)
+(setf *str* (get-string-from-user
+              "prompt"
+              :position (make-point 10 10)
+              :initial-string "foo"))
 
-(print *modal-dialog-ret*)
+(check (string= *str* "a"))
+
 
 
