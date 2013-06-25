@@ -31,14 +31,13 @@
                                       (beep)
                                       (return-from-modal-dialog 5))))))))))))
 
+(sleep .2)
 (dotimes (i 2)
   (left-mouse-click
-    (add-points
       (add-points 
         (view-position (front-window))
-        (view-position
-          (first (subviews (front-window)))))
-      (make-point 10 10)))
+        (view-center
+          (first (subviews (front-window))))))
   (sleep .5))
 
 (while (not *t*)

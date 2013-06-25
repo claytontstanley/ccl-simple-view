@@ -1,4 +1,3 @@
-testing/testSequenceDialog.lisp
 testing/testNSFMotor.lisp
 testing/testMCLInterfaceBuilder.lisp
 testing/testFormat.lisp

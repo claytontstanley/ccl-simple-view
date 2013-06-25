@@ -22,7 +22,27 @@
                             :view-nick-name :sdi
                             ))))
 
-(print (select-item-from-list (list 'a 'b "c" "d" "hello" (list 4 3 2))))
+(process-run-function
+  "foo"
+  (lambda ()
+    (sleep 1)
+    (left-mouse-click (view-position (front-window)))
+    (sleep .3)
+    (left-mouse-click
+      (add-points
+        (view-position (front-window))
+        (view-center
+          (first
+            (remove-if-not
+              (lambda (x)
+                (equalp (class-name (class-of x))
+                        'default-button-dialog-item))
+              (view-subviews (front-window)))))))))
+
+(setf *a* (select-item-from-list (list 'a 'b "c" "d" "hello" (list 4 3 2))
+                              :view-position (make-point 10 200)))
+                   
+(check (equalp *a* (list 'a)))
 
 #|
 (invalidate-view *win*))

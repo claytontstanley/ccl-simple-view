@@ -910,6 +910,12 @@
                 (point-y (view-size window))))))
       (setf (slot-value window 'easygui::position) position))))
 
+(defmethod view-center ((view simple-view))
+  (destructuring-bind (x y) (as-list (view-position view))
+    (destructuring-bind (sizex sizey) (as-list (view-size view))
+      (make-point (+ x (/ sizex 2))
+                  (+ y (/ sizey 2))))))
+
 ; FIXME: This seems to work properly, but I don't currently understand why,
 ; or what view-origin is supposed to do in MCL
 (defmethod view-origin ((view simple-view))

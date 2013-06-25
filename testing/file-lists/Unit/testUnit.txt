@@ -10,3 +10,4 @@ testing/testEnsureDefined.lisp
 testing/testParseMCLInitargs.lisp
 testing/testEditableTextDialogItem.lisp
 testing/testGetText.lisp
+testing/testSequenceDialog.lisp
