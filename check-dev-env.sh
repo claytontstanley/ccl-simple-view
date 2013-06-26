@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo $BASH_VERSION
-
 checkDependency() {
 	if eval "$1"; then 
 		echo "Passed test: $1"
