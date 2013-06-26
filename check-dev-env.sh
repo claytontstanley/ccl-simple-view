@@ -6,7 +6,7 @@ checkDependency() {
 	if eval "$1"; then 
 		echo "Passed test: $1"
 	else
-		printf "$2\n"
+		printf "Failed. $2\n"
 		exit 1
 	fi
 }
@@ -21,12 +21,18 @@ checkSSHHostname() {
 	egrep -iq "^Host[[:space:]]+$1$" ~/.ssh/config
 }
 
+checkFont() {
+	system_profiler SPFontsDataType | grep -iq "$1:"
+}
+
+
 hostnameTemplate=$(cat <<'EOF'
 Host chil
 	User		clayton	
 	HostName 	chil.rice.edu
 EOF
 )
+
 
 checkDependency "[[ -n '$(which make)' ]]" "Install make (suggestion: Install XCode and check the box to install command line tools)"
 checkDependency "[[ -n '$(which port)' ]]" "Install MacPorts (suggestion: Install using the binary found on MacPorts webpage)"
@@ -36,6 +42,8 @@ checkDependency "[[ -n '$(which ssh-copy-id)' ]]" "Install ssh-copy-id (suggesti
 checkDependency "checkSSHHostname chil" "chil hostname not configured: add something like this (replace User field with your chil login name) to ~/.ssh/config: \n$hostnameTemplate"
 checkDependency "checkNoPassword chil" "chil not good: use ssh-copy-id to enable passwordless login to chil using public/private keys; otherwise submodule updating gets tedious"
 checkDependency "[[ -n '$(which pdflatex)' ]]" "Install TexLive suite (suggestion: sudo port install texlive +full)"
+checkDependency "checkFont 'Avant Garde'" "Install 'Avant Garde' font (suggestion: run fonts/fix-attributes.sh, then double click ./fonts/Avant Guarde)"
+checkDependency "checkFont 'Charcoal'" "Install 'Charcoal' font (suggestion: double click ./fonts/Charcoal.ttf"
 
 echo "Initializing and updating submodules"
 ( cd "$pathToThisDir" && git submodule update --init --recursive )
