@@ -106,16 +106,16 @@ Currently, three files are generated during the build to achieve this purpose:
     \item uwi.lisp: submodules/actr6/devices/ccl/uwi.lisp
 \end{enumerate}
 
-1. provides the language layer for CCL, so that CCL can read in MCL gui source code.
+1. provides the language layer for CCL, so that CCL can read in MCL GUI source code.
 You'll see a subset of Digitool's GUI specification implemented for CCL in this file.
 
 2. and 3. provide the ACT-R device for CCL, so that models that interacted with the task environments written for MCL can now work with CCL.
 These files are essentially copies of the analogous files for MCL, except at the top they require 1., so that the MCL language layer is available in CCL before the rest of the code is read in.
 
-ccl-simple-view.lisp is a concatenation of many smaller .lisp files in this repo.
-This was done because I find it easier / more productive to work with many smaller files during development, but it's easier / more straightfoward to provide a single file that does a single purpose to the user. 
+ccl-simple-view.lisp is a concatenation of many smaller .lisp files in this repository.
+This was done because I find it easier / more productive to work with many smaller files during development, but it's easier / more straightforward to provide a single file that does a single purpose to the user. 
 
-ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozure's Objective C bridge and Apple's Cocoa framework.
+ccl-simple-view.lisp implements Digitool's GUI specification by leveraging Clozure's Objective C bridge and Apple's Cocoa framework.
 The majority of the structure of this file is written in CLOS style, and is built on top of Clozure's provided 'easygui' package. 
 
 \section{Preparing Repository for Development}
@@ -123,7 +123,7 @@ The majority of the structure of this file is written in CLOS style, and is buil
 In order to run the unit and regression tests, and work on the codebase, there are a few dependencies that must be installed first.
 To check that your system has these dependencies installed, run ./check-dev-env.sh.
 This file will notify you if any dependencies need to be installed, and will offer suggestions on how to install them.
-During this process, all submodules for the repo will be initialized and updated.
+During this process, all submodules for the repository will be initialized and updated.
 Once you can run this file without error, then your development environment is correctly configured.
 
 %----------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ The only tests that should be run from the command line are the regression and u
 It's not recommended to run a test for a single file from the command line.
 The command line targets are used during the deployment process, to ensure that the recent commit is valid.
 And I've used some optimization techniques in this case.
-Specifically, before running these tests, a standalone image of the current src in the repo is created, and then each test is executed by first loading that standalone image.
+Specifically, before running these tests, a standalone image of the current src in the repository is created, and then each test is executed by first loading that standalone image.
 This saves time by not recompiling the CCL Cocoa libraries for each test, and also isolates each test from each other by starting with a fresh CCL image before running each test.
 
 However these optimization decisions mean that if you were to run a single test from the command line, it would use the previously-built CCL image when running that test.
@@ -145,9 +145,9 @@ So if you're in the middle of development and want to run a single test, and ens
 
 \subsection{Regression and Unit Tests}
 
-After the development environment has been configured, you can run the unit tests by typing make -C testing unit at the top level of the repo.
+After the development environment has been configured, you can run the unit tests by typing make -C testing unit at the top level of the repository.
 This will execute make in the testing folder, and tell it to fire the unit target, which will run all unit tests.
-If you want to run the more lengthy and thorough regression tests, use the continous-integration target instead of the unit target.
+If you want to run the more lengthy and thorough regression tests, use the continuous-integration target instead of the unit target.
 
 \subsection{Individual Tests}
 
@@ -166,19 +166,19 @@ Each test first loads a bootstrap file.
 That file will determine how to load the ccl-simple-view src and then load it, among other things.
 The main branch in that file is related to how ccl-simple-view gets loaded.
 If the test was launched from the command line, then the deployed ccl-simple-view.lisp will get loaded.
-If the test was launched from a CCL development REPL, then each src file in the repo that makes up ccl-simple-view.lisp will get loaded directly.
+If the test was launched from a CCL development REPL, then each src file in the repository that makes up ccl-simple-view.lisp will get loaded directly.
 
 \section{Making a Build}
 
 Once you have made a new commit and are ready to make a build, execute make zip-actr6 from the top level directory.
 This creates the three build files from the current src, and then places a zip file in the actr6 submodules top level directory.
-This file is what I'm currently emailing to Dan whenever I'm ready to get a new build in the ACT-R distro.
+This file is what I'm currently emailing to Dan whenever I'm ready to get a new build in the ACT-R distribution.
 
-Other builds can be made as well, like building a votebox test for Kristen, or a Phaser test for Frank, or a NextGen test for Jeff.
+Other builds can be made as well, like building a Votebox test for Kristen, or a Phaser test for Frank, or a NextGen test for Jeff.
 The targets for these builds are zip-Votebox, zip-tamborello, and zip-NextGen respectively.
 Executing each target will make a zip file with all necessary src code and dependencies needed to run the test, and place that zip file at the top level directory.
 Within that zip file in the testing folder, will be the test file that is associated with each of builds. 
-Another developer without even checking out the repo source code should be able to unzip that file, load the Clozure App, load ACT-R, and then load that test file.
+Another developer without even checking out the repository source code should be able to unzip that file, load the Clozure App, load ACT-R, and then load that test file.
 
 All of these builds rely on properly documenting dependencies for each of them.
 For example, the Phaser tasks depend on a few files in the bincarbon folder (like procedure-window2.lisp),
@@ -192,11 +192,11 @@ So I'd recommend taking the time to digest how the top-level Makefile, the testi
 
 \section{Deploying Code Changes}
 
-You've made a new commit and would like to deploy the current code in your development repo to RedGiant.
+You've made a new commit and would like to deploy the current code in your development repository to RedGiant.
 This process is done in two steps: Push your changes and run the deploy target.
 To push your changes to chil:/srv/git/mcl-migration, do a git push.
 To run the deploy target, execute make -C build deploy from the top-level directory.
-This deploy script will update all folders on RedGiant that are associated with the repo.
+This deploy script will update all folders on RedGiant that are associated with the repository.
 This includes the Projects/mcl-migration folder, and also all submodules that have a location on RedGiant (e.g., bincarbon, NextGen, Phaser, etc.).
 The list of deployed locations is included in the builds directory.
 
@@ -207,13 +207,13 @@ The list of deployed locations is included in the builds directory.
 \item actr6: All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. Note the share.lisp file lives here for now, which contains the MCL GUI interface for CCL
 
 \item bincarbon:
-  All original MCL bincarbon code as well as CCl-specific utility files. 
+  All original MCL bincarbon code as well as CCL-specific utility files. 
   Most original MCL files have been ported to work with both CCL and MCL.
   Timer is broken on CCL currently though.
   Other files, like CFBundle.lisp don't work at all on CCL, but aren't necessary on CCL.
   This folder is itself a git repository, so it is added as a submodule for this repository.
 
-\item build: Code to generate a single source file from current code in the repo.
+\item build: Code to generate a single source file from current code in the repository.
 
 \item docs:
   Archived documentation and reference manuals found online.
@@ -226,16 +226,16 @@ The list of deployed locations is included in the builds directory.
 \item fonts: Contains font dependencies used in some of the testing source code (e.g., Tamborello's Phaser experiments).
 
 \item rmcl:
-  Any lisp code from RMCL that was either directly copied to this distro (some of the digitool GUI code could be bootstrapped after the CCL interface was defined)
-  or rewritten for this distro (e.g., the modal dialog implementation)
+  Any lisp code from RMCL that was either directly copied to this distribution (some of the Digitool GUI code could be bootstrapped after the CCL interface was defined)
+  or rewritten for this distribution (e.g., the modal dialog implementation)
 
-\item spell: Contains lisp of words that vim ignores when spell checking repo.
+\item spell: Contains lisp of words that vim ignores when spell checking repository.
 
 \item submodules: Source code for actr and ccl
 	\begin{itemize}
 	\item actr is newest version (as of Jun 2013). All code is same except that loader files (loader.lisp) are inside each of the tutorial folders
 	\item ccl-1.9 is newest version (as of Jun 2013). Original image. Used to reference ccl src and run basic ccl core file
-	\item lisp-dev is a git repo for building a custom ccl core that I use during development.
+	\item lisp-dev is a git repository for building a custom ccl core that I use during development.
 	  I'm using some of the src for the utilities in the GUI code, so the builds here grab some of that src.
 	\item rmcl is the newest version; no changes; used to reference rmcl src, and run rmcl for each of the tests.
 	\end{itemize}
@@ -248,7 +248,7 @@ The list of deployed locations is included in the builds directory.
 	\item testTamboDisModel.lisp: Tests to run Phaser on CCL
 	\end{itemize}
 
-\item tools: Various shell scripts and tools used to manage the repo
+\item tools: Various shell scripts and tools used to manage the repository.
 	\begin{itemize}
 	\item merge-and-verify-driver. Used by git when I want to do a merge by hand.
 	\end{itemize}
