@@ -25,7 +25,7 @@
 
 \usepackage{enumitem}
 \setlist{nolistsep} % or \setlist{noitemsep} to leave space around whole list
-\usepackage{float} % Allows putting an [H] in \begin{figure} to specify the exact location of the figure
+\usepackage{float} % Allows putting an [H] in \ldots to specify the exact location of the figure
 \usepackage{wrapfig} % Allows in-line images such as the example fish picture
 
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
@@ -36,6 +36,9 @@
 
 \graphicspath{{./Pictures/}} % Specifies the directory where pictures are stored
 
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\filesys}[1]{\texttt{#1}}
+
 \begin{document}
 
 %----------------------------------------------------------------------------------------
@@ -44,38 +47,38 @@
 
 \begin{titlepage}
 
-\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+  \newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
 
-\center % Center everything on the page
+  \center % Center everything on the page
 
-\textsc{\LARGE Rice University}\\[1.5cm] % Name of your university/college
-\textsc{\Large Department of Psychology}\\[0.5cm] % Major heading such as course name
-\textsc{\large Computer Human Interaction Laboratory (CHIL)}\\[0.5cm] % Minor heading such as course title
+  \textsc{\LARGE Rice University}\\[1.5cm] % Name of your university/college
+  \textsc{\Large Department of Psychology}\\[0.5cm] % Major heading such as course name
+  \textsc{\large Computer Human Interaction Laboratory (CHIL)}\\[0.5cm] % Minor heading such as course title
 
 
-\HRule \\[0.4cm]
-{ \huge \bfseries Lab Transition From MCL to Clozure Common Lisp}\\[0.4cm] % Title of your document
-\HRule \\[1.5cm]
+  \HRule \\[0.4cm]
+  { \huge \bfseries Lab Transition From MCL to Clozure Common Lisp}\\[0.4cm] % Title of your document
+  \HRule \\[1.5cm]
 
-\begin{minipage}{0.4\textwidth}
-\begin{flushleft} \large
-\emph{Author:}\\
-Clayton Stanley % Your name
-\end{flushleft}
-\end{minipage}
-~
-\begin{minipage}{0.4\textwidth}
-\begin{flushright} \large
-\emph{Supervisor:} \\
-Dr. Mike Byrne % Supervisor's Name
-\end{flushright}
-\end{minipage}\\[4cm]
+  \begin{minipage}{0.4\textwidth}
+    \begin{flushleft} \large
+      \emph{Author:}\\
+      Clayton Stanley % Your name
+    \end{flushleft}
+  \end{minipage}
+  ~
+  \begin{minipage}{0.4\textwidth}
+    \begin{flushright} \large
+      \emph{Supervisor:} \\
+      Dr. Mike Byrne % Supervisor's Name
+    \end{flushright}
+  \end{minipage}\\[4cm]
 
-{\large \today}\\[1cm] % Date, change the \today to a set date if you want to be precise
+  {\large \today}\\[1cm] % Date, change the \today to a set date if you want to be precise
 
-\includegraphics[scale=.5]{ChilLogo} % Include a department/university logo - this will require the graphicx package
+  \includegraphics[scale=.5]{ChilLogo} % Include a department/university logo - this will require the graphicx package
 
-\vfill % Fill the rest of the page with whitespace
+  \vfill % Fill the rest of the page with whitespace
 
 \end{titlepage}
 
@@ -101,27 +104,28 @@ This enables task environments written in MCL (e.g., Phaser, Votebox, NextGen) t
 Currently, three files are generated during the build to achieve this purpose:
 
 \begin{enumerate}[topsep=12pt]
-    \item ccl-simple-view.lisp: submodules/actr6/support
-    \item device.lisp: submodules/actr6/devices/ccl/device.lisp
-    \item uwi.lisp: submodules/actr6/devices/ccl/uwi.lisp
+  \item \filesys{ccl-simple-view.lisp}: \filesys{submodules/actr6/support}
+  \item \filesys{device.lisp}: \filesys{submodules/actr6/devices/ccl/device.lisp}
+  \item \filesys{uwi.lisp}: \filesys{submodules/actr6/devices/ccl/uwi.lisp}
 \end{enumerate}
 
-1. provides the language layer for CCL, so that CCL can read in MCL GUI source code.
+The file \filesys{ccl-simple-view.lisp} provides the language layer for CCL, so that CCL can read in MCL GUI source code.
 You'll see a subset of Digitool's GUI specification implemented for CCL in this file.
 
-2. and 3. provide the ACT-R device for CCL, so that models that interacted with the task environments written for MCL can now work with CCL.
-These files are essentially copies of the analogous files for MCL, except at the top they require 1., so that the MCL language layer is available in CCL before the rest of the code is read in.
+Files \filesys{device.lisp} and \filesys{uwi.lisp} provide the ACT-R device for CCL, so that models that interact with the task environments written for MCL can now work with CCL.
+These files are essentially copies of the analogous files for MCL except at the top they require \filesys{ccl-simple-view.lisp}.
+This is so the MCL language layer is available in CCL before the rest of the code is read in.
 
-ccl-simple-view.lisp is a concatenation of many smaller .lisp files in this repository.
+File \filesys{ccl-simple-view.lisp} is a concatenation of many smaller .lisp files in this repository.
 This was done because I find it easier / more productive to work with many smaller files during development, but it's easier / more straightforward to provide a single file that does a single purpose to the user. 
 
-ccl-simple-view.lisp implements Digitool's GUI specification by leveraging Clozure's Objective C bridge and Apple's Cocoa framework.
-The majority of the structure of this file is written in CLOS style, and is built on top of Clozure's provided 'easygui' package. 
+File \filesys{ccl-simple-view.lisp} implements Digitool's GUI specification by leveraging Clozure's Objective C bridge and Apple's Cocoa framework.
+The majority of the structure of this file is written in CLOS style, and is built on top of Clozure's provided ``easygui'' package. 
 
 \section{Preparing Repository for Development}
 
 In order to run the unit and regression tests, and work on the codebase, there are a few dependencies that must be installed first.
-To check that your system has these dependencies installed, run ./check-dev-env.sh.
+To check that your system has these dependencies installed, run \code{./check-dev-env.sh}.
 This file will notify you if any dependencies need to be installed, and will offer suggestions on how to install them.
 During this process, all submodules for the repository will be initialized and updated.
 Once you can run this file without error, then your development environment is correctly configured.
@@ -136,126 +140,112 @@ The only tests that should be run from the command line are the regression and u
 It's not recommended to run a test for a single file from the command line.
 The command line targets are used during the deployment process, to ensure that the recent commit is valid.
 And I've used some optimization techniques in this case.
-Specifically, before running these tests, a standalone image of the current src in the repository is created, and then each test is executed by first loading that standalone image.
+Specifically, before running these tests, a standalone image of the current source in the repository is created, and then each test is executed by first loading that standalone image.
 This saves time by not recompiling the CCL Cocoa libraries for each test, and also isolates each test from each other by starting with a fresh CCL image before running each test.
 
 However these optimization decisions mean that if you were to run a single test from the command line, it would use the previously-built CCL image when running that test.
-If you were to change a line of src code and then run the test, the CCL image would not contain that source code change.
+If you were to change a line of source code and then run the test, the CCL image would not contain that source code change.
 So if you're in the middle of development and want to run a single test, and ensure that the test loads the most recent source, run the test from within your development REPL.
 
 \subsection{Regression and Unit Tests}
 
-After the development environment has been configured, you can run the unit tests by typing make -C testing unit at the top level of the repository.
+After the development environment has been configured, you can run the unit tests by typing \code{make -C testing unit} at the top level of the repository.
 This will execute make in the testing folder, and tell it to fire the unit target, which will run all unit tests.
-If you want to run the more lengthy and thorough regression tests, use the continuous-integration target instead of the unit target.
+If you want to run the more lengthy and thorough regression tests, use the \code{continuous-integration} target instead of the \code{unit} target.
 
 \subsection{Individual Tests}
 
-Each file in the ./testing directory is an individual test that can be run in isolation (as opposed to running during the unit or continuous-integration tests).
+Each file in the \filesys{./testing} directory is an individual test that can be run in isolation (as opposed to running during the unit or continuous-integration tests).
 The most straightforward way to run a single test file is to launch your CCL development environment and load the file.
 
-Note that the current bootstrap code for the tests assumes that a development environment is a 'SLIME' session (using either SLIME or slimv).
-So if you are using a different development environment (e.g., working from the included CCL GUI), then the bootstrap.lisp file will not work properly.
-One current workaround is to add ``swank-repl'' to *modules* before loading a test.
-You could place this in ~/.ccl-init.lisp, or (my recommendation) use a slime implementation, or
-(better fix if you don't want to) change the logic in the bootstrap.lisp file so that it does a better check to figure out if you're currently in a dev REPL or launched from the command line.
+Note that the current bootstrap code for the tests assumes that a development environment is a ``SLIME'' session (using either SLIME or slimv).
+So if you are using a different development environment (e.g., working from the included CCL GUI), then the \filesys{bootstrap.lisp} file will not work properly.
+One current workaround is to add \code{swank-repl} to \code{*modules*} before loading a test.
+You could place this in \code{\textasciitilde/.ccl-init.lisp}, or (my recommendation) use a slime implementation, or
+(better fix if you don't want to) change the logic in the \filesys{bootstrap.lisp} file so that it does a better check to figure out if you're currently in a dev REPL or launched from the command line.
 
-\subsection{The testing/bootstrap.lisp File}
+\subsection{The \filesys{testing/bootstrap.lisp} File}
 
 Each test first loads a bootstrap file.
-That file will determine how to load the ccl-simple-view src and then load it, among other things.
+That file will determine how to load the ccl-simple-view source and then load it, among other things.
 The main branch in that file is related to how ccl-simple-view gets loaded.
-If the test was launched from the command line, then the deployed ccl-simple-view.lisp will get loaded.
-If the test was launched from a CCL development REPL, then each src file in the repository that makes up ccl-simple-view.lisp will get loaded directly.
+If the test was launched from the command line, then the deployed \filesys{ccl-simple-view.lisp} will get loaded.
+If the test was launched from a CCL development REPL, then each source file in the repository that makes up \filesys{ccl-simple-view.lisp} will get loaded directly.
 
 \section{Making a Build}
 
-Once you have made a new commit and are ready to make a build, execute make zip-actr6 from the top level directory.
-This creates the three build files from the current src, and then places a zip file in the actr6 submodules top level directory.
-This file is what I'm currently emailing to Dan whenever I'm ready to get a new build in the ACT-R distribution.
+Once you have made a new commit and are ready to make a build, execute \code{make zip-actr6} from the top level directory.
+This creates the three build files from the current source, and then places a zip file in the actr6 submodules top level directory.
+This file is what I'm currently emailing to Dan whenever I'm ready to place a new build in the ACT-R distribution.
 
 Other builds can be made as well, like building a Votebox test for Kristen, or a Phaser test for Frank, or a NextGen test for Jeff.
-The targets for these builds are zip-Votebox, zip-tamborello, and zip-NextGen respectively.
-Executing each target will make a zip file with all necessary src code and dependencies needed to run the test, and place that zip file at the top level directory.
-Within that zip file in the testing folder, will be the test file that is associated with each of builds. 
+The targets for these builds are \code{zip-Votebox}, \code{zip-tamborello}, and \code{zip-NextGen} respectively.
+Executing each target will make a zip file with all necessary source code and dependencies needed to run the test, and place that zip file at the top level directory.
+Within that zip file in the \filesys{testing} folder, will be the test file that is associated with each of builds. 
 Another developer without even checking out the repository source code should be able to unzip that file, load the Clozure App, load ACT-R, and then load that test file.
 
 All of these builds rely on properly documenting dependencies for each of them.
-For example, the Phaser tasks depend on a few files in the bincarbon folder (like procedure-window2.lisp),
+For example, the Phaser tasks depend on a few files in the \filesys{bincarbon} folder (like \filesys{procedure-window2.lisp}),
 and the Votebox tasks need to load the Votebox emulator before loading the model files.
-All of this is taken care of within the testing/file-lists directory.
-Each test file in testing has an associated file-list file in testing/file-lists, which lists each file that must be loaded in order to run the test.
-Those files in file-list are examined when making builds as well, so that all dependencies are included in the builds.
+All of this is taken care of within the \filesys{testing/file-lists} directory.
+Each test file in testing has an associated file-list file in \filesys{testing/file-lists}, which lists each file that must be loaded in order to run the test.
+Those files in \filesys{file-list} are examined when making builds as well, so that all dependencies are included in the builds.
 A lot of time and care has been put into creating these build dependency files.
-And as is usually the case, even with all the simplifying that I've done, the build scripts are probably the most complicated part of this entire development environment.
-So I'd recommend taking the time to digest how the top-level Makefile, the testing/bootstrap.lisp code, the testing/file-lists files, and the build/Makefile, all interact.
+Even with all the simplifying that I've done, the build scripts are probably the most complicated part of this entire development environment (as is usually the case with build scripts).
+So I'd recommend taking the time to digest how the top-level \filesys{Makefile}, the \filesys{testing/bootstrap.lisp} code, the \filesys{testing/file-lists} files, and the \filesys{build/Makefile}, all interact.
 
 \section{Deploying Code Changes}
 
 You've made a new commit and would like to deploy the current code in your development repository to RedGiant.
 This process is done in two steps: Push your changes and run the deploy target.
-To push your changes to chil:/srv/git/mcl-migration, do a git push.
-To run the deploy target, execute make -C build deploy from the top-level directory.
+To push your changes to \filesys{chil.rice.edu}, do a \code{git push}.
+To run the deploy target, execute \code{make -C build deploy} from the top-level directory.
 This deploy script will update all folders on RedGiant that are associated with the repository.
 This includes the Projects/mcl-migration folder, and also all submodules that have a location on RedGiant (e.g., bincarbon, NextGen, Phaser, etc.).
-The list of deployed locations is included in the builds directory.
+The list of deployed locations is included in the \filesys{builds} directory.
 
 \section{Directory Structure} % Major section
 
 \begin{itemize}
-
-\item actr6: All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. Note the share.lisp file lives here for now, which contains the MCL GUI interface for CCL
-
-\item bincarbon:
-  All original MCL bincarbon code as well as CCL-specific utility files. 
-  Most original MCL files have been ported to work with both CCL and MCL.
-  Timer is broken on CCL currently though.
-  Other files, like CFBundle.lisp don't work at all on CCL, but aren't necessary on CCL.
-  This folder is itself a git repository, so it is added as a submodule for this repository.
-
-\item build: Code to generate a single source file from current code in the repository.
-
-\item docs:
-  Archived documentation and reference manuals found online.
-  Also contains src to build this document.
-
-\item easygui:
-  Any .lisp extensions to CCL's easygui package.
-  Contains a few bug fixes, and an extension which provides a Cocoa view that does not respond to mouse activity.
-
-\item fonts: Contains font dependencies used in some of the testing source code (e.g., Tamborello's Phaser experiments).
-
-\item rmcl:
-  Any lisp code from RMCL that was either directly copied to this distribution (some of the Digitool GUI code could be bootstrapped after the CCL interface was defined)
-  or rewritten for this distribution (e.g., the modal dialog implementation)
-
-\item spell: Contains lisp of words that vim ignores when spell checking repository.
-
-\item submodules: Source code for actr and ccl
-	\begin{itemize}
-	\item actr is newest version (as of Jun 2013). All code is same except that loader files (loader.lisp) are inside each of the tutorial folders
-	\item ccl-1.9 is newest version (as of Jun 2013). Original image. Used to reference ccl src and run basic ccl core file
-	\item lisp-dev is a git repository for building a custom ccl core that I use during development.
-	  I'm using some of the src for the utilities in the GUI code, so the builds here grab some of that src.
-	\item rmcl is the newest version; no changes; used to reference rmcl src, and run rmcl for each of the tests.
-	\end{itemize}
-
-\item testing: Source code for testing the ccl code
-	\begin{itemize}
-	\item testCCLDevice.lisp: Used to test basic functionality of building a Cocoa display by writing lisp code that meets the uwi.lisp interface spec
-	\item testTutorials.lisp: Runs ACT-R through all tutorials; checks that ACT-R can 'see' CCL's Cocoa device
-	\item testVotebox.lisp: Tests to run Votebox on CCL
-	\item testTamboDisModel.lisp: Tests to run Phaser on CCL
-	\end{itemize}
-
-\item tools: Various shell scripts and tools used to manage the repository.
-	\begin{itemize}
-	\item merge-and-verify-driver. Used by git when I want to do a merge by hand.
-	\end{itemize}
-
+  \item actr6: All .lisp files needed to build an ACT-R device for CCL that uses a Cocoa display. Note the share.lisp file lives here for now, which contains the MCL GUI interface for CCL
+  \item \filesys{bincarbon}:
+    All original MCL bincarbon code as well as CCL-specific utility files. 
+    Most original MCL files have been ported to work with both CCL and MCL.
+    Timer is broken on CCL currently though.
+    Other files, like CFBundle.lisp don't work at all on CCL, but aren't necessary on CCL.
+    This folder is itself a git repository, so it is added as a submodule for this repository.
+  \item \filesys{build}: Code to generate a single source file from current code in the repository.
+  \item \filesys{docs}:
+    Archived documentation and reference manuals found online.
+    Also contains source to build this document.
+  \item \filesys{easygui}:
+    Any .lisp extensions to CCL's easygui package.
+    Contains a few bug fixes, and an extension which provides a Cocoa view that does not respond to mouse activity.
+  \item \filesys{fonts}: Contains font dependencies used in some of the testing source code (e.g., Tamborello's Phaser experiments).
+  \item \filesys{rmcl}:
+    Any lisp code from RMCL that was either directly copied to this distribution (some of the Digitool GUI code could be bootstrapped after the CCL interface was defined)
+    or rewritten for this distribution (e.g., the modal dialog implementation)
+  \item \filesys{spell}: Contains lisp of words that vim ignores when spell checking repository.
+  \item \filesys{submodules}: Source code for actr and ccl
+    \begin{itemize}
+      \item \filesys{actr} is newest version (as of Jun 2013). All code is same except that loader files (loader.lisp) are inside each of the tutorial folders
+      \item \filesys{ccl-1.9} is newest version (as of Jun 2013). Original image. Used to reference ccl source and run basic ccl core file
+      \item \filesys{lisp-dev} is a git repository for building a custom ccl core that I use during development.
+	I'm using some of the source for the utilities in the GUI code, so the builds here grab some of that source.
+      \item \filesys{rmcl} is the newest version; no changes; used to reference rmcl source, and run rmcl for each of the tests.
+    \end{itemize}
+  \item \filesys{testing}: Source code for testing the ccl code
+    \begin{itemize}
+      \item \filesys{testCCLDevice.lisp}: Used to test basic functionality of building a Cocoa display by writing lisp code that meets the uwi.lisp interface spec
+      \item \filesys{testTutorials.lisp}: Runs ACT-R through all tutorials; checks that ACT-R can 'see' CCL's Cocoa device
+      \item \filesys{testVotebox.lisp}: Tests to run Votebox on CCL
+      \item \filesys{testTamboDisModel.lisp}: Tests to run Phaser on CCL
+    \end{itemize}
+  \item tools: Various shell scripts and tools used to manage the repository.
+    \begin{itemize}
+      \item \filesys{merge-and-verify-driver}. Used by git when I want to do a merge by hand.
+    \end{itemize}
 \end{itemize}
 
-
-
-
 \end{document}
+
