@@ -2,6 +2,7 @@ include ../include.mk
 
 actrPath = ../submodules/actr6
 server = chilGalaxy 
+rrServer = chil
 outFile = ccl-simple-view.lisp
 
 depdir = /Volumes/RedGiant/Projects/mcl-migration 
@@ -69,7 +70,7 @@ outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g'
 
 update-remote-repositories:
-	set -e && cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} "cd \"$$repo\" && git remote update && git rebase && git submodule update --init --recursive"; done
+	set -e && cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${rrServer} "cd \"$$repo\" && git remote update && git rebase && git submodule update --init --recursive"; done
 
 rebuild-kernel: ${cclOrigFiles}
 	[[ "${rebuild-kernel-p}" != "true" ]] || rlwrap ../testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"
