@@ -1,7 +1,7 @@
 include ../include.mk
 
 actrPath = ../submodules/actr6
-server = chil
+server = chilGalaxy 
 outFile = ccl-simple-view.lisp
 
 depdir = /Volumes/RedGiant/Projects/mcl-migration 
