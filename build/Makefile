@@ -1,8 +1,8 @@
 include ../include.mk
 
 actrPath = ../submodules/actr6
-#server = chilGalaxy 
-server = chil
+server = chilGalaxy 
+#server = chil
 rrServer = chil
 outFile = ccl-simple-view.lisp
 
