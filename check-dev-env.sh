@@ -33,6 +33,7 @@ checkDependency "[[ -n '$(which rlwrap)' ]]" "Install rlwrap (suggestion: sudo p
 checkDependency "[[ -n '$(which ssh-copy-id)' ]]" "Install ssh-copy-id (suggestion: sudo port install openssh)"
 checkDependency "checkSSHHostname chil" "chil hostname not configured: add something like this (replace User field with your chil login name) to ~/.ssh/config: \n$hostnameTemplate"
 checkDependency "checkNoPassword chil" "chil not good: use ssh-copy-id to enable passwordless login to chil using public/private keys; otherwise submodule updating gets tedious"
+checkDependency "[[ -n '$(which pdflatex)' ]]" "Install TexLive suite (suggestion: sudo port install texlive +full)"
 
 echo "Initializing and updating submodules"
 git submodule update --init --recursive
