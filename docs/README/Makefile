@@ -1,4 +1,4 @@
 include ../../include.mk
 
 all:
-	pdflatex README.tex
+	latexmk -pdf README.tex

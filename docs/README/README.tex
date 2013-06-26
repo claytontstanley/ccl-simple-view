@@ -23,6 +23,8 @@
 
 \usepackage{graphicx} % Required for including pictures
 
+\usepackage{enumitem}
+\setlist{nolistsep} % or \setlist{noitemsep} to leave space around whole list
 \usepackage{float} % Allows putting an [H] in \begin{figure} to specify the exact location of the figure
 \usepackage{wrapfig} % Allows in-line images such as the example fish picture
 
@@ -91,28 +93,112 @@ Dr. Mike Byrne % Supervisor's Name
 
 \section{Introduction} % Major section
 
-The purpose of this code is to enable Clozure Common Lisp to read in GUI source code written for Macintosh Common Lisp. This enables task environments written in MCL (e.g., Phaser, Votebox, NextGen) to work with CCL with minimal code modifications. 
+The purpose of this code is to enable Clozure Common Lisp to read in GUI source code written for Macintosh Common Lisp.
+This enables task environments written in MCL (e.g., Phaser, Votebox, NextGen) to work with CCL with minimal code modifications. 
 
 \subsection{Design Notes}
 
 Currently, three files are generated during the build to achieve this purpose:
-\begin{enumerate}
-\item ccl-simple-view.lisp: submodules/actr6/support
-\item device.lisp: submodules/actr6/devices/ccl/device.lisp
-\item uwi.lisp: submodules/actr6/devices/ccl/uwi.lisp
+
+\begin{enumerate}[topsep=12pt]
+    \item ccl-simple-view.lisp: submodules/actr6/support
+    \item device.lisp: submodules/actr6/devices/ccl/device.lisp
+    \item uwi.lisp: submodules/actr6/devices/ccl/uwi.lisp
 \end{enumerate}
 
-1. provides the language layer for CCL, so that CCL can read in MCL gui source code. You'll see a subset of Digitool's GUI specification implemented for CCL in this file.
+1. provides the language layer for CCL, so that CCL can read in MCL gui source code.
+You'll see a subset of Digitool's GUI specification implemented for CCL in this file.
 
-2. and 3. provide the ACT-R device for CCL, so that models that interacted with the task environments written for MCL can now work with CCL. These files are essentially copies of the analogous files for MCL, except at the top they require 1., so that the MCL language layer is available in CCL before the rest of the code is read in.
+2. and 3. provide the ACT-R device for CCL, so that models that interacted with the task environments written for MCL can now work with CCL.
+These files are essentially copies of the analogous files for MCL, except at the top they require 1., so that the MCL language layer is available in CCL before the rest of the code is read in.
 
-ccl-simple-view.lisp is a concatenation of many smaller .lisp files in this repo. This was done because I find it easier / more productive to work with many smaller files during development, but it's easier / more straightfoward to provide a single file that does a single purpose to the user. 
+ccl-simple-view.lisp is a concatenation of many smaller .lisp files in this repo.
+This was done because I find it easier / more productive to work with many smaller files during development, but it's easier / more straightfoward to provide a single file that does a single purpose to the user. 
 
-ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozure's Objective C bridge and Apple's Cocoa framework. The majority of the structure of this file is written in CLOS style, and is built on top of Clozure's provided 'easygui' package. 
+ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozure's Objective C bridge and Apple's Cocoa framework.
+The majority of the structure of this file is written in CLOS style, and is built on top of Clozure's provided 'easygui' package. 
+
+\section{Preparing Repository for Development}
+
+In order to run the unit and regression tests, and work on the codebase, there are a few dependencies that must be installed first.
+To check that your system has these dependencies installed, run ./check-dev-env.sh.
+This file will notify you if any dependencies need to be installed, and will offer suggestions on how to install them.
+During this process, all submodules for the repo will be initialized and updated.
+Once you can run this file without error, then your development environment is correctly configured.
 
 %----------------------------------------------------------------------------------------
 %	MAJOR SECTION 1
 %----------------------------------------------------------------------------------------
+\section{Running the Tests}
+
+Tests can be run in two ways: From the command line using make targets, or directly within your CCL development REPL.
+The only tests that should be run from the command line are the regression and unit tests.
+It's not recommended to run a test for a single file from the command line.
+The command line targets are used during the deployment process, to ensure that the recent commit is valid.
+And I've used some optimization techniques in this case.
+Specifically, before running these tests, a standalone image of the current src in the repo is created, and then each test is executed by first loading that standalone image.
+This saves time by not recompiling the CCL Cocoa libraries for each test, and also isolates each test from each other by starting with a fresh CCL image before running each test.
+
+However these optimization decisions mean that if you were to run a single test from the command line, it would use the previously-built CCL image when running that test.
+If you were to change a line of src code and then run the test, the CCL image would not contain that source code change.
+So if you're in the middle of development and want to run a single test, and ensure that the test loads the most recent source, run the test from within your development REPL.
+
+\subsection{Regression and Unit Tests}
+
+After the development environment has been configured, you can run the unit tests by typing make -C testing unit at the top level of the repo.
+This will execute make in the testing folder, and tell it to fire the unit target, which will run all unit tests.
+If you want to run the more lengthy and thorough regression tests, use the continous-integration target instead of the unit target.
+
+\subsection{Individual Tests}
+
+Each file in the ./testing directory is an individual test that can be run in isolation (as opposed to running during the unit or continuous-integration tests).
+The most straightforward way to run a single test file is to launch your CCL development environment and load the file.
+
+Note that the current bootstrap code for the tests assumes that a development environment is a 'SLIME' session (using either SLIME or slimv).
+So if you are using a different development environment (e.g., working from the included CCL GUI), then the bootstrap.lisp file will not work properly.
+One current workaround is to add ``swank-repl'' to *modules* before loading a test.
+You could place this in ~/.ccl-init.lisp, or (my recommendation) use a slime implementation, or
+(better fix if you don't want to) change the logic in the bootstrap.lisp file so that it does a better check to figure out if you're currently in a dev REPL or launched from the command line.
+
+\subsection{The testing/bootstrap.lisp File}
+
+Each test first loads a bootstrap file.
+That file will determine how to load the ccl-simple-view src and then load it, among other things.
+The main branch in that file is related to how ccl-simple-view gets loaded.
+If the test was launched from the command line, then the deployed ccl-simple-view.lisp will get loaded.
+If the test was launched from a CCL development REPL, then each src file in the repo that makes up ccl-simple-view.lisp will get loaded directly.
+
+\section{Making a Build}
+
+Once you have made a new commit and are ready to make a build, execute make zip-actr6 from the top level directory.
+This creates the three build files from the current src, and then places a zip file in the actr6 submodules top level directory.
+This file is what I'm currently emailing to Dan whenever I'm ready to get a new build in the ACT-R distro.
+
+Other builds can be made as well, like building a votebox test for Kristen, or a Phaser test for Frank, or a NextGen test for Jeff.
+The targets for these builds are zip-Votebox, zip-tamborello, and zip-NextGen respectively.
+Executing each target will make a zip file with all necessary src code and dependencies needed to run the test, and place that zip file at the top level directory.
+Within that zip file in the testing folder, will be the test file that is associated with each of builds. 
+Another developer without even checking out the repo source code should be able to unzip that file, load the Clozure App, load ACT-R, and then load that test file.
+
+All of these builds rely on properly documenting dependencies for each of them.
+For example, the Phaser tasks depend on a few files in the bincarbon folder (like procedure-window2.lisp),
+and the Votebox tasks need to load the Votebox emulator before loading the model files.
+All of this is taken care of within the testing/file-lists directory.
+Each test file in testing has an associated file-list file in testing/file-lists, which lists each file that must be loaded in order to run the test.
+Those files in file-list are examined when making builds as well, so that all dependencies are included in the builds.
+A lot of time and care has been put into creating these build dependency files.
+And as is usually the case, even with all the simplifying that I've done, the build scripts are probably the most complicated part of this entire development environment.
+So I'd recommend taking the time to digest how the top-level Makefile, the testing/bootstrap.lisp code, the testing/file-lists files, and the build/Makefile, all interact.
+
+\section{Deploying Code Changes}
+
+You've made a new commit and would like to deploy the current code in your development repo to RedGiant.
+This process is done in two steps: Push your changes and run the deploy target.
+To push your changes to chil:/srv/git/mcl-migration, do a git push.
+To run the deploy target, execute make -C build deploy from the top-level directory.
+This deploy script will update all folders on RedGiant that are associated with the repo.
+This includes the Projects/mcl-migration folder, and also all submodules that have a location on RedGiant (e.g., bincarbon, NextGen, Phaser, etc.).
+The list of deployed locations is included in the builds directory.
 
 \section{Directory Structure} % Major section
 
@@ -125,21 +211,32 @@ ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozu
   Most original MCL files have been ported to work with both CCL and MCL.
   Timer is broken on CCL currently though.
   Other files, like CFBundle.lisp don't work at all on CCL, but aren't necessary on CCL.
+  This folder is itself a git repository, so it is added as a submodule for this repository.
 
 \item build: Code to generate a single source file from current code in the repo.
 
-\item docs: Archived documentation and reference manuals found online.
+\item docs:
+  Archived documentation and reference manuals found online.
+  Also contains src to build this document.
 
-\item easygui: Any .lisp extensions to CCL's easygui package. Contains a few bug fixes, and an extension which provides a Cocoa view that does not respond to mouse activity	
-\item rmcl: Any lisp code from RMCL that was either directly copied to this distro (some of the digitool GUI code could be bootstrapped after the CCL interface was defined) or rewritten for this distro (e.g., thermometer.lisp, the modal dialog implementation)
+\item easygui:
+  Any .lisp extensions to CCL's easygui package.
+  Contains a few bug fixes, and an extension which provides a Cocoa view that does not respond to mouse activity.
 
-\item scratch: Stray lisp code, experimental, etc. None of this is loaded for any of the tests
+\item fonts: Contains font dependencies used in some of the testing source code (e.g., Tamborello's Phaser experiments).
+
+\item rmcl:
+  Any lisp code from RMCL that was either directly copied to this distro (some of the digitool GUI code could be bootstrapped after the CCL interface was defined)
+  or rewritten for this distro (e.g., the modal dialog implementation)
+
+\item spell: Contains lisp of words that vim ignores when spell checking repo.
 
 \item submodules: Source code for actr and ccl
 	\begin{itemize}
-	\item actr is newest version (as of Jun 2012). All code is same except that loader files (loader.lisp) are inside each of the tutorial folders
-	\item ccl is newest version (as of Jun 2012). Original image. Used to reference ccl src and run basic ccl core file
-	\item lisp-dev is a git repo for building a custom ccl core that I use during development. I'm using some of the src for the utilities in the GUI code, so the builds here grab some of that src.
+	\item actr is newest version (as of Jun 2013). All code is same except that loader files (loader.lisp) are inside each of the tutorial folders
+	\item ccl-1.9 is newest version (as of Jun 2013). Original image. Used to reference ccl src and run basic ccl core file
+	\item lisp-dev is a git repo for building a custom ccl core that I use during development.
+	  I'm using some of the src for the utilities in the GUI code, so the builds here grab some of that src.
 	\item rmcl is the newest version; no changes; used to reference rmcl src, and run rmcl for each of the tests.
 	\end{itemize}
 
@@ -147,9 +244,8 @@ ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozu
 	\begin{itemize}
 	\item testCCLDevice.lisp: Used to test basic functionality of building a Cocoa display by writing lisp code that meets the uwi.lisp interface spec
 	\item testTutorials.lisp: Runs ACT-R through all tutorials; checks that ACT-R can 'see' CCL's Cocoa device
-	\item testImages.lisp: Tests that the CCL resources.lisp file correctly manages images
 	\item testVotebox.lisp: Tests to run Votebox on CCL
-	\item testPhaser.lisp: Tests to run Phaser on CCL
+	\item testTamboDisModel.lisp: Tests to run Phaser on CCL
 	\end{itemize}
 
 \item tools: Various shell scripts and tools used to manage the repo
@@ -159,66 +255,7 @@ ccl-simple-view.lisp implements Digitool's GUI specification by levaraging CLozu
 
 \end{itemize}
 
-\section{To Run A Test}
-
-\begin{itemize}
-\item Mount RedGiant volume	
-\item Navigate to the Projects/mcl-migration folder on RedGiant
-\item Either access the data in the folder over the network (preferred), or copy the folder locally if you want to access it w/o internet.
-\item Download Clozure CL from the App Store and install if you don't have it yet.
-\item Launch Clozure CL
-\item Use the Cocoa listener to load one of the test files.
-\end{itemize}
-
-e.g.: Launch Clozure CL, and then load Votebox in ./testing/testVotebox.lisp
-
-\subsection{Notes about the Tests}
-
-	Each test loads a bootstrap file, and then any necessary files to run that particular test.
-		The bootstrap file (bootstrap.lisp) loads up ccl-simple-view and any shared lisp code that is needed to run a test file (particularly the unit test framework). 
-		The necessary files to run the test are defined in ./testing/file-lists/[testName]/[testName].txt. If you wanted to bootstrap the test code manually, load each lisp file in the order in that file.
 
 
-
-
-%----------------------------------------------------------------------------------------
-%	MAJOR SECTION X - TEMPLATE - UNCOMMENT AND FILL IN
-%----------------------------------------------------------------------------------------
-
-%\section{Content Section}
-
-%\subsection{Subsection 1} % Sub-section
-
-% Content
-
-%------------------------------------------------
-
-%\subsection{Subsection 2} % Sub-section
-
-% Content
-
-%----------------------------------------------------------------------------------------
-%	CONCLUSION
-%----------------------------------------------------------------------------------------
-
-\section{Conclusion} % Major section
-
-\lipsum[12-13]
-
-%----------------------------------------------------------------------------------------
-%	BIBLIOGRAPHY
-%----------------------------------------------------------------------------------------
-
-\begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
-
-\bibitem[Figueredo and Wolf, 2009]{Figueredo:2009dg}
-Figueredo, A.~J. and Wolf, P. S.~A. (2009).
-\newblock Assortative pairing and life history strategy - a cross-cultural
-  study.
-\newblock {\em Human Nature}, 20:317--330.
- 
-\end{thebibliography}
-
-%----------------------------------------------------------------------------------------
 
 \end{document}
