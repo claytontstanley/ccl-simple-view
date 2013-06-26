@@ -21,6 +21,8 @@ outFiles = ccl-simple-view.lisp device.lisp uwi.lisp
 decompileTargets = ${outFiles:%=decompile-%}
 rrepos = remote-deployed-repositories.txt
 
+cclOrigFiles = ${pathToCCL}/dx86cl64 ${pathToCCL}/dx86cl64.image
+
 deploy-test = continuous-integration
 rebuild-kernel-p = true
 
@@ -69,10 +71,13 @@ outFileHeader:
 update-remote-repositories:
 	set -e && cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} "cd \"$$repo\" && git ru && git rb && git su"; done
 
-rebuild-kernel:
+rebuild-kernel: ${cclOrigFiles}
 	[[ "${rebuild-kernel-p}" != "true" ]] || rlwrap ../testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"
 
-build-app:
+${cclOrigFiles}:
+	cp $@.bak $@
+
+build-app: ${cclOrigFiles} 
 	rlwrap ../testing/ccl -l build-app.lisp
 	ln -sf ../../../../darwin-x86-headers64 "${pathToCCL}/Clozure CL64.app/Contents/Resources/ccl/"
 
