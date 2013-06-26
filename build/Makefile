@@ -36,7 +36,7 @@ path-device.lisp = ${actrPath}/devices/ccl-cocoa
 path-uwi.lisp = ${path-device.lisp}
 path-ccl-simple-view.lisp = ${actrPath}/support
 
-git-is-clean = [[ -z "$$(git st --porcelain)" ]]
+git-is-clean = [[ -z "$$(git status --porcelain)" ]]
 
 ccl-simple-view.lisp:
 	make -s outFileHeader > ${path-${@}}/$@
@@ -69,7 +69,7 @@ outFileHeader:
 	cat $@.lisp | sed 's/_GITID_/${commitID}/g' | sed 's/_FILE_/${outFile}/g' | sed 's/_DATE_/${date}/g'
 
 update-remote-repositories:
-	set -e && cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} "cd \"$$repo\" && git ru && git rb && git su"; done
+	set -e && cat ./${rrepos} | while read repo; do echo $$repo && ssh -n ${server} "cd \"$$repo\" && git remote update && git rebase && git submodule update --init --recursive"; done
 
 rebuild-kernel: ${cclOrigFiles}
 	[[ "${rebuild-kernel-p}" != "true" ]] || rlwrap ../testing/ccl -e "(rebuild-ccl :full t)" -e "(quit)"
@@ -88,7 +88,7 @@ deploy:
 	make deploy-bincarbon	
 	cd .. && ${git-is-clean} && git push
 	make update-remote-repositories
-	ssh ${server} 'cd ${depdir} && git ru && git rb origin/master && git submodule update --init --recursive && git submodule sync && ${git-is-clean}'
+	ssh ${server} 'cd ${depdir} && git remote update && git rebase origin/master && git submodule update --init --recursive && git submodule sync && ${git-is-clean}'
 	ssh ${server} 'cd ${depdir} && make -C build rebuild-kernel rebuild-kernel-p=true'
 	ssh ${server} 'cd ${depdir} && make -C build all'
 	ssh ${server} 'cd ${depdir} && make -C docs/README'
