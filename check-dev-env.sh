@@ -19,4 +19,4 @@ checkDependency "[[ -z '$(which rlwrap)' ]]" "Install rlwrap (suggestion: sudo p
 echo "Initializing and updating submodules"
 git submodule update --init --recursive
 
-echo "Success! Developer environment correctly configured to run tests"
+echo "Success! Developer environment correctly configured"
