@@ -5,7 +5,8 @@ server = chilGalaxy
 rrServer = chil
 outFile = ccl-simple-view.lisp
 
-depdir = /Volumes/RedGiant/Projects/mcl-migration 
+#depdir = /Volumes/RedGiant/Projects/mcl-migration 
+depdir = ~/src/mcl-migration
 
 # Defaults are to make changes to remote repo
 sshIP = ${server}
