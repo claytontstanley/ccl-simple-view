@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pathToThisDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 checkDependency() {
 	if eval "$1"; then 
 		echo "Passed test: $1"
@@ -36,6 +38,6 @@ checkDependency "checkNoPassword chil" "chil not good: use ssh-copy-id to enable
 checkDependency "[[ -n '$(which pdflatex)' ]]" "Install TexLive suite (suggestion: sudo port install texlive +full)"
 
 echo "Initializing and updating submodules"
-git submodule update --init --recursive
+( cd "$pathToThisDir" && git submodule update --init --recursive )
 
 echo "Success! Developer environment correctly configured"
