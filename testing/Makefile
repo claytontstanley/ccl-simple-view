@@ -22,10 +22,10 @@ test-file:
 test-files:
 	set -e && testFiles=($$(cat ${testFiles})) && for file in "$${testFiles[@]}"; do make test-file testFile="$$file"; done
 
-checkDevEnvironment:
+check-dev-environment:
 	../check-dev-env.sh
 
-unit: clean-actr-compiled-files checkDevEnvironment
+unit: clean-actr-compiled-files check-dev-environment
 	make -C ../build build-app all
 	make test-files testFiles=file-lists/Unit/testUnit.txt
 
