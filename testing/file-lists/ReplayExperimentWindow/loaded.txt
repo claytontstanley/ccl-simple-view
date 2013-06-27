@@ -1,3 +1,4 @@
+bincarbon/defsystem-patched.lisp
 bincarbon/DMTracker-bootstrap.lisp
 bincarbon/tracker-experiment-window.lisp
 bincarbon/replay-experiment-window.lisp
