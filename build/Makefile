@@ -40,7 +40,7 @@ path-uwi.lisp = ${path-device.lisp}
 path-ccl-simple-view.lisp = ${actrPath}/support
 
 git-is-clean = [[ -z "$$(git status --porcelain)" ]]
-git-full-update = git remote update && git rebase && git submodule update --init --recursive && ${git-is-clean}
+git-full-update = git remote update && git rebase && git submodule update --init --recursive
 
 ccl-simple-view.lisp:
 	make -s outFileHeader > ${path-${@}}/$@
@@ -92,7 +92,7 @@ deploy:
 	make deploy-bincarbon	
 	cd .. && ${git-is-clean} && git push
 	make update-remote-repositories
-	ssh ${server} 'cd ${depdir} && ${git-full-update}'
+	ssh ${server} 'cd ${depdir} && ${git-full-update} && ${git-is-clean}'
 	ssh ${server} 'cd ${depdir} && make -C build rebuild-kernel rebuild-kernel-p=true'
 	ssh ${server} 'cd ${depdir} && make -C build all'
 	ssh ${server} 'cd ${depdir} && make -C docs/README'
