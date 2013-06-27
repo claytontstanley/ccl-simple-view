@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 pathToThisDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 checkDependency() {
