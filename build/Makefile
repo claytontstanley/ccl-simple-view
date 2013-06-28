@@ -1,7 +1,7 @@
 include ../include.mk
 
 actrPath = ../submodules/actr6
-server = chilGalaxy 
+server = chil
 rrServer = chil
 outFile = ccl-simple-view.lisp
 depdir = ~/src/mcl-migration
