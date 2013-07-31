@@ -485,7 +485,9 @@
    (table-hscrollp :reader table-hscrollp :initarg :table-hscrollp :initform nil)
    (table-vscrollp :reader table-vscrollp :initarg :table-vscrollp :initform t)
    (selection-type :initarg :selection-type))
-  (:default-initargs :specifically 'easygui::cocoa-matrix))
+  (:default-initargs
+    :specifically 'easygui::cocoa-matrix
+    :table-sequence ()))
 
 (defmethod (setf rows) (new-rows (view sequence-dialog-item))
   (with-slots (columns rows) view
