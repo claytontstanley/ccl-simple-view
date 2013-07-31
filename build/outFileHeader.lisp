@@ -82,6 +82,10 @@
 ;;;               This ensures that any autoreleased objects during both compilation and runtime have 
 ;;;               a pool to release to. This was only an issue when running CCL via SVN (e.g., with common SLIME setup),
 ;;;               and not via the Clozure CL.app, because the App already has an autorelease pool set up on startup.
+;;; 2013.07.31 cts
+;;;            :  Incorporated additional functionality needed for a recent project into the ccl-simple-view library:
+;;;               -Sequence dialog item now defaults to nil sequence if none specified on init
+;;;               -menu-view and menu-item objects now set font correctly
 ;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
