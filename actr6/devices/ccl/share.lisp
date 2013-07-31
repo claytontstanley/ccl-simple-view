@@ -412,16 +412,19 @@
    (cancel-button :initarg :cancel-button))
   (:default-initargs :specifically 'easygui::cocoa-button :text-justification $tejustcenter))
 
+(defmethod get-mutable-title ((view view-text-via-title-mixin))
+  (let ((attributed-title (guard-!null-ptr (#/attributedTitle (cocoa-ref view)))))
+    (let ((mutable-title (#/alloc ns:ns-mutable-attributed-string)))
+      (#/initWithAttributedString: mutable-title attributed-title))))
+
+(defmethod add-to-attributed-title ((view view-text-via-title-mixin) name val)
+  (let* ((mutable-title (get-mutable-title view))
+         (title-range (ns:make-ns-range 0 (#/length mutable-title))))
+    (#/addAttribute:value:range: mutable-title name val title-range)
+    (#/setAttributedTitle: (cocoa-ref view) mutable-title)))
+
 (defmethod set-fore-color :before ((view view-text-via-button-title-mixin) (color ns:ns-color))
-  (let* ((color-title
-           (#/initWithAttributedString: (#/alloc ns:ns-mutable-attributed-string)
-            (#/attributedTitle (cocoa-ref view))))
-         (title-range (ns:make-ns-range 0 (#/length color-title))))
-    (#/addAttribute:value:range: color-title
-     #$NSForegroundColorAttributeName
-     color
-     title-range)
-    (#/setAttributedTitle: (cocoa-ref view) color-title)))
+  (add-to-attributed-title view #$NSForegroundColorAttributeName color))
 
 (defmethod initialize-instance :after ((view view-text-via-button-title-mixin) &key)
   (set-fore-color view (slot-value view 'easygui::foreground)))
@@ -625,7 +628,7 @@
            (if action (list :dialog-item-action action))
            attributes)))
 
-(defclass menu-view (easygui::menu-view view view-text-via-title-mixin easygui::decline-menu-mixin)
+(defclass menu-view (easygui::menu-view view view-text-via-title-mixin easygui::text-fonting-mixin easygui::decline-menu-mixin)
   ((easygui::text :initarg :menu-title)
    (default-item :initarg :default-item :initform 1)
    (auto-update-default :initarg :auto-update-default)
@@ -636,7 +639,7 @@
 ; to use this slot, and make it so that the char rendered for the checked item can be changed, or also that multiple items can be checked,
 ; etc.?
 
-(defclass menu-item (easygui::menu-item-view view view-text-via-title-mixin action-view-mixin easygui::decline-menu-mixin)
+(defclass menu-item (easygui::menu-item-view view view-text-via-title-mixin easygui::text-fonting-mixin action-view-mixin easygui::decline-menu-mixin)
   ((easygui::text :initarg :menu-item-title)
    (style :initarg :style)
    (menu-item-checked :initarg :menu-item-checked :initform nil))
