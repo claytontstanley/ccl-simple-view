@@ -84,8 +84,10 @@
 ;;;               and not via the Clozure CL.app, because the App already has an autorelease pool set up on startup.
 ;;; 2013.07.31 cts
 ;;;            :  Incorporated additional functionality needed for a recent project into the ccl-simple-view library:
-;;;               -Sequence dialog item now defaults to nil sequence if none specified on init
-;;;               -menu-view and menu-item objects now set font correctly
+;;;                -Sequence dialog item now defaults to nil sequence if none specified on init
+;;;                -menu-view and menu-item objects now set font correctly
+;;;            :  Everything works on 10.6.8 - 10.8.4 (newest Mountain Lion install as of testing date)
+;;;                -required a fix for radio buttons. Clustering did not work on 10.8 prior to fix
 ;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

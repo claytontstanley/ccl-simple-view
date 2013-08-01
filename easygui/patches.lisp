@@ -74,7 +74,7 @@
 ; easygui design, since the cocoa-ref of a radio-button object would have been an NSMatrix,
 ; which breaks the view-text and (setf view-text) mixin methods, as well as auto sizing the
 ; view to the text it contains on init, etc. So, I went with the simple image switching hack.
- 
+
 (let ((alternate-radio-button-image)
       (radio-button-image)
       (radio-button))

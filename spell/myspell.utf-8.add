@@ -711,3 +711,6 @@ Tamborello's
 rmcl
 Digitool
 testCCLDevice
+NSMatrix
+NSSwitchButton
+NSRadioButton
