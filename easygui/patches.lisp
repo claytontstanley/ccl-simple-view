@@ -61,3 +61,34 @@
   ;; it may be preferable to use running-on-main-thread.
   (declare (ignore waitp))
   `(progn ,@body))
+
+; Radio buttons in 10.8 require being enclosed within an NSMatrix.
+; If not (default easygui implementation), each one is assigned to the
+; same virtual NSMatrix, which means they are all part of the same cluster,
+; which means that the common lisp clustering implementation breaks since
+; Cocoa is now forcing all radio buttons to be part of the same cluster.
+; The fix is to use NSSwitchButton Cocoa functionality for radio buttons,
+; but use NSRadioButton images (for selected and deselected) for the implementation.
+; Another approach would have been to embed each radio button in its own NSMatrix,
+; but this required much more code than the image switching technique, and it messed up the overall
+; easygui design, since the cocoa-ref of a radio-button object would have been an NSMatrix,
+; which breaks the view-text and (setf view-text) mixin methods, as well as auto sizing the
+; view to the text it contains on init, etc. So, I went with the simple image switching hack.
+ 
+(let ((alternate-radio-button-image)
+      (radio-button-image)
+      (radio-button))
+  (defmethod easygui::initialize-view :after ((self easygui::radio-button-view))
+    (labels ((init-images ()
+               (setf radio-button (make-instance 'easygui::cocoa-button))
+               (#/setButtonType: radio-button #$NSRadioButton)
+               (setf radio-button-image (#/image radio-button))
+               (setf alternate-radio-button-image (#/alternateImage radio-button))))
+      (when (cocoa-ref self)
+        (unless radio-button
+          (init-images))
+        (dcc (#/setButtonType: (cocoa-ref self) #$NSSwitchButton))
+        (dcc (#/setImage: (cocoa-ref self) radio-button-image))
+        (dcc (#/setAlternateImage: (cocoa-ref self) alternate-radio-button-image))
+        (when (slot-value self 'easygui::selected) (easygui::radio-button-select self))
+        (setf (slot-value (cocoa-ref self) 'easygui::easygui-view) self)))))
