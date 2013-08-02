@@ -532,19 +532,9 @@
     (make-point (pref colnum #>NSInteger)
                 (pref rownum #>NSInteger))))
 
-(defclass easygui::cocoa-matrix-cell (easygui::cocoa-extension-mixin ns:ns-text-field-cell)
-  ((title-width :accessor title-width))
-  (:metaclass ns:+ns-object))
-
-(objc:defmethod (#/setTitleWidth: void) ((self easygui::cocoa-matrix-cell) (width :<CGF>LOAT))
-  (setf (title-width self) width))
-
-(objc:defmethod (#/titleWidth: :<CGF>LOAT) ((self easygui::cocoa-matrix-cell) (size :<NSS>IZE))
-  (title-width self))
-
 (defmethod initialize-instance :after ((view sequence-dialog-item) &key)
   (let ((cocoa-matrix (cocoa-ref view))
-        (prototype (make-instance 'easygui::cocoa-matrix-cell)))
+        (prototype (make-instance 'easygui::cocoa-text-field-cell)))
     (with-slots (table-hscrollp table-vscrollp columns) view
       (guard (table-vscrollp "Sequence dialog item must allow vertical scrolling"))
       (guard ((not table-hscrollp) "Sequence dialog item must not allow horizontal scrolling"))

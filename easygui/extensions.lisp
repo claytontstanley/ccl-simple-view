@@ -230,7 +230,11 @@
         (dcc (#/flushWindow cwin)))
       window)))
 
-(defclass easygui::cocoa-matrix (easygui::cocoa-extension-mixin ns:ns-form)
+(defclass easygui::cocoa-matrix (easygui::cocoa-extension-mixin ns:ns-matrix)
+  ()
+  (:metaclass ns:+ns-object))
+
+(defclass easygui::cocoa-text-field-cell (easygui::cocoa-extension-mixin ns:ns-text-field-cell)
   ()
   (:metaclass ns:+ns-object))
 
