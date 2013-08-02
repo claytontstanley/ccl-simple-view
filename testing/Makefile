@@ -31,11 +31,14 @@ unit: clean-actr-compiled-files check-dev-environment
 	make -C ../build build-app all
 	make test-files testFiles=file-lists/Unit/testUnit.txt
 
-continuous-integration: unit
+continuous-integration: unit clean-coverage
 	make test-files testFiles=file-lists/CI/testCI.txt
 
 clean-actr-compiled-files:
 	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' ${binaryFileStr} | while read line; do rm "$$line"; done
+
+clean-coverage:
+	rm -f ${coverageTempFile}
 
 coverage:
 	${ccl} -l "make-coverage.lisp" ${cclQuit}
