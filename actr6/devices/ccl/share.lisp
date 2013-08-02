@@ -549,8 +549,7 @@
     (#/setMode: cocoa-matrix #$NSListModeMatrix)
     (#/setIntercellSpacing: cocoa-matrix (ns:make-ns-size 0 0))
     (set-cell-size view (cell-size view))
-    (set-table-sequence view (table-sequence view))
-    ))
+    (set-table-sequence view (table-sequence view))))
 
 (defclass image-view (easygui::image-view view) ())
 
