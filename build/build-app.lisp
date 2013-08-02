@@ -14,4 +14,6 @@
                    (setf *app-name* name)))
     (require :cocoa-application)))
 
+(setf ccl:*compile-code-coverage* t)
+
 (save-application *app-name*)

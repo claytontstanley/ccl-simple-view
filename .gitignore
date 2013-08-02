@@ -3,3 +3,5 @@
 *.tex.swp
 *.dx64fsl
 /scratch
+/coverage
+.coverage.temp

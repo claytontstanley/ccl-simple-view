@@ -89,5 +89,6 @@ deploy:
 	ssh ${server} 'cd ${depdir} && make -C build all'
 	ssh ${server} 'cd ${depdir} && make -C docs/README'
 	ssh ${server} 'cd ${depdir} && make -C testing ${deployTest}'
+	ssh ${server} 'cd ${depdir} && make -C testing coverage 
 	ssh ${server} 'cd ${depdir} && ${gitIsClean}'
 

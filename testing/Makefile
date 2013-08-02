@@ -5,7 +5,9 @@ include ../include.mk
 
 actr6 = ../submodules/actr6
 
+coverageTempFile = ${TOP}/.coverage.temp
 cclQuit = -e '(quit)'
+cclSaveCoverage = -e '(save-coverage-in-file "${coverageTempFile}")'
 
 ccl = rlwrap "${pathToCCL}/Clozure CL64.app/Contents/MacOS/dx86cl64" -e '(gui::start-cocoa-ide)'
 
@@ -16,7 +18,7 @@ binaryFileStr = ${binaryFileLst:%= -o -name '*.%'}
 test-file:
 	-@echo ""	
 	-@echo "Running tests for file ${testFile}"
-	${ccl} -l "../${testFile}" ${cclQuit}
+	${ccl} -l "../${testFile}" ${cclSaveCoverage} ${cclQuit}
 	-@echo ""
 
 test-files:
@@ -35,3 +37,5 @@ continuous-integration: unit
 clean-actr-compiled-files:
 	find ${actr6}/ -name '*.dx64fsl' -o -name '*.cfsl' ${binaryFileStr} | while read line; do rm "$$line"; done
 
+coverage:
+	${ccl} -l "make-coverage.lisp" ${cclQuit}
