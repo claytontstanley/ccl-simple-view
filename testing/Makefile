@@ -27,11 +27,11 @@ test-files:
 check-dev-environment:
 	../check-dev-env.sh
 
-unit: clean-actr-compiled-files check-dev-environment
+unit: clean-coverage clean-actr-compiled-files check-dev-environment
 	make -C ../build build-app all
 	make test-files testFiles=file-lists/Unit/testUnit.txt
 
-continuous-integration: unit clean-coverage
+continuous-integration: unit
 	make test-files testFiles=file-lists/CI/testCI.txt
 
 clean-actr-compiled-files:
