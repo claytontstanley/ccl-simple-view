@@ -29,6 +29,7 @@
 \usepackage{wrapfig} % Allows in-line images such as the example fish picture
 
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+\usepackage{hyperref}
 
 \linespread{1.2} % Line spacing
 
@@ -203,6 +204,13 @@ To run the deploy target, execute \code{make -C build deploy} from the top-level
 This deploy script will update all folders on RedGiant that are associated with the repository.
 This includes the Projects/mcl-migration folder, and also all submodules that have a location on RedGiant (e.g., bincarbon, NextGen, Phaser, etc.).
 The list of deployed locations is included in the \filesys{builds} directory.
+
+\section{Looking at Code Coverage}
+
+An html code coverage report for ccl-simple-view.lisp is generated on the deployed server after pushing the code changes.
+The report is located in the \filesys{coverage} directory on the deployed server.
+The \filesys{chil.rice.edu} server has this report symlinked, and that version can be accessed at:
+\url{http://chil.rice.edu/mcl-migration/coverage/support_ccl-simple-view_lisp.html}.
 
 \section{Directory Structure} % Major section
 
