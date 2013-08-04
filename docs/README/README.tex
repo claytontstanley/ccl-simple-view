@@ -207,8 +207,12 @@ The list of deployed locations is included in the \filesys{builds} directory.
 
 \section{Looking at Code Coverage}
 
-An html code coverage report for ccl-simple-view.lisp is generated on the deployed machine after pushing the code changes.
-The \filesys{report.html} file is located in the \filesys{coverage} directory on the deployed machine.
+An html code coverage report for the build files (e.g., ccl-simple-view.lisp) is created on the deployed machine after pushing the code changes.
+This is a combined report of all code execution paths traversed (and not traversed) when running all unit and continuous-integration tests.
+The top-level \filesys{report.html} file is located in the \filesys{coverage} directory on the deployed machine.
+After opening that file, you can click on the reports for the individual build files.
+Currently coverage reports are also generated for all ACT-R files.
+Those can be discarded for the time being, until the coverage report is cleaned up and these files are removed from the report.
 
 \section{Directory Structure} % Major section
 
