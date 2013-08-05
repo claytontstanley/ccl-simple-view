@@ -66,9 +66,3 @@
 
 (setf (pict-id *view*) "voteboxbg")
 
-(make-instance 'window
-               :view-size (make-point 1028 772)
-               :view-subviews
-               (list
-                 (make-instance 'test-image
-                                :pict-id "voteboxbg")))
