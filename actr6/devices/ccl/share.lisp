@@ -1129,11 +1129,6 @@
 (defmethod view-mouse-position ((view simple-view))
   (easygui:view-mouse-position view :allow-negative-position-p t))
 
-(defmacro with-psn (&body body)
-  `(rlet ((psn #>ProcessSerialNumber))
-     (#_GetFrontProcess psn)
-     ,@body))
-
 (defun create-mouse-event (event pos)
   (#_CGEventCreateMouseEvent
    ccl:+null-ptr+
