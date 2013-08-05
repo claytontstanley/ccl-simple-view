@@ -5,7 +5,7 @@
   (string-right-trim
     (list #\newline)
     (with-output-to-string (strm)
-      (run-program "mktemp" () :output strm))))
+      (run-program "mktemp" (list "/tmp/lisp-file-locks-XXXX") :output strm))))
 
 (setf *temp-file* (make-temp-file))
 (check (not (file-locked-p *temp-file*)))
