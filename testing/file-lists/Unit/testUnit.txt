@@ -12,3 +12,5 @@ testing/testEditableTextDialogItem.lisp
 testing/testGetText.lisp
 testing/testSequenceDialog.lisp
 testing/testRadioButtons.lisp
+testing/testFileLocks.lisp
+testing/testMessageDialog.lisp

@@ -30,11 +30,24 @@
 
 (add-resource (create-resource 'sound *image-path*) "voteboxbg")
 
+(let ((res))
+  (with-shadow (sv-log (lambda (&rest args)
+                         (apply fun-orig args)
+                         (destructuring-bind (str &rest args) args
+                           (declare (ignore args))
+                           (when (search "already present" str)
+                             (setf res t)))))
+    (add-resource (create-resource 'sound *image-path*) "voteboxbg"))
+  (check res))
+
 (let ((res (get-resource-val "voteboxbg" 'image)))
   (check (eq res (val *image*))))
 
 (check (errors-p
          (get-resource "voteboxbg")))
+
+(check (errors-p
+         (get-resource "foobar")))
 
 (check (not (errors-p
               (get-resource "voteboxbg" 'image))))
@@ -53,5 +66,9 @@
 
 (setf (pict-id *view*) "voteboxbg")
 
-
-
+(make-instance 'window
+               :view-size (make-point 1028 772)
+               :view-subviews
+               (list
+                 (make-instance 'test-image
+                                :pict-id "voteboxbg")))

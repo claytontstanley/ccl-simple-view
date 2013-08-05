@@ -325,10 +325,6 @@
 (defclass consuming-view (easygui::consuming-view view)
   ())
 
-(defclass color-dialog (window)
-  ()
-  (:documentation "Top-level class for windows"))
-
 (defclass liner (view)
   ((liner-type :reader liner-type :initarg :liner-type)
    (easygui::foreground :reader color :initarg :color)))
@@ -338,6 +334,10 @@
   (:default-initargs
     :window-title "Untitled Dialog"
     :window-type :document))
+
+(defclass color-dialog (dialog)
+  ()
+  (:documentation "Top-level class for windows"))
 
 (defclass action-view-mixin (easygui::action-view-mixin) ())
 
@@ -1061,10 +1061,7 @@
      ,@body))
 
 (defmethod wptr ((view window))
-  (if (slot-boundp view 'easygui::ref)
-    (#/isVisible
-     (guard-!null-ptr
-       (easygui::cocoa-ref view)))))
+  (slot-boundp view 'easygui::ref))
 
 (defmethod local-to-global ((view simple-view) local-pos)
   (add-points (view-position view) local-pos))
