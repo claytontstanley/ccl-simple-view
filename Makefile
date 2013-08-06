@@ -46,6 +46,5 @@ reformat-all spelling-all: %-all:
 reformat-builds spelling-builds: %-builds:
 	make $* list-cmd="cat build/file-list*"
 
-.PHONY : coverage
-coverage:
+testing-files-included:
 	comm <(cat testing/file-lists/CI/testCI.txt testing/file-lists/Unit/testUnit.txt | sort) <(ls -1 testing/*.lisp | sort)
