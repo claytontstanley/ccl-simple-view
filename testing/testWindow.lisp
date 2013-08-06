@@ -82,3 +82,15 @@
   )
 
 (test-front-window)
+
+(defun test-find-window ()
+  (let ((foo-win (make-instance 'foo-window :window-title "3")))
+    (check (null (find-window "3" 'window)))
+    (let ((win (make-instance 'window :window-title "3")))
+      (check (eq win (find-window "3" 'window)))
+      (check (eq foo-win (find-window "3" 'foo-window)))
+      (check (find-window "3"))
+      (window-close win)
+      (window-close foo-win))))
+
+(test-find-window)

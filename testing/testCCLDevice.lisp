@@ -137,7 +137,19 @@
                             :dialog-item-text "here"))
 (add-visual-items-to-rpm-window *win* *view*)
 
+(multiple-value-bind (start end) (selection-range (view-named :et *win*))
+  (check (= start 0))
+  (check (= end (length (dialog-item-text (view-named :et *win*))))))
+
+(set-selection-range (view-named :et *win*))
+(multiple-value-bind (start end) (selection-range (view-named :et *win*))
+  (check (= start 0))
+  (check (= end 0)))
+
 (set-selection-range (view-named :et *win*) 1 2)
+(multiple-value-bind (start end) (selection-range (view-named :et *win*))
+  (check (= start 1))
+  (check (= end 2)))
 
 (setf *view* (make-instance 'radio-button-dialog-item
                             :view-position (make-point 100 300)
