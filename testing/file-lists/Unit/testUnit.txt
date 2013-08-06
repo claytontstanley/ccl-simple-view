@@ -14,3 +14,4 @@ testing/testSequenceDialog.lisp
 testing/testRadioButtons.lisp
 testing/testFileLocks.lisp
 testing/testMessageDialog.lisp
+testing/testChooseDialogs.lisp
