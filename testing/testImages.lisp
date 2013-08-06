@@ -40,6 +40,8 @@
     (add-resource (create-resource 'sound *image-path*) "voteboxbg"))
   (check res))
 
+(check (= (length (get-pool-as-lst)) 3))
+
 (let ((res (get-resource-val "voteboxbg" 'image)))
   (check (eq res (val *image*))))
 
