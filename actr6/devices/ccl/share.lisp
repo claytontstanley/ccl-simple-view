@@ -551,40 +551,28 @@
     (set-cell-size view (cell-size view))
     (set-table-sequence view (table-sequence view))))
 
-(defclass image-view (easygui::image-view view) ())
+(defclass image-view (easygui::image-view view)
+  ((pict-id :reader pict-id :initarg :pict-id)))
 
-(defclass clickable-image-view (easygui::clickable-image-view image-view) ())
+(defmethod initialize-instance :after ((view image-view) &key)
+  (when (slot-boundp view 'pict-id)
+    (setf (pict-id view) (pict-id view)))
+  (unless (slot-boundp view 'easygui::size)
+    (let ((ns-size (#/size (#/image (cocoa-ref view)))))
+      (destructuring-bind (width height) (as-list ns-size)
+        (set-view-size view (make-point width height))))))
+
+(defmethod (setf pict-id) (pict-id (view image-view))
+  (unwind-protect (setf (slot-value view 'pict-id) pict-id)
+    (#/setImage: (easygui:cocoa-ref view) (get-resource-val pict-id 'image))))
 
 (defclass back-image-view (image-view) ())
 
+(defclass clickable-image-view (easygui::clickable-image-view image-view) ())
+
 (defclass icon-dialog-item (clickable-image-view dialog-item view)
-  ((icon :reader icon :initarg :icon)
+  ((pict-id :reader icon :initarg :icon)
    (easygui::view-text :initarg :view-text)))
-
-(defun icon->pict-id (icon)
-  (format nil "~a" icon))
-
-(defmethod initialize-instance :after ((view icon-dialog-item) &key)
-  (when (slot-boundp view 'icon)
-    (#/setImage: (easygui:cocoa-ref view)
-     (get-resource-val (icon->pict-id (icon view)) 'image))))
-
-(defclass image-view-mixin ()
-  ((pict-id :reader pict-id :initarg :pict-id)
-   (image-view :accessor image-view)))
-
-(defmethod (setf pict-id) (pict-id (view image-view-mixin))
-  (unwind-protect (setf (slot-value view 'pict-id) pict-id)
-    (#/setImage: (easygui:cocoa-ref (image-view view)) (get-resource-val pict-id 'image))))
-
-(defmethod initialize-instance :after ((view image-view-mixin) &key)
-  (let ((image-view (make-instance 'back-image-view
-                                   :view-size (view-size view)
-                                   :view-position (make-point 0 0))))
-    (setf (image-view view) image-view)
-    (add-subviews view image-view)
-    (when (slot-boundp view 'pict-id)
-      (#/setImage: (easygui:cocoa-ref image-view) (get-resource-val (pict-id view) 'image)))))
 
 ; Place all images in the background (behind all other views). Do this by
 ; specializing on the add-1-subview method in the easygui package. And call
@@ -598,14 +586,6 @@
    (easygui:cocoa-ref view)
    #$NSWindowBelow
    nil))
-
-(defmethod easygui::add-1-subview :after ((view image-view) (super-view view))
-  (unless (slot-boundp view 'easygui::size)
-    (let ((ns-size (#/size (#/image (cocoa-ref view)))))
-      (destructuring-bind (width height) (list
-                                           (ns:ns-size-width ns-size)
-                                           (ns:ns-size-height ns-size))
-        (setf (slot-value view 'easygui::size) (make-point width height))))))
 
 (provide :icon-dialog-item)
 
@@ -699,6 +679,16 @@
 (defmethod as-list ((r ns:ns-range))
   (list (ns:ns-range-location r)
         (ns:ns-range-length r)))
+
+(defmethod as-list ((r ns:ns-rect))
+  (list (ns:ns-rect-width r)
+        (ns:ns-rect-height r)
+        (ns:ns-rect-x r)
+        (ns:ns-rect-y r)))
+
+(defmethod as-list ((s ns:ns-size))
+  (list (ns:ns-size-width s)
+        (ns:ns-size-height s)))
 
 (defmethod points-equal-p ((p1 easygui::eg-point) (p2 easygui::eg-point))
   (destructuring-bind (x1 y1) (as-list p1)

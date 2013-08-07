@@ -1,7 +1,7 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-(defclass test-image (image-view-mixin view)
+(defclass test-image (back-image-view)
   ())
 
 (defparameter *win* 
@@ -68,3 +68,41 @@
 
 (setf (pict-id *view*) "voteboxbg")
 
+(make-instance
+  'window
+  :view-size (make-point 1044 788)
+  :view-subviews
+  (list
+    (make-instance
+      'test-image
+      :view-nick-name :tv
+      :view-position (make-point 0 10)
+      :pict-id "voteboxbg")))
+
+(let ((view (view-named :tv (front-window))))
+  (check (equalp (as-list (view-size view))
+                 (list 1024 768)))
+  (check (equalp (as-list (#/frame (cocoa-ref view)))
+                 (list 1024 768 0 10))))
+
+
+(defclass foo-svm (pict-svm window) ())
+
+(progn
+  (make-instance
+    'foo-svm
+    :pict-id "voteboxbg")
+  (let ((view (get-image-view (front-window))))
+    (set-view-pict (front-window) "voteboxbg")
+    (check (eq view (get-image-view (front-window)))))
+  (sleep .5)
+  (window-close (front-window))
+  (sleep .5)
+  (make-instance 'foo-svm)
+  (check (not (get-image-view (front-window))))
+  (set-view-pict (front-window) "voteboxbg")
+  (sleep .5)
+  (let ((view (get-image-view (front-window))))
+    (set-view-pict (front-window) "image")
+    (check (not (eq view (get-image-view (front-window)))))))
+  

@@ -1,4 +1,5 @@
 submodules/lisp-dev/Lisp-Unit-Testing-Framework/unitTestFramework.lisp
+bincarbon/pict-svm.lisp
 bincarbon/thermometer.lisp
 bincarbon/device-extensions.lisp
 bincarbon/misc-lib.lisp
