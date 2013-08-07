@@ -48,3 +48,9 @@ reformat-builds spelling-builds: %-builds:
 
 testing-files-included:
 	comm <(cat testing/file-lists/CI/testCI.txt testing/file-lists/Unit/testUnit.txt | sort) <(ls -1 testing/*.lisp | sort)
+
+lastSVNPushGitID = 2c657888e2d506d7e9556cc680c58762dc9890
+
+diff-since-last-actr-svn-push:
+	git df ${lastSVNPushGitID} build/outFileHeader.lisp actr6/devices/ccl/{device.lisp,uwi.lisp} 
+
