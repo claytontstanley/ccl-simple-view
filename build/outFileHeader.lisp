@@ -86,6 +86,7 @@
 ;;;            :  Incorporated additional functionality needed for a recent project into the ccl-simple-view library:
 ;;;                -Sequence dialog item now defaults to nil sequence if none specified on init
 ;;;                -menu-view and menu-item objects now set font correctly
+;;;            :  Refactored and simplified image-view code 
 ;;;            :  Everything works on 10.6.8 - 10.8.4 (newest Mountain Lion install as of testing date)
 ;;;                -required a fix for radio buttons. Clustering did not work on 10.8 prior to fix
 ;;;            :  Code-coverage report is now generated for each build. 
