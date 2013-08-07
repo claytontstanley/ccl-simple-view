@@ -241,5 +241,3 @@
 
                 (t ;(#_changewindowattributes (wptr dialog) 0 #$kWindowCollapseBoxAttribute)
                  (modal-dialog dialog))))))))
-
-

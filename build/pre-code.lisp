@@ -2,4 +2,3 @@
   (require :cocoa)
   (require :easygui)
   (ccl::create-autorelease-pool))
-
