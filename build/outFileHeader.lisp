@@ -83,14 +83,14 @@
 ;;;               a pool to release to. This was only an issue when running CCL via SVN (e.g., with common SLIME setup),
 ;;;               and not via the Clozure CL.app, because the App already has an autorelease pool set up on startup.
 ;;; 2013.07.31 cts
-;;;            :  Incorporated additional functionality needed for a recent project into the ccl-simple-view library:
-;;;                -Sequence dialog item now defaults to nil sequence if none specified on init
-;;;                -menu-view and menu-item objects now set font correctly
-;;;            :  Refactored and simplified image-view code 
-;;;            :  Everything works on 10.6.8 - 10.8.4 (newest Mountain Lion install as of testing date)
-;;;                -required a fix for radio buttons. Clustering did not work on 10.8 prior to fix
-;;;            :  Code-coverage report is now generated for each build. 
-;;;                -Used report to remove stray code and discover/fix a few minor bugs
+;;;             : Incorporated additional functionality needed for a recent project into the ccl-simple-view library:
+;;;               -Sequence dialog item now defaults to nil sequence if none specified on init
+;;;               -menu-view and menu-item objects now set font correctly
+;;;             : Refactored and simplified image-view code 
+;;;             : Everything works on 10.6.8 - 10.8.4 (newest Mountain Lion install as of testing date)
+;;;               -required a fix for radio buttons. Clustering did not work on 10.8 prior to fix
+;;;             : Code-coverage report is now generated for each build. 
+;;;               -Used report to remove stray code and discover/fix a few minor bugs
 ;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
