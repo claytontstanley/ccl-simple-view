@@ -1,4 +1,3 @@
-
 (defun easygui::point-from-ns-point (point)
   (easygui::point 
     (ns:ns-point-x point)
