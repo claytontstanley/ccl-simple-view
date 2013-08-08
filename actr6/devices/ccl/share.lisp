@@ -57,7 +57,7 @@
 
 (defparameter *fred-default-font-spec* '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0)))
 
-(defclass view-mixin (easygui:view)
+(defclass view-mixin (easygui::view)
   ((easygui::size :initarg :view-size)
    (easygui::position :initarg :view-position :initform (make-point 0 0))
    (temp-view-subviews :initarg :view-subviews)

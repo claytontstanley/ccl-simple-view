@@ -8,7 +8,6 @@
 ; This flips the screen vertically, so that it matches MCL's default. That is, position 0,0 is at top left
 (setf easygui::*screen-flipped* t)
 
-
 (setf easygui::*debug-cocoa-calls* nil)
 
 ; There are particular window configurations that keep the window from becoming key or main (borderless windows for example).
@@ -87,9 +86,6 @@
 (defclass easygui::image-view (easygui::view)
   ()
   (:default-initargs :specifically 'easygui::cocoa-image-view))
-
-(defmethod easygui::initialize-view :after ((view easygui::image-view))
-  (setf (slot-value (cocoa-ref view) 'easygui::easygui-view) view))
 
 (defclass easygui::cocoa-clickable-image-view (easygui::cocoa-image-view)
   ()
