@@ -105,4 +105,4 @@
   (let ((view (get-image-view (front-window))))
     (set-view-pict (front-window) "image")
     (check (not (eq view (get-image-view (front-window)))))))
-  
+
