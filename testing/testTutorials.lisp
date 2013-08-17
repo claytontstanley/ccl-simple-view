@@ -23,6 +23,24 @@
                :close-window-p nil)
   (clear-all))
 
+(defmacro with-faster-than-real-time-run (&body body)
+  `(with-shadow (run (lambda (run-time &key (real-time))
+                        (declare (ignore real-time))
+                        (funcall fun-orig run-time :real-time nil)))
+     ,@body))
+
+(defmacro with-visible-window-run (&body body)
+  `(with-shadow (open-exp-window (lambda (title &rest args)
+                                   (remf args :visible) 
+                                   (apply fun-orig title :visible t args)))
+     ,@body))
+
+(defmacro with-verbose-run (&body body)
+  `(with-shadow (reset (lambda ()
+                         (funcall fun-orig)
+                         (sgp :v t)))
+     ,@body))
+
 (do-agi-example "multiple-models-single-window.lisp")
 (do-agi-example "multiple-models-multiple-windows.lisp")
 (do-agi-example "single-model-multiple-windows.lisp")
