@@ -3,6 +3,7 @@
 
 (load-as-lst ".." "bincarbon" "text-view.lisp")
 (load-as-lst ".." "bincarbon" "chil-ccl-utilities.lisp")
+(load-as-lst ".." "bincarbon" "password-entry-text-view.lisp")
 
 (setf *win*
       (make-instance
