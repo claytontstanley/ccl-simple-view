@@ -1,3 +1,9 @@
+; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
+(load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
+
+(load-as-lst ".." "bincarbon" "text-view.lisp")
+(load-as-lst ".." "bincarbon" "chil-ccl-utilities.lisp")
+
 (setf *win*
       (make-instance
         'window
