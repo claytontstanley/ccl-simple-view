@@ -10,7 +10,7 @@
     (make-instance
       'text-view
       :view-nick-name :foo
-      :view-font '("Courier" 9)
+      :view-font '("Courier" 11)
       :dialog-item-text "abc"
       :view-size (make-point 100 50))))
 
@@ -21,7 +21,7 @@
 
 (let ((font (view-font (view-named :foo (front-window)))))
   (check (string-equal (font-name font) "Courier"))
-  (check (= (font-point font) 9)))
+  (check (= (font-point font) 11)))
 
 (sleep .5)
 (progn
