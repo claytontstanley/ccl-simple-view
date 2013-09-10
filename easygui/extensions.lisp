@@ -247,4 +247,3 @@
   (call-next-method id)
   (let ((win (easygui::easygui-window-of cocoa-win)))
     (setf (easygui::view-position win) (easygui::view-position win))))
-
