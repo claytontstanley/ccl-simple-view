@@ -10,12 +10,18 @@
     (make-instance
       'text-view
       :view-nick-name :foo
+      :view-font '("Courier" 9)
+      :dialog-item-text "abc"
       :view-size (make-point 100 50))))
 
 (left-mouse-click (view-position (front-window)))
 (left-mouse-click (add-points
                     (view-position (front-window))
                     (view-center (view-named :foo (front-window)))))
+
+(let ((font (view-font (view-named :foo (front-window)))))
+  (check (string-equal (font-name font) "Courier"))
+  (check (= (font-point font) 9)))
 
 (sleep .5)
 (progn
@@ -27,4 +33,4 @@
   )
 
 (check (string-equal (dialog-item-text (view-named :foo (front-window)))
-                     (format nil "a~%~%~%b")))
+                     (format nil "abca~%~%~%b")))
