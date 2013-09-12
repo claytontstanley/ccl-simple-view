@@ -1194,7 +1194,17 @@
   (when delay (spin-for-fct 50))
   (sv-log-n 1 "ending keypress"))
 
+; Relay keypress events to the window, after allowing the text field to handle the keypress properly.
+
+(defparameter *view-of-keypress* nil)
+
+(defmethod handle-keypress-in-editable-text ((view dialog-item) the-event)
+  (let ((*view-of-keypress* view))
+    (#/keyDown: (#/window (cocoa-ref view)) the-event)))
+
 (defmethod easygui::view-key-event-handler :after ((device window) key)
+  (when *view-of-keypress*
+    (view-key-event-handler *view-of-keypress* key))
   (view-key-event-handler device key)
   (post-view-key-event-handler device key))
 
@@ -1202,13 +1212,13 @@
   (declare (ignore key))
   (values))
 
-(defmethod view-key-event-handler :around ((device window) key)
+(defmethod view-key-event-handler :around ((device simple-view) key)
   (declare (ignore key))
   (sv-log-n 1 "starting view-key-event-handler")
   (unwind-protect (call-next-method)
     (sv-log-n 1 "ending view-key-event-handler")))
 
-(defmethod view-key-event-handler ((device window) key)
+(defmethod view-key-event-handler ((device simple-view) key)
   (declare (ignore key))
   ; Default primary method on the window is to do nothing
   (values))
