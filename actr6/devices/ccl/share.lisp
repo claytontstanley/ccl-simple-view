@@ -482,7 +482,7 @@
                      (list :specifically cocoa-text-view-specifically
                            :text-truncation nil
                            :outer-dialog-item view
-                           :view-size (make-point 1000 1000) ; needed so that frame-inited-p is set to t, so that view size can be modified at end of method 
+                           :view-size (make-point 100000 100000) ; will be changed when outer-dialog-item requests to calculate its size 
                            )
                      (if view-font (list :view-font view-font)))
                    (if dialog-item-text (list :dialog-item-text dialog-item-text))))))
@@ -497,14 +497,14 @@
       (#/ensureLayoutForTextContainer: manager container)
       (let ((frame (#/usedRectForTextContainer: manager container)))
         (#/setFrameSize: (cocoa-ref view)
-         (ns:make-ns-size (+ 5 (ns:ns-rect-width frame))
-                          (+ 5 (ns:ns-rect-height frame))))
+         (ns:make-ns-size (ns:ns-rect-width frame)
+                          (ns:ns-rect-height frame)))
         (easygui::size-to-fit view)))))
 
 (defmethod size-to-fit ((view simple-view))
   (awhen (inner-view-of view)
     (size-to-fit it) 
-    (set-view-size view (view-size it))
+    (set-view-size view (add-points (make-point 5 5) (view-size it)))
     (return-from size-to-fit))
   (#/sizeToFit (cocoa-ref view))
   (easygui::size-to-fit view))
