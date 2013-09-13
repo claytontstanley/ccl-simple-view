@@ -887,11 +887,6 @@
 (defmethod initialize-instance :after ((view view-text-mixin) &key)
   (set-text-justification view (text-justification view)))
 
-(defmethod get-field-editor ((view simple-view))
-  (#/fieldEditor:forObject: (cocoa-ref (guard-!nil (view-window view)))
-   #$YES 
-   (cocoa-ref view)))
-
 (defmethod selection-range ((view easygui::inner-view-mixin))
   (selection-range (easygui::inner-view-of view)))
 
