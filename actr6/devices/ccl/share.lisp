@@ -471,8 +471,6 @@
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
   ((outer-dialog-item :reader outer-dialog-item :initarg :outer-dialog-item)))
 
-; FIXME: Clean up this method
-
 (defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text)
   (let ((inner-text-view
           (apply #'make-instance
