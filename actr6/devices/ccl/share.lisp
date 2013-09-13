@@ -397,25 +397,6 @@
     (loop for (part color) in (group (part-color-list view) 2)
           do (set-part-color view part (mcl-color->system-color color)))))
 
-(defmethod size-to-fit ((view easygui::inner-view-mixin))
-  (size-to-fit (easygui::inner-view-of view))
-  (destructuring-bind (x y) (as-list (view-size (easygui::inner-view-of view)))
-    (set-view-size view x y)))
-
-(defmethod size-to-fit ((view inner-text-view))
-  (let ((container (#/textContainer (cocoa-ref view))))
-    (let ((manager (#/layoutManager (cocoa-ref view))))
-      (#/ensureLayoutForTextContainer: manager container)
-      (let ((frame (#/usedRectForTextContainer: manager container)))
-        (#/setFrameSize: (cocoa-ref view)
-         (ns:make-ns-size (+ 5 (ns:ns-rect-width frame))
-                          (+ 5 (ns:ns-rect-height frame))))
-        (easygui::size-to-fit view)))))
-
-(defmethod size-to-fit ((view simple-view))
-  (#/sizeToFit (cocoa-ref view))
-  (easygui::size-to-fit view))
-
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
 ; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.
 ; Most of the easygui package uses a global easygui::*view-class-to-ns-class-map* variable that contains mappings of lisp
@@ -505,6 +486,25 @@
       (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
       (#/setDocumentView: (cocoa-ref view) (cocoa-text-view view))
       )))
+
+(defmethod size-to-fit ((view easygui::inner-view-mixin))
+  (size-to-fit (easygui::inner-view-of view))
+  (destructuring-bind (x y) (as-list (view-size (easygui::inner-view-of view)))
+    (set-view-size view x y)))
+
+(defmethod size-to-fit ((view inner-text-view))
+  (let ((container (#/textContainer (cocoa-ref view))))
+    (let ((manager (#/layoutManager (cocoa-ref view))))
+      (#/ensureLayoutForTextContainer: manager container)
+      (let ((frame (#/usedRectForTextContainer: manager container)))
+        (#/setFrameSize: (cocoa-ref view)
+         (ns:make-ns-size (+ 5 (ns:ns-rect-width frame))
+                          (+ 5 (ns:ns-rect-height frame))))
+        (easygui::size-to-fit view)))))
+
+(defmethod size-to-fit ((view simple-view))
+  (#/sizeToFit (cocoa-ref view))
+  (easygui::size-to-fit view))
 
 (defmethod cocoa-text-view ((view editable-text-dialog-item))
   (cocoa-ref (easygui::inner-view-of view)))
@@ -906,6 +906,10 @@
                                              (list 0 0))
     (#/setSelectedRange: (cocoa-ref view)
      (ns:make-ns-range position (- cursorpos position)))))
+
+(defmethod set-selection-range :after ((view editable-text-dialog-item) &optional position cursorpos)
+  (declare (ignore position cursorpos))
+  (#/becomeFirstResponder (cocoa-ref view)))
 
 (defmethod dialog-item-enable ((view action-view-mixin))
   ;(easygui:set-dialog-item-enabled-p view t)

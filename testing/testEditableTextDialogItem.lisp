@@ -6,18 +6,20 @@
               :view-subviews
               (list (make-instance
                       'editable-text-dialog-item
+                      :view-nick-name :et
                       :dialog-item-text "so"))))
 
 (check (equal
          (list 0 2)
-         (multiple-value-list (selection-range *win*))))
+         (multiple-value-list (selection-range (view-named :et *win*)))))
 
 (add-subviews *win*
               (make-instance
                 'editable-text-dialog-item
                 :dialog-item-text "bar"
+                :view-font (list "Courier" 55)
                 :view-position (make-point 40 40)))
 
 (check (equal
          (list 0 2)
-         (multiple-value-list (selection-range *win*))))
+         (multiple-value-list (selection-range (view-named :et *win*)))))
