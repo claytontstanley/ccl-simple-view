@@ -84,6 +84,7 @@
 
 (defclass simple-view (easygui::simple-view view-mixin output-stream pen-mixin)
   ((bezier-path :accessor bezier-path :initform nil)
+   (inner-view-of :accessor inner-view-of :initarg :inner-view-of :initform nil)
    (direction :initarg :direction :initform :output)
    (wptr :initarg :wptr :initform nil)
    (help-spec :initarg :help-spec :initform nil)
@@ -453,7 +454,7 @@
   (unwind-protect (setf (slot-value view 'bordered-p) bordered-p)
     (#/setBordered: (easygui:cocoa-ref view) (if bordered-p #$YES #$NO))))
 
-(defclass editable-text-dialog-item (easygui::inner-view-mixin easygui::editable-mixin easygui::mouse-tracking-mixin dialog-item) 
+(defclass editable-text-dialog-item (easygui::editable-mixin easygui::mouse-tracking-mixin dialog-item) 
   ((allow-returns :initarg :allow-returns)
    (draw-outline :initarg :draw-outline)
    (cocoa-text-view-specifically :reader cocoa-text-view-specifically :initarg :cocoa-text-view-specifically)
@@ -490,11 +491,6 @@
       (#/setDocumentView: (cocoa-ref view) (cocoa-text-view view))
       )))
 
-(defmethod size-to-fit ((view easygui::inner-view-mixin))
-  (size-to-fit (easygui::inner-view-of view))
-  (destructuring-bind (x y) (as-list (view-size (easygui::inner-view-of view)))
-    (set-view-size view x y)))
-
 (defmethod size-to-fit ((view inner-text-view))
   (let ((container (#/textContainer (cocoa-ref view))))
     (let ((manager (#/layoutManager (cocoa-ref view))))
@@ -506,11 +502,15 @@
         (easygui::size-to-fit view)))))
 
 (defmethod size-to-fit ((view simple-view))
+  (awhen (inner-view-of view)
+    (size-to-fit it) 
+    (set-view-size view (view-size it))
+    (return-from size-to-fit))
   (#/sizeToFit (cocoa-ref view))
   (easygui::size-to-fit view))
 
 (defmethod cocoa-text-view ((view editable-text-dialog-item))
-  (cocoa-ref (easygui::inner-view-of view)))
+  (cocoa-ref (inner-view-of view)))
 
 (defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-button-title-mixin dialog-item)
   ((easygui::cluster :initarg :radio-button-cluster)
@@ -866,6 +866,12 @@
 (defmethod set-dialog-item-text ((view view-text-mixin) text)
   (setf (easygui:view-text view) text))
 
+(defmethod easygui::view-text ((view editable-text-dialog-item))
+  (easygui::view-text (inner-view-of view)))
+
+(defmethod (setf easygui::view-text) (new-text (view editable-text-dialog-item))
+  (setf (easygui::view-text (inner-view-of view)) new-text))
+  
 (defmethod text-just ((view view-text-mixin))
   (text-justification view))
 
@@ -878,27 +884,23 @@
       (cdr (assoc justification mapping)))))
 
 (defmethod set-text-justification ((view view-text-mixin) justification)
+  (awhen (inner-view-of view)
+    (return-from set-text-justification (set-text-justification it justification)))
   (#/setAlignment: (easygui:cocoa-ref view) (convert-justification justification))
   (setf (text-justification view) justification))
-
-(defmethod set-text-justification ((view easygui::inner-view-mixin) justification)
-  (when (slot-boundp view 'easygui::inner-view-of) 
-    (set-text-justification (easygui::inner-view-of view) justification)))
 
 (defmethod initialize-instance :after ((view view-text-mixin) &key)
   (set-text-justification view (text-justification view)))
 
-(defmethod selection-range ((view easygui::inner-view-mixin))
-  (selection-range (easygui::inner-view-of view)))
-
 (defmethod selection-range ((view simple-view))
+  (awhen (inner-view-of view)
+    (return-from selection-range (selection-range it)))
   (destructuring-bind (start length) (as-list (#/selectedRange (cocoa-ref view)))
     (values start (+ start length))))
 
-(defmethod set-selection-range ((view easygui::inner-view-mixin) &optional position cursorpos)
-  (set-selection-range (easygui::inner-view-of view) position cursorpos))
-
 (defmethod set-selection-range ((view view-text-mixin) &optional position cursorpos)
+  (awhen (inner-view-of view)
+    (return-from set-selection-range (set-selection-range it position cursorpos)))
   (destructuring-bind (position cursorpos) (if position
                                              (list position cursorpos)
                                              (list 0 0))

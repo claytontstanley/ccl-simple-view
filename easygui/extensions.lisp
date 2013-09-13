@@ -250,19 +250,6 @@
   ()
   (:metaclass ns:+ns-object))
 
-; Creating an inner-view-mixin class for views that contain an inner view, where the inner view is the one that does the interesting stuff.
-; For example, an NSTextView should be contained within a NSScrollView.
-; text-view in bincarbon/textview inherits from this mixin class, so that calls to the text-view object get passed to the NSTextView contained within the NSScrollView
- 
-(defclass easygui::inner-view-mixin ()
-  ((easygui::inner-view-of :accessor easygui::inner-view-of :initarg :inner-view-of)))
-
-(defmethod easygui::view-text ((view easygui::inner-view-mixin)) 
-  (easygui::view-text (easygui::inner-view-of view)))
-
-(defmethod (setf easygui::view-text) (new-text (view easygui::inner-view-mixin))
-  (setf (easygui::view-text (easygui::inner-view-of view)) new-text))
-
 ; NSTextView uses #/string and #/setString methods, which are different from #/title (title-mixin) and #/stringValue (string-value-mixin) methods,
 ; so creating an additional mixin when dealing with text objects that inherit from NSTextView
  
