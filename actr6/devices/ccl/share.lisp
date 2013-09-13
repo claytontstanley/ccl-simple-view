@@ -912,12 +912,18 @@
   (#/becomeFirstResponder (cocoa-ref view)))
 
 (defmethod dialog-item-enable ((view action-view-mixin))
-  ;(easygui:set-dialog-item-enabled-p view t)
-  )
+  (easygui:set-dialog-item-enabled-p view t))
 
 (defmethod dialog-item-disable ((view action-view-mixin))
-  ;(easygui:set-dialog-item-enabled-p view nil)
-  )
+  (easygui:set-dialog-item-enabled-p view nil))
+
+; FIXME: What now to do about these, since etdi is a text-view, which is not an NSControl
+
+(defmethod dialog-item-enable ((view editable-text-dialog-item))
+  ())
+
+(defmethod dialog-item-disable ((view editable-text-dialog-item))
+  ())
 
 (defmethod check-box-check ((item check-box-dialog-item))
   (easygui:check-box-check item nil))
