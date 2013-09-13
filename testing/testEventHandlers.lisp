@@ -26,6 +26,7 @@
                      :view-nick-name :et)))
   (setf *chain* nil)
   (setf *keychain* nil)
+  (sleep .1)
   (left-mouse-click (view-center (front-window)))
   (left-mouse-click (add-points
                       (view-center (view-named :et (front-window)))
@@ -41,10 +42,12 @@
           for key-registered in *keychain*
           do (check (eq key-pressed key-registered)))))
 
+
 (progn
   (setf *keychain* nil)
   (setf *chain* nil)
   (make-instance 'foo)
+  (sleep .1)
   (left-mouse-click (view-center (front-window)))
   (keypress "b")
   (check (eq (pop *keychain*) #\b))
