@@ -476,18 +476,15 @@
           (apply #'make-instance
                  'inner-text-view
                  (nconc
-                   (nconc
-                     (list :specifically cocoa-text-view-specifically
-                           :text-truncation nil
-                           :outer-dialog-item view
-                           :view-size (make-point 100000 100000) ; will be changed when outer-dialog-item requests to calculate its size 
-                           )
-                     (if view-font (list :view-font view-font)))
+                   (list :specifically cocoa-text-view-specifically
+                         :text-truncation nil
+                         :view-size (make-point 100000 100000) ; will be changed when outer-dialog-item requests to calculate its size 
+                         :outer-dialog-item view)
+                   (if view-font (list :view-font view-font))
                    (if dialog-item-text (list :dialog-item-text dialog-item-text))))))
-    (unwind-protect (apply #'call-next-method view :inner-view-of inner-text-view args)
-      (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
-      (#/setDocumentView: (cocoa-ref view) (cocoa-text-view view))
-      )))
+  (unwind-protect (apply #'call-next-method view :inner-view-of inner-text-view args)
+    (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
+    (#/setDocumentView: (cocoa-ref view) (cocoa-text-view view)))))
 
 (defmethod size-to-fit ((view inner-text-view))
   (let ((container (#/textContainer (cocoa-ref view))))
