@@ -13,7 +13,7 @@
   (push-to-end 'window *chain*)
   (push-to-end key *keychain*))
 
-(defmethod view-key-event-handler ((view simple-view) key)
+(defmethod view-key-event-handler ((view editable-text-dialog-item) key)
   (push-to-end 'view *chain*))
 
 (progn

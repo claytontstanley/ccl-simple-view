@@ -468,7 +468,7 @@
       (set-selection-range view 0 (length (dialog-item-text view))))))
 
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
-  ())
+  ((outer-dialog-item :reader outer-dialog-item :initarg :outer-dialog-item)))
 
 ; FIXME: Clean up this method
 
@@ -480,6 +480,7 @@
                    (nconc
                      (list :specifically cocoa-text-view-specifically
                            :text-truncation nil
+                           :outer-dialog-item view
                            :view-size (make-point 1000 1000) ; needed so that frame-inited-p is set to t, so that view size can be modified at end of method 
                            )
                      (if view-font (list :view-font view-font)))
@@ -1259,7 +1260,10 @@
 
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
   (call-next-method the-event)
-  (handle-keypress-in-editable-text (easygui::easygui-view-of cocoa-self) the-event))
+  (handle-keypress-in-editable-text
+    (outer-dialog-item
+      (easygui::easygui-view-of cocoa-self))
+    the-event))
 
 (defmethod handle-keypress-in-editable-text ((view dialog-item) the-event)
   (let ((*view-of-keypress* view))
