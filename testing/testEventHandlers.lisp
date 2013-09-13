@@ -1,5 +1,7 @@
+; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
+(load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
-
+(load-as-lst ".." "bincarbon" "direct-event-calls.lisp")
 
 (defclass foo (window)
   ())
@@ -19,7 +21,7 @@
     'foo
     :view-subviews
     (list
-      (make-instance 'text-view
+      (make-instance 'editable-text-dialog-item
                      :view-size (make-point 100 50)
                      :view-nick-name :et)))
   (setf *chain* nil)
