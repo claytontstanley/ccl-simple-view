@@ -239,3 +239,40 @@
   (call-next-method id)
   (let ((win (easygui::easygui-window-of cocoa-win)))
     (setf (easygui::view-position win) (easygui::view-position win))))
+
+; Class definitions for ns-text-view base cocoa class
+
+(defclass easygui::cocoa-text-view (easygui::cocoa-extension-mixin ns:ns-text-view)
+  ()
+  (:metaclass ns:+ns-object))
+
+(defclass easygui::cocoa-scroll-view (easygui::cocoa-extension-mixin ns:ns-scroll-view)
+  ()
+  (:metaclass ns:+ns-object))
+
+; Creating an inner-view-mixin class for views that contain an inner view, where the inner view is the one that does the interesting stuff.
+; For example, an NSTextView should be contained within a NSScrollView.
+; text-view in bincarbon/textview inherits from this mixin class, so that calls to the text-view object get passed to the NSTextView contained within the NSScrollView
+ 
+(defclass easygui::inner-view-mixin ()
+  ((easygui::inner-view-of :accessor easygui::inner-view-of :initarg :inner-view-of)))
+
+(defmethod easygui::view-text ((view easygui::inner-view-mixin)) 
+  (easygui::view-text (easygui::inner-view-of view)))
+
+(defmethod (setf easygui::view-text) (new-text (view easygui::inner-view-mixin))
+  (setf (easygui::view-text (easygui::inner-view-of view)) new-text))
+
+; NSTextView uses #/string and #/setString methods, which are different from #/title (title-mixin) and #/stringValue (string-value-mixin) methods,
+; so creating an additional mixin when dealing with text objects that inherit from NSTextView
+ 
+(defclass easygui::view-text-via-string-mixin ()
+  ())
+
+(defmethod easygui::view-text ((view easygui::view-text-via-string-mixin))
+  (objc:lisp-string-from-nsstring (#/string (cocoa-ref view))))
+
+(defmethod (setf easygui::view-text) (new-text (view easygui::view-text-via-string-mixin))
+  (#/setString: (cocoa-ref view) (objc:make-nsstring new-text))
+  new-text)
+

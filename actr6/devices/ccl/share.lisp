@@ -392,11 +392,29 @@
     (#/setLineBreakMode: (#/cell (cocoa-ref view)) it))
   (when (and (slot-boundp view 'easygui::text)
              (not (slot-boundp view 'easygui::size)))
-    (#/sizeToFit (cocoa-ref view))
-    (easygui::size-to-fit view))
+    (size-to-fit view))
   (when (slot-boundp view 'part-color-list)
     (loop for (part color) in (group (part-color-list view) 2)
           do (set-part-color view part (mcl-color->system-color color)))))
+
+(defmethod size-to-fit ((view easygui::inner-view-mixin))
+  (size-to-fit (easygui::inner-view-of view))
+  (destructuring-bind (x y) (as-list (view-size (easygui::inner-view-of view)))
+    (set-view-size view x y)))
+
+(defmethod size-to-fit ((view inner-text-view))
+  (let ((container (#/textContainer (cocoa-ref view))))
+    (let ((manager (#/layoutManager (cocoa-ref view))))
+      (#/ensureLayoutForTextContainer: manager container)
+      (let ((frame (#/usedRectForTextContainer: manager container)))
+        (#/setFrameSize: (cocoa-ref view)
+         (ns:make-ns-size (+ 5 (ns:ns-rect-width frame))
+                          (+ 5 (ns:ns-rect-height frame))))
+        (easygui::size-to-fit view)))))
+
+(defmethod size-to-fit ((view simple-view))
+  (#/sizeToFit (cocoa-ref view))
+  (easygui::size-to-fit view))
 
 ; Note that the :specifically initarg says what cocoa view class to associate with an instance of the object. 
 ; These really should have been specified in the easygui package, alongside each easygui class definition IMHO, but they weren't.
@@ -454,15 +472,42 @@
   (unwind-protect (setf (slot-value view 'bordered-p) bordered-p)
     (#/setBordered: (easygui:cocoa-ref view) (if bordered-p #$YES #$NO))))
 
-(defclass editable-text-dialog-item (easygui:text-input-view view-text-via-stringvalue-mixin dialog-item)
+(defclass editable-text-dialog-item (easygui::inner-view-mixin easygui::editable-mixin easygui::mouse-tracking-mixin dialog-item) 
   ((allow-returns :initarg :allow-returns)
-   (draw-outline :initarg :draw-outline))
-  (:default-initargs :specifically 'easygui::cocoa-text-field))
+   (draw-outline :initarg :draw-outline)
+   (cocoa-text-view-specifically :reader cocoa-text-view-specifically :initarg :cocoa-text-view-specifically)
+   (text-truncation :initform nil))
+  (:default-initargs
+    :specifically 'easygui::cocoa-scroll-view
+    :cocoa-text-view-specifically 'easygui::cocoa-text-view))
 
 (defmethod easygui::add-1-subview :after ((view editable-text-dialog-item) (super-view view))
   (destructuring-bind (start end) (multiple-value-list (selection-range view))
     (when (eq start end)
       (set-selection-range view 0 (length (dialog-item-text view))))))
+
+(defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
+  ())
+
+(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text)
+  (let ((inner-text-view
+          (apply #'make-instance
+                 'inner-text-view
+                 (nconc
+                   (nconc
+                     (list :specifically cocoa-text-view-specifically
+                           :text-truncation nil
+                           :view-size (make-point 1000 1000) ; needed so that frame-inited-p is set to t, so that view size can be modified at end of method 
+                           )
+                     (if view-font (list :view-font view-font)))
+                   (if dialog-item-text (list :dialog-item-text dialog-item-text))))))
+    (unwind-protect (apply #'call-next-method view :inner-view-of inner-text-view args)
+      (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
+      (#/setDocumentView: (cocoa-ref view) (cocoa-text-view view))
+      )))
+
+(defmethod cocoa-text-view ((view editable-text-dialog-item))
+  (cocoa-ref (easygui::inner-view-of view)))
 
 (defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-button-title-mixin dialog-item)
   ((easygui::cluster :initarg :radio-button-cluster)
@@ -833,6 +878,10 @@
   (#/setAlignment: (easygui:cocoa-ref view) (convert-justification justification))
   (setf (text-justification view) justification))
 
+(defmethod set-text-justification ((view easygui::inner-view-mixin) justification)
+  (when (slot-boundp view 'easygui::inner-view-of) 
+    (set-text-justification (easygui::inner-view-of view) justification)))
+
 (defmethod initialize-instance :after ((view view-text-mixin) &key)
   (set-text-justification view (text-justification view)))
 
@@ -841,27 +890,30 @@
    #$YES 
    (cocoa-ref view)))
 
+(defmethod selection-range ((view easygui::inner-view-mixin))
+  (selection-range (easygui::inner-view-of view)))
+
 (defmethod selection-range ((view simple-view))
-  (destructuring-bind (start length) (as-list (#/selectedRange (get-field-editor view)))
+  (destructuring-bind (start length) (as-list (#/selectedRange (cocoa-ref view)))
     (values start (+ start length))))
+
+(defmethod set-selection-range ((view easygui::inner-view-mixin) &optional position cursorpos)
+  (set-selection-range (easygui::inner-view-of view) position cursorpos))
 
 (defmethod set-selection-range ((view view-text-mixin) &optional position cursorpos)
   (destructuring-bind (position cursorpos) (if position
                                              (list position cursorpos)
                                              (list 0 0))
-    ; In order for setSelectedRange: to work, the view must be selected first, so the 
-    ; view is currently selected by calling selectText:, which actually highlights all
-    ; text in the view. So, a bit of a kludge, but it seems to behave just fine.
-    (#/selectText: (cocoa-ref view)
-     ccl:+null-ptr+)
-    (#/setSelectedRange: (get-field-editor view)
+    (#/setSelectedRange: (cocoa-ref view)
      (ns:make-ns-range position (- cursorpos position)))))
 
 (defmethod dialog-item-enable ((view action-view-mixin))
-  (easygui:set-dialog-item-enabled-p view t))
+  ;(easygui:set-dialog-item-enabled-p view t)
+  )
 
 (defmethod dialog-item-disable ((view action-view-mixin))
-  (easygui:set-dialog-item-enabled-p view nil))
+  ;(easygui:set-dialog-item-enabled-p view nil)
+  )
 
 (defmethod check-box-check ((item check-box-dialog-item))
   (easygui:check-box-check item nil))
@@ -1194,13 +1246,19 @@
   (when delay (spin-for-fct 50))
   (sv-log-n 1 "ending keypress"))
 
-; Relay keypress events to the window, after allowing the text field to handle the keypress properly.
+; Relay keypress events in editable text views to the view and the window, after allowing the text field to handle the keypress properly.
 
 (defparameter *view-of-keypress* nil)
+
+(objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
+  (call-next-method the-event)
+  (handle-keypress-in-editable-text (easygui::easygui-view-of cocoa-self) the-event))
 
 (defmethod handle-keypress-in-editable-text ((view dialog-item) the-event)
   (let ((*view-of-keypress* view))
     (#/keyDown: (#/window (cocoa-ref view)) the-event)))
+
+; #/keyDown: method on cocoa-window calls easygui::view-key-event-handler on the window (see views.lisp in easygui)
 
 (defmethod easygui::view-key-event-handler :after ((device window) key)
   (when *view-of-keypress*
