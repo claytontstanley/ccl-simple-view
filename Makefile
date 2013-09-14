@@ -40,8 +40,10 @@ spelling: vicmd = cs
 reformat spelling:
 	${list-cmd} | grep '.lisp$$' | egrep -v '${exclude-list}' | /usr/bin/xargs -n 1 -o -I {} bash -ic "echo '{}'; ${vicmd} {} || true"
 
+%-all: lst-cmd = (git ls-files && cd bincarbon && git ls-files | perl -pe 's|^|bincarbon/|')
+
 reformat-all spelling-all: %-all:
-	make $* list-cmd="git ls-files" exclude-list="bincarbon/(CFBundle|base-trek-tasks|pict-svm|procedure-window2|timer).lisp$$"
+	make $* list-cmd="${lst-cmd}" exclude-list="bincarbon/(CFBundle|base-trek-tasks|pict-svm|procedure-window2|timer).lisp$$"
 
 reformat-builds spelling-builds: %-builds:
 	make $* list-cmd="cat build/file-list*"

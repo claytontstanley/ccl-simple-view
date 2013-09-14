@@ -482,9 +482,9 @@
                          :outer-dialog-item view)
                    (if view-font (list :view-font view-font))
                    (if dialog-item-text (list :dialog-item-text dialog-item-text))))))
-  (unwind-protect (apply #'call-next-method view :inner-view-of inner-text-view args)
-    (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
-    (#/setDocumentView: (cocoa-ref view) (cocoa-text-view view)))))
+    (unwind-protect (apply #'call-next-method view :inner-view-of inner-text-view args)
+      (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
+      (#/setDocumentView: (cocoa-ref view) (cocoa-text-view view)))))
 
 (defmethod size-to-fit ((view inner-text-view))
   (let ((container (#/textContainer (cocoa-ref view))))
@@ -866,7 +866,7 @@
 
 (defmethod (setf easygui::view-text) (new-text (view editable-text-dialog-item))
   (setf (easygui::view-text (inner-view-of view)) new-text))
-  
+
 (defmethod text-just ((view view-text-mixin))
   (text-justification view))
 

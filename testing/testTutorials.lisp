@@ -25,8 +25,8 @@
 
 (defmacro with-faster-than-real-time-run (&body body)
   `(with-shadow (run (lambda (run-time &key (real-time))
-                        (declare (ignore real-time))
-                        (funcall fun-orig run-time :real-time nil)))
+                       (declare (ignore real-time))
+                       (funcall fun-orig run-time :real-time nil)))
      ,@body))
 
 (defmacro with-visible-window-run (&body body)

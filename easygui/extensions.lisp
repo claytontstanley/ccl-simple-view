@@ -252,7 +252,7 @@
 
 ; NSTextView uses #/string and #/setString methods, which are different from #/title (title-mixin) and #/stringValue (string-value-mixin) methods,
 ; so creating an additional mixin when dealing with text objects that inherit from NSTextView
- 
+
 (defclass easygui::view-text-via-string-mixin ()
   ())
 
