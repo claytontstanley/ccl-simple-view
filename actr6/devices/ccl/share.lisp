@@ -1253,6 +1253,29 @@
 
 ; Relay keypress events in editable text views to the view and the window, after allowing the text field to handle the keypress properly.
 
+; http://stackoverflow.com/questions/2484072/how-can-i-make-the-tab-key-move-focus-out-of-a-nstextview
+(objc:defmethod (#/doCommandBySelector: :void) ((cocoa-self easygui::cocoa-text-view) (selector :<SEL>))
+  (cond ((ccl::%ptr-eql selector (ccl::@selector #/insertTab:))
+         (#/selectNextKeyView: (#/window cocoa-self) ccl:+null-ptr+))
+        ((ccl::%ptr-eql selector (ccl::@selector #/insertBacktab:))
+         (#/selectPreviousKeyView: (#/window cocoa-self) ccl:+null-ptr+))
+        (t
+         (call-next-method selector))))
+
+; http://superuser.com/questions/473143/how-to-tab-between-buttons-on-an-mac-os-x-dialog-box
+; Tabbing does not cycle through buttons by default, but this can be changed in system preferences
+; If this is changed and an NSButton becomes key, then (currently) the NSButton does not respond by pressing a tab.
+; As a workaround subclass the #/keyDown: method and explicitly cycle through prev and next views if tab or backtab is pressed.
+; I wouldn't think that you would need to explicitly write these methods, but I can't find the setting/issue with the NSButtons
+; to make this behavior default.
+(objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-button) the-event)
+  (unwind-protect (call-next-method the-event)
+    (let* ((str (objc:lisp-string-from-nsstring (#/charactersIgnoringModifiers the-event)))
+           (char (char str 0)))
+      (case char
+        (#\tab (#/selectNextKeyView: (#/window cocoa-self) ccl:+null-ptr+))
+        (#\em (#/selectPreviousKeyView: (#/window cocoa-self) ccl:+null-ptr+))))))
+
 (defparameter *view-of-keypress* nil)
 
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-text-view) the-event)

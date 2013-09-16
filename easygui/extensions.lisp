@@ -240,6 +240,13 @@
   (let ((win (easygui::easygui-window-of cocoa-win)))
     (setf (easygui::view-position win) (easygui::view-position win))))
 
+; All cocoa windows will auto recalculate the key view loop, since this works most of the time, and isn't computed in the inner loop of a program
+; http://stackoverflow.com/questions/4271115/how-should-i-subclass-nswindow-initialization-in-objective-c
+(objc:defmethod (#/initWithContentRect:styleMask:backing:defer: :id) ((cocoa-win easygui::cocoa-window) (content-rect :<NSR>ECT) (style-mask :<NSUI>NTEGER)
+                                                                                                        (backing :<NSB>ACKING<S>TORE<T>YPE) (defer :<BOOL>))
+  (unwind-protect (call-next-method content-rect style-mask backing defer)
+    (#/setAutorecalculatesKeyViewLoop: cocoa-win #$YES)))
+
 ; Class definitions for ns-text-view base cocoa class
 
 (defclass easygui::cocoa-text-view (easygui::cocoa-extension-mixin ns:ns-text-view)
