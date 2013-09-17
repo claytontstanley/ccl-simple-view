@@ -463,11 +463,6 @@
     :specifically 'easygui::cocoa-scroll-view
     :cocoa-text-view-specifically 'easygui::cocoa-text-view))
 
-(defmethod easygui::add-1-subview :after ((view editable-text-dialog-item) (super-view view))
-  (destructuring-bind (start end) (multiple-value-list (selection-range view))
-    (when (eq start end)
-      (set-selection-range view 0 (length (dialog-item-text view))))))
-
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
   ((outer-dialog-item :reader outer-dialog-item :initarg :outer-dialog-item)))
 

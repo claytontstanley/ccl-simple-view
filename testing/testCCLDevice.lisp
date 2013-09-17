@@ -138,7 +138,7 @@
 (add-visual-items-to-rpm-window *win* *view*)
 
 (multiple-value-bind (start end) (selection-range (view-named :et *win*))
-  (check (= start 0))
+  (check (= start (length (dialog-item-text (view-named :et *win*)))))
   (check (= end (length (dialog-item-text (view-named :et *win*))))))
 
 (set-selection-range (view-named :et *win*))

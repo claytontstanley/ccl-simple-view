@@ -6,6 +6,9 @@
 (defclass foo (window)
   ())
 
+(defclass my-etdi (editable-text-dialog-item)
+  ())
+
 (defparameter *chain* ())
 (defparameter *keychain* ())
 
@@ -13,7 +16,7 @@
   (push-to-end 'window *chain*)
   (push-to-end key *keychain*))
 
-(defmethod view-key-event-handler ((view editable-text-dialog-item) key)
+(defmethod view-key-event-handler ((view my-etdi) key)
   (push-to-end 'view *chain*))
 
 (progn
@@ -21,12 +24,12 @@
     'foo
     :view-subviews
     (list
-      (make-instance 'editable-text-dialog-item
+      (make-instance 'my-etdi
                      :view-size (make-point 100 50)
                      :view-nick-name :et)))
+  (event-dispatch)
   (setf *chain* nil)
   (setf *keychain* nil)
-  (sleep .1)
   (left-mouse-click (view-center (front-window)))
   (left-mouse-click (add-points
                       (view-center (view-named :et (front-window)))
@@ -47,10 +50,44 @@
   (setf *keychain* nil)
   (setf *chain* nil)
   (make-instance 'foo)
-  (sleep .1)
+  (event-dispatch)
   (left-mouse-click (view-center (front-window)))
   (keypress "b")
   (check (eq (pop *keychain*) #\b))
   (check (equal *chain* (list 'window)))
   )
+
+(defclass bar (window) ())
+(defclass m-etdi (editable-text-dialog-item) ())
+(defclass m-bdi (button-dialog-item) ())
+(defclass m-cdi (check-box-dialog-item) ())
+
+(progn
+  (make-instance
+    'bar
+    :view-subviews
+    (list (make-instance 'm-etdi
+                         :view-position (make-point 0 0)
+                         :view-nick-name :etdi
+                         :view-size (make-point 20 40))
+          (make-instance 'm-bdi
+                         :view-nick-name :bdi
+                         :view-position (make-point 20 50))
+          (make-instance 'm-cdi
+                         :view-nick-name :cdi
+                         :view-position (make-point 40 100))))
+  (event-dispatch)
+  (left-mouse-click (view-position (front-window)))
+  (left-mouse-click (add-points
+                      (view-position (front-window))
+                      (view-center (view-named :etdi (front-window)))))
+  (dotimes (i 10)
+    (loop for nick in (list :etdi :bdi :cdi :etdi :cdi :bdi)
+          for count from 1
+          for state = (if (<= count 3) #\tab #\em)
+          for view = (view-named nick (front-window))
+          for cocoa-ref = (if (eq nick :etdi) (cocoa-text-view view) (cocoa-ref view))
+          for responder = (#/firstResponder (cocoa-ref (front-window)))
+          do (check (equal cocoa-ref responder))
+          do (keypress state))))
 
