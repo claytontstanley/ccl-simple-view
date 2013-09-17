@@ -1263,6 +1263,13 @@
 ; As a workaround subclass the #/keyDown: method and explicitly cycle through prev and next views if tab or backtab is pressed.
 ; I wouldn't think that you would need to explicitly write this method, but I can't find the setting/issue with the NSButtons
 ; to make this behavior default.
+
+; I could not get #/setKeyEquivalent: to work for NSButtons, so as a workaround,
+; explicitly call #/performClick: when the user presses the #\space key.
+; This allows the user to navigate the UI by using the keyboard only, and also 
+; press buttons with the keyboard. The #\space as the action button seems to be 
+; the fairly consistent technique across OS X Cocoa apps and web-browser apps
+ 
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-button) the-event)
   (let ((*view-of-keypress* (easygui::easygui-view-of cocoa-self)))
     (unwind-protect (call-next-method the-event)
@@ -1287,6 +1294,11 @@
     (#/keyDown: (#/window (cocoa-ref view)) the-event)))
 
 ; #/keyDown: method on cocoa-window calls easygui::view-key-event-handler on the window (see views.lisp in easygui)
+
+; The default first responder when the window is created is the reference to the window
+; If the user presses the #\tab key, select the next key view in the responder loop
+; This technique usually does the right thing, for instance, it will select the top-most
+; editable text in the view after the first tab press
 
 (defmethod easygui::view-key-event-handler :after ((device window) key)
   (when (eq key #\tab)
