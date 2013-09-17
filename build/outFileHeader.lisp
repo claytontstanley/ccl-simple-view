@@ -91,7 +91,22 @@
 ;;;               -required a fix for radio buttons. Clustering did not work on 10.8 prior to fix
 ;;;             : Code-coverage report is now generated for each build. 
 ;;;               -Used report to remove stray code and discover/fix a few minor bugs
-;;;               
+;;; 2013.09.17 cts
+;;;             : Swapped cocoa class for editable-text-dialog-item from NSTextField to NSTextView
+;;;               -Ensures that keypresses on the view that are relayed to view-key-event-handler are accurate
+;;;               -Allows for more control over keypresses in the view, so that for example, the next responder
+;;;                can be called when a #\tab is pressed in the view.
+;;;             : Reworked #\tab presses for UI, so that tabbing moves between all of the views on the window
+;;;               that can become first responder.
+;;;             : Reworked #\space presses for buttons, so that if a #\space is pressed when a button is
+;;;               first responder, then the action for that button fires (i.e., the button is clicked).
+;;;             : Ensured that the window is always the starting first responder when the view is created.
+;;;               Afterwards, if the user presses #\tab, then the next responder is activated, and tabbing
+;;;               then cycles through all available first responders. This is to ensure that no particular view
+;;;               is the first responder in the simplest case: for a basic window where the user does not
+;;;               wish to tab between views.
+;;;             : If tabbing across buttons is enabled at the OS level:
+;;;               http://superuser.com/questions/473143/how-to-tab-between-buttons-on-an-mac-os-x-dialog-box
+;;;               then a user can work through most tasks involving editing text views and pressing buttons
+;;;               using only the keyboard. #\tab to navigate and #\space to select
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
