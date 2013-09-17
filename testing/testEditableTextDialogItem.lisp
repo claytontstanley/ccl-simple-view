@@ -10,7 +10,7 @@
                       :dialog-item-text "so"))))
 
 (check (equal
-         (list 0 2)
+         (list 2 2)
          (multiple-value-list (selection-range (view-named :et *win*)))))
 
 (add-subviews *win*
@@ -28,5 +28,5 @@
                 :view-position (make-point 150 150)))
 
 (check (equal
-         (list 0 2)
+         (list 2 2)
          (multiple-value-list (selection-range (view-named :et *win*)))))
