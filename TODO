@@ -1,3 +1,4 @@
 clean up init method for inner
 clean up testing sleeps for make instance window (event-dispatch?)
 add doc header for NSTextView and tabbing and ?
+add doc header for tab/space ui

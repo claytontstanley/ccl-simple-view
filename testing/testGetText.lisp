@@ -24,9 +24,20 @@
     (lambda ()
       (sleep 1)
       (left-mouse-click (view-position (front-window)))
-      (sleep .3)
+      (sv-log (format nil "~a" (subviews (front-window))))
+      (left-mouse-click
+        (add-points
+          (view-position (front-window))
+          (view-center
+            (first (remove-if-not
+                     (lambda (x)
+                       (equalp (class-name (class-of x))
+                               'editable-text-dialog-item))
+                     (subviews (front-window)))))))
+      (keypress #\rubout)
+      (keypress #\rubout)
+      (keypress #\rubout)
       (keypress #\a)
-      (sleep .3)
       (left-mouse-click
         (add-points
           (view-position (front-window))
@@ -41,6 +52,5 @@
                 :position (make-point 10 10)
                 :initial-string "foo"))
   (check (string= *str* "a")))
-
 
 
