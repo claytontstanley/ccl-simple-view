@@ -1260,7 +1260,7 @@
 ; http://superuser.com/questions/473143/how-to-tab-between-buttons-on-an-mac-os-x-dialog-box
 ; Tabbing does not cycle through buttons by default, but this can be changed in system preferences
 ; If this is changed and an NSButton becomes key, then (currently) the NSButton does not respond by pressing a tab.
-; As a workaround subclass the #/keyDown: method and explicitly cycle through prev and next views if tab or backtab is pressed.
+; As a workaround subclass the #/keyDown: method and explicitly cycle through previous and next views if tab or backtab is pressed.
 ; I wouldn't think that you would need to explicitly write this method, but I can't find the setting/issue with the NSButtons
 ; to make this behavior default.
 
