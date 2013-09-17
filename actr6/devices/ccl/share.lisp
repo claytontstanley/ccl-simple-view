@@ -1269,6 +1269,8 @@
 ; This allows the user to navigate the UI by using the keyboard only, and also 
 ; press buttons with the keyboard. The #\space as the action button seems to be 
 ; the fairly consistent technique across OS X Cocoa apps and web-browser apps
+
+(defparameter *view-of-keypress* nil)
  
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-button) the-event)
   (let ((*view-of-keypress* (easygui::easygui-view-of cocoa-self)))
@@ -1279,8 +1281,6 @@
           (#\tab (#/selectNextKeyView: (#/window cocoa-self) ccl:+null-ptr+))
           (#\em (#/selectPreviousKeyView: (#/window cocoa-self) ccl:+null-ptr+))
           (#\space (#/performClick: cocoa-self ccl:+null-ptr+)))))))
-
-(defparameter *view-of-keypress* nil)
 
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
   (call-next-method the-event)
