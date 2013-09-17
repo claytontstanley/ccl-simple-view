@@ -1264,12 +1264,14 @@
 ; I wouldn't think that you would need to explicitly write this method, but I can't find the setting/issue with the NSButtons
 ; to make this behavior default.
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-button) the-event)
-  (unwind-protect (call-next-method the-event)
-    (let* ((str (objc:lisp-string-from-nsstring (#/charactersIgnoringModifiers the-event)))
-           (char (char str 0)))
-      (case char
-        (#\tab (#/selectNextKeyView: (#/window cocoa-self) ccl:+null-ptr+))
-        (#\em (#/selectPreviousKeyView: (#/window cocoa-self) ccl:+null-ptr+))))))
+  (let ((*view-of-keypress* (easygui::easygui-view-of cocoa-self)))
+    (unwind-protect (call-next-method the-event)
+      (let* ((str (objc:lisp-string-from-nsstring (#/charactersIgnoringModifiers the-event)))
+             (char (char str 0)))
+        (case char
+          (#\tab (#/selectNextKeyView: (#/window cocoa-self) ccl:+null-ptr+))
+          (#\em (#/selectPreviousKeyView: (#/window cocoa-self) ccl:+null-ptr+))
+          (#\space (#/performClick: cocoa-self ccl:+null-ptr+)))))))
 
 (defparameter *view-of-keypress* nil)
 
@@ -1287,6 +1289,9 @@
 ; #/keyDown: method on cocoa-window calls easygui::view-key-event-handler on the window (see views.lisp in easygui)
 
 (defmethod easygui::view-key-event-handler :after ((device window) key)
+  (when (eq key #\tab)
+    (when (equal (cocoa-ref device) (#/firstResponder (cocoa-ref device)))
+      (#/selectNextKeyView: (cocoa-ref device) ccl:+null-ptr+)))
   (when *view-of-keypress*
     (view-key-event-handler *view-of-keypress* key))
   (view-key-event-handler device key)
