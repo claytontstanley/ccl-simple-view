@@ -359,6 +359,7 @@
    (part-color-list :reader part-color-list :initarg :part-color-list)
    (dialog-item-handle :accessor dialog-item-handle :initarg :dialog-item-handle :initform nil)
    (dialog-item-action :accessor dialog-item-action :initarg :dialog-item-action :initform nil)
+   (allow-tabs :reader allow-tabs :initarg :allow-tabs :initform nil)
    (compress-text :accessor compress-text :initarg :compress-text :initform nil)
    (text-truncation :initarg :text-truncation :reader text-truncation :initform #$NSLineBreakByTruncatingTail))
   (:default-initargs 
@@ -466,7 +467,7 @@
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
   ((outer-dialog-item :reader outer-dialog-item :initarg :outer-dialog-item)))
 
-(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text)
+(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text allow-tabs)
   (let ((inner-text-view
           (apply #'make-instance
                  'inner-text-view
@@ -474,6 +475,7 @@
                    (list :specifically cocoa-text-view-specifically
                          :text-truncation nil
                          :view-size (make-point 100000 100000) ; will be changed when outer-dialog-item requests to calculate its size 
+                         :allow-tabs allow-tabs
                          :outer-dialog-item view)
                    (if view-font (list :view-font view-font))
                    (if dialog-item-text (list :dialog-item-text dialog-item-text))))))
@@ -1250,12 +1252,27 @@
 
 ; http://stackoverflow.com/questions/2484072/how-can-i-make-the-tab-key-move-focus-out-of-a-nstextview
 (objc:defmethod (#/doCommandBySelector: :void) ((cocoa-self easygui::cocoa-text-view) (selector :<SEL>))
-  (cond ((ccl::%ptr-eql selector (ccl::@selector #/insertTab:))
-         (#/selectNextKeyView: (#/window cocoa-self) ccl:+null-ptr+))
-        ((ccl::%ptr-eql selector (ccl::@selector #/insertBacktab:))
-         (#/selectPreviousKeyView: (#/window cocoa-self) ccl:+null-ptr+))
-        (t
-         (call-next-method selector))))
+  (unless (cond ((ccl::%ptr-eql selector (ccl::@selector #/insertTab:))
+                 (select-next-key-view (easygui::easygui-view-of cocoa-self)))
+                ((ccl::%ptr-eql selector (ccl::@selector #/insertBacktab:))
+                 (select-prev-key-view (easygui::easygui-view-of cocoa-self))))
+    (call-next-method selector)))
+
+(defmethod select-next-key-view ((view dialog-item))
+  (unless (allow-tabs view)
+    (select-next-key-view (view-window view))))
+
+(defmethod select-next-key-view ((win window))
+  (unwind-protect t
+    (#/selectNextKeyView: (cocoa-ref win) ccl:+null-ptr+)))
+
+(defmethod select-prev-key-view ((view dialog-item))
+  (unless (allow-tabs view)
+    (select-prev-key-view (view-window view))))
+
+(defmethod select-prev-key-view ((win window))
+  (unwind-protect t
+    (#/selectPreviousKeyView: (cocoa-ref win) ccl:+null-ptr+)))
 
 ; http://superuser.com/questions/473143/how-to-tab-between-buttons-on-an-mac-os-x-dialog-box
 ; Tabbing does not cycle through buttons by default, but this can be changed in system preferences
@@ -1278,8 +1295,8 @@
       (let* ((str (objc:lisp-string-from-nsstring (#/charactersIgnoringModifiers the-event)))
              (char (char str 0)))
         (case char
-          (#\tab (#/selectNextKeyView: (#/window cocoa-self) ccl:+null-ptr+))
-          (#\em (#/selectPreviousKeyView: (#/window cocoa-self) ccl:+null-ptr+))
+          (#\tab (select-next-key-view (easygui::easygui-view-of cocoa-self)))
+          (#\em (select-prev-key-view (easygui::easygui-view-of cocoa-self)))
           (#\space (#/performClick: cocoa-self ccl:+null-ptr+)))))))
 
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
@@ -1303,7 +1320,7 @@
 (defmethod easygui::view-key-event-handler :after ((device window) key)
   (when (eq key #\tab)
     (when (equal (cocoa-ref device) (#/firstResponder (cocoa-ref device)))
-      (#/selectNextKeyView: (cocoa-ref device) ccl:+null-ptr+)))
+      (select-next-key-view device)))
   (when *view-of-keypress*
     (view-key-event-handler *view-of-keypress* key))
   (view-key-event-handler device key)

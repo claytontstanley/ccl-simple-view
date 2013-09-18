@@ -124,9 +124,30 @@
   (check (equal (#/firstResponder (cocoa-ref (front-window))) (cocoa-text-view (view-named :etdi (front-window)))))
   (keypress #\tab)
   (check (equal (#/firstResponder (cocoa-ref (front-window))) (cocoa-text-view (view-named :etdi (front-window))))))
+
+(progn
+  (make-instance 'window
+                 :view-subviews (list (make-instance 'editable-text-dialog-item
+                                                     :view-nick-name :etdi
+                                                     :allow-tabs t
+                                                     :view-size (make-point 100 20))
+                                      (make-instance 'editable-text-dialog-item
+                                                     :view-size (make-point 100 20)
+                                                     :view-position (make-point 0 30))))
+  (event-dispatch)
+  (left-mouse-click (view-center (front-window)))
+  (keypress #\tab)
+  (keypress #\a)
+  (keypress #\tab)
+  (check (string-equal (dialog-item-text (view-named :etdi (front-window)))
+                       (format nil "a~a" #\tab)))
+  (check (equal (#/firstResponder (cocoa-ref (front-window)))
+                (cocoa-text-view (view-named :etdi (front-window))))))
+  
   
   
 #|
+(inspect *)
 (inspect (front-window))
 (#/initialFirstResponder (cocoa-ref (front-window)))
 (#/firstResponder (cocoa-ref (front-window)))
