@@ -468,7 +468,7 @@
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
   ())
 
-(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text allow-tabs text-justification)
+(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text allow-tabs text-justification view-size)
   (let ((inner-text-view
           (apply #'make-instance
                  'inner-text-view
@@ -476,6 +476,7 @@
                    (list :specifically cocoa-text-view-specifically
                          :text-truncation nil
                          )
+                   (if view-size (list :view-size view-size))
                    (if allow-tabs (list :allow-tabs allow-tabs))
                    (if view-font (list :view-font view-font))
                    (if dialog-item-text (list :dialog-item-text dialog-item-text))
