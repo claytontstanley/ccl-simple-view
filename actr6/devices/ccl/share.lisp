@@ -468,26 +468,29 @@
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
   ())
 
-(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text allow-tabs text-justification view-size)
+(defmethod getf-include-key (place key)
+  (aif (getf place key)
+    (list key it)))
+
+(defmethod getf-include-key (place (keys list))
+  (loop for key in keys
+        append (aif (getf place key) (list key it))))
+
+(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically)
   (let ((inner-text-view
           (apply #'make-instance
                  'inner-text-view
                  (nconc
                    (list :specifically cocoa-text-view-specifically
-                         :text-truncation nil
-                         )
-                   (if view-size (list :view-size view-size))
-                   (if allow-tabs (list :allow-tabs allow-tabs))
-                   (if view-font (list :view-font view-font))
-                   (if dialog-item-text (list :dialog-item-text dialog-item-text))
-                   (if text-justification (list :text-justification text-justification))))))
+                         :text-truncation nil)
+                   (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification))))))
     (size-to-fit inner-text-view)
+    ; Not removing :view-size, since the content-view-mixin should make use of this information as well, if available
     (remf args :allow-tabs)
     (remf args :view-font)
     (remf args :dialog-item-text)
     (remf args :text-justification)
-    (unwind-protect (apply #'call-next-method view :content-view inner-text-view args)
-      )))
+    (apply #'call-next-method view :content-view inner-text-view args)))
 
 (defmethod easygui::content-view ((view editable-text-dialog-item))
   (assert (eql (cocoa-ref (slot-value view 'easygui::content-view))
