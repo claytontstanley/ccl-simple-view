@@ -18,12 +18,12 @@
 (set-view-size (content-view *win*) (view-size *win*)) 
 
 (add-subviews *win* (make-instance 'static-text-dialog-item
-                                   :text "hello"
+                                   :dialog-item-text "hello"
                                    :view-position (make-point 50 50)))
 
 
 (add-subviews *win* (make-instance 'static-text-dialog-item
-                                   :text "hello"
+                                   :dialog-item-text "hello"
                                    :view-nick-name :remove
                                    :view-position (make-point 0 0)))
 
@@ -33,10 +33,10 @@
 
 (add-subviews *win*
               (make-instance 'static-text-dialog-item
-                             :text "foo"
+                             :dialog-item-text "foo"
                              :view-nick-name :one)
               (make-instance 'static-text-dialog-item
-                             :text "bar"
+                             :dialog-item-text "bar"
                              :view-nick-name :two))
 
 (check (eq (view-named :one *win*)

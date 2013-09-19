@@ -475,12 +475,12 @@
                  (nconc
                    (list :specifically cocoa-text-view-specifically
                          :text-truncation nil
-                         :view-size (make-point 100000 100000) ; will be changed when the editable-text-dialog-item requests to calculate its size 
                          )
                    (if allow-tabs (list :allow-tabs allow-tabs))
                    (if view-font (list :view-font view-font))
                    (if dialog-item-text (list :dialog-item-text dialog-item-text))
                    (if text-justification (list :text-justification text-justification))))))
+    (size-to-fit inner-text-view)
     (remf args :allow-tabs)
     (remf args :view-font)
     (remf args :dialog-item-text)
@@ -501,18 +501,23 @@
     ))
 
 (defmethod size-to-fit ((view inner-text-view))
-  (let ((container (#/textContainer (cocoa-ref view))))
-    (let ((manager (#/layoutManager (cocoa-ref view))))
-      (#/ensureLayoutForTextContainer: manager container)
-      (let ((frame (#/usedRectForTextContainer: manager container)))
-        (#/setFrameSize: (cocoa-ref view)
-         (ns:make-ns-size (ns:ns-rect-width frame)
-                          (ns:ns-rect-height frame)))
-        (easygui::size-to-fit view)))))
+  (when (and (slot-boundp view 'easygui::text)
+             (not (slot-boundp view 'easygui::size)))
+    (easygui::running-on-main-thread ()
+      (#/setFrameSize: (cocoa-ref view) (ns:make-ns-size 100000 10000))
+      (let ((container (#/textContainer (cocoa-ref view))))
+        (let ((manager (#/layoutManager (cocoa-ref view))))
+          (#/ensureLayoutForTextContainer: manager container)
+          (let ((frame (#/usedRectForTextContainer: manager container)))
+            (#/setFrameSize: (cocoa-ref view)
+             (ns:make-ns-size (ns:ns-rect-width frame)
+                              (ns:ns-rect-height frame)))
+            (easygui::size-to-fit view)))))))
 
 (defmethod size-to-fit ((view editable-text-dialog-item))
-  (size-to-fit (content-view view))
-  (set-view-size view (add-points (make-point 5 5) (view-size (content-view view)))))
+  (when (and (not (slot-boundp view 'easygui::size))
+             (slot-boundp (content-view view) 'easygui::size))
+    (set-view-size view (add-points (make-point 5 5) (view-size (content-view view))))))
 
 (defmethod size-to-fit ((view simple-view))
   (when (and (slot-boundp view 'easygui::text)
@@ -654,7 +659,7 @@
            (list
              :view-position position
              :view-size size
-             :text text)
+             :dialog-item-text text)
            (if action (list :dialog-item-action action))
            attributes)))
 

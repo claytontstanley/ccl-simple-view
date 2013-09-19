@@ -15,6 +15,8 @@
       :view-size (make-point 100 50))))
 
 (event-dispatch)
+(check (equal (as-list (view-size (view-named :foo (front-window))))
+              (list 100 50)))
 (left-mouse-click (view-position (front-window)))
 (keypress #\tab)
 
