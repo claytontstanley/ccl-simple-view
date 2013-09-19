@@ -490,7 +490,9 @@
     (remf args :view-font)
     (remf args :dialog-item-text)
     (remf args :text-justification)
-    (apply #'call-next-method view :content-view inner-text-view args)))
+    (unwind-protect (apply #'call-next-method view :content-view inner-text-view args)
+      (setf (slot-value inner-text-view 'easygui::flipped)
+            (slot-value view 'easygui::flipped)))))
 
 (defmethod easygui::content-view ((view editable-text-dialog-item))
   (assert (eql (cocoa-ref (slot-value view 'easygui::content-view))
