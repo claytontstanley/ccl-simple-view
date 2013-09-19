@@ -18,7 +18,9 @@
 (check (equal (as-list (view-size (view-named :foo (front-window))))
               (list 100 50)))
 (left-mouse-click (view-position (front-window)))
-(keypress #\tab)
+(left-mouse-click (add-points
+                    (view-position (front-window))
+                    (view-center (view-named :foo (front-window)))))
 
 (let ((font (view-font (view-named :foo (front-window)))))
   (check (string-equal (font-name font) "Courier"))
