@@ -50,10 +50,11 @@
   ())
 
 (defclass view-text-via-stringvalue-mixin (easygui::view-text-via-stringvalue-mixin)
-  ((easygui::text :initarg :text)))
+  ())
 
 (defclass view-text-mixin (easygui::view-text-mixin)
-  ((text-justification :accessor text-justification :initarg :text-justification :initform $tejustleft)))
+  ((text-justification :accessor text-justification :initarg :text-justification))
+  (:default-initargs :text-justification $tejustleft))
 
 (defparameter *fred-default-font-spec* '("Monaco" 9 :SRCOR :PLAIN (:COLOR-INDEX 0)))
 
@@ -84,7 +85,6 @@
 
 (defclass simple-view (easygui::simple-view view-mixin output-stream pen-mixin)
   ((bezier-path :accessor bezier-path :initform nil)
-   (inner-view-of :accessor inner-view-of :initarg :inner-view-of :initform nil)
    (direction :initarg :direction :initform :output)
    (wptr :initarg :wptr :initform nil)
    (help-spec :initarg :help-spec :initform nil)
@@ -387,14 +387,15 @@
   (guard ((not (null view)) "dialog item action must be associated with a view"))
   (list :action (lambda () (funcall action view))))
 
+(defmethod initialize-instance :before ((view dialog-item) &key text)
+  (guard ((null text) "Do not use :text initarg; use :dialog-item-text instead")))
+
 (defmethod initialize-instance :after ((view dialog-item) &key)
   (guard ((null (dialog-item-handle view)) "Not utilizing dialog-item-handle"))
   (guard ((null (compress-text view)) "Not utilizing compress-text"))
   (awhen (text-truncation view)
     (#/setLineBreakMode: (#/cell (cocoa-ref view)) it))
-  (when (and (slot-boundp view 'easygui::text)
-             (not (slot-boundp view 'easygui::size)))
-    (size-to-fit view))
+  (size-to-fit view)
   (when (slot-boundp view 'part-color-list)
     (loop for (part color) in (group (part-color-list view) 2)
           do (set-part-color view part (mcl-color->system-color color)))))
@@ -455,7 +456,7 @@
   (unwind-protect (setf (slot-value view 'bordered-p) bordered-p)
     (#/setBordered: (easygui:cocoa-ref view) (if bordered-p #$YES #$NO))))
 
-(defclass editable-text-dialog-item (easygui::editable-mixin easygui::mouse-tracking-mixin dialog-item) 
+(defclass editable-text-dialog-item (easygui::content-view-mixin easygui::editable-mixin easygui::mouse-tracking-mixin dialog-item) 
   ((allow-returns :initarg :allow-returns)
    (draw-outline :initarg :draw-outline)
    (cocoa-text-view-specifically :reader cocoa-text-view-specifically :initarg :cocoa-text-view-specifically)
@@ -465,23 +466,39 @@
     :cocoa-text-view-specifically 'easygui::cocoa-text-view))
 
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
-  ((outer-dialog-item :reader outer-dialog-item :initarg :outer-dialog-item)))
+  ())
 
-(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text allow-tabs)
+(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically view-font dialog-item-text allow-tabs text-justification)
   (let ((inner-text-view
           (apply #'make-instance
                  'inner-text-view
                  (nconc
                    (list :specifically cocoa-text-view-specifically
                          :text-truncation nil
-                         :view-size (make-point 100000 100000) ; will be changed when outer-dialog-item requests to calculate its size 
-                         :allow-tabs allow-tabs
-                         :outer-dialog-item view)
+                         :view-size (make-point 100000 100000) ; will be changed when the editable-text-dialog-item requests to calculate its size 
+                         )
+                   (if allow-tabs (list :allow-tabs allow-tabs))
                    (if view-font (list :view-font view-font))
-                   (if dialog-item-text (list :dialog-item-text dialog-item-text))))))
-    (unwind-protect (apply #'call-next-method view :inner-view-of inner-text-view args)
-      (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
-      (#/setDocumentView: (cocoa-ref view) (cocoa-text-view view)))))
+                   (if dialog-item-text (list :dialog-item-text dialog-item-text))
+                   (if text-justification (list :text-justification text-justification))))))
+    (remf args :allow-tabs)
+    (remf args :view-font)
+    (remf args :dialog-item-text)
+    (remf args :text-justification)
+    (unwind-protect (apply #'call-next-method view :content-view inner-text-view args)
+      )))
+
+(defmethod easygui::content-view ((view editable-text-dialog-item))
+  (assert (eql (cocoa-ref (slot-value view 'easygui::content-view))
+               (dcc (#/documentView (cocoa-ref view)))))
+  (slot-value view 'easygui::content-view))
+
+(defmethod easygui::initialize-view :after ((view editable-text-dialog-item))
+  (let ((content-view (slot-value view 'easygui::content-view)))
+    (#/setDocumentView: (cocoa-ref view) (cocoa-ref content-view))
+    (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
+    (setf (slot-value content-view 'easygui::parent) view)
+    ))
 
 (defmethod size-to-fit ((view inner-text-view))
   (let ((container (#/textContainer (cocoa-ref view))))
@@ -493,16 +510,18 @@
                           (ns:ns-rect-height frame)))
         (easygui::size-to-fit view)))))
 
+(defmethod size-to-fit ((view editable-text-dialog-item))
+  (size-to-fit (content-view view))
+  (set-view-size view (add-points (make-point 5 5) (view-size (content-view view)))))
+
 (defmethod size-to-fit ((view simple-view))
-  (awhen (inner-view-of view)
-    (size-to-fit it) 
-    (set-view-size view (add-points (make-point 5 5) (view-size it)))
-    (return-from size-to-fit))
-  (#/sizeToFit (cocoa-ref view))
-  (easygui::size-to-fit view))
+  (when (and (slot-boundp view 'easygui::text)
+             (not (slot-boundp view 'easygui::size)))
+    (#/sizeToFit (cocoa-ref view))
+    (easygui::size-to-fit view)))
 
 (defmethod cocoa-text-view ((view editable-text-dialog-item))
-  (cocoa-ref (inner-view-of view)))
+  (cocoa-ref (content-view view)))
 
 (defclass radio-button-dialog-item (easygui:radio-button-view view-text-via-button-title-mixin dialog-item)
   ((easygui::cluster :initarg :radio-button-cluster)
@@ -859,10 +878,10 @@
   (setf (easygui:view-text view) text))
 
 (defmethod easygui::view-text ((view editable-text-dialog-item))
-  (easygui::view-text (inner-view-of view)))
+  (easygui::view-text (content-view view)))
 
 (defmethod (setf easygui::view-text) (new-text (view editable-text-dialog-item))
-  (setf (easygui::view-text (inner-view-of view)) new-text))
+  (setf (easygui::view-text (content-view view)) new-text))
 
 (defmethod text-just ((view view-text-mixin))
   (text-justification view))
@@ -876,23 +895,24 @@
       (cdr (assoc justification mapping)))))
 
 (defmethod set-text-justification ((view view-text-mixin) justification)
-  (awhen (inner-view-of view)
-    (return-from set-text-justification (set-text-justification it justification)))
   (#/setAlignment: (easygui:cocoa-ref view) (convert-justification justification))
   (setf (text-justification view) justification))
 
 (defmethod initialize-instance :after ((view view-text-mixin) &key)
-  (set-text-justification view (text-justification view)))
+  (when (slot-boundp view 'text-justification)
+    (set-text-justification view (text-justification view))))
+
+(defmethod selection-range ((view easygui::content-view-mixin))
+  (selection-range (content-view view)))
 
 (defmethod selection-range ((view simple-view))
-  (awhen (inner-view-of view)
-    (return-from selection-range (selection-range it)))
   (destructuring-bind (start length) (as-list (#/selectedRange (cocoa-ref view)))
     (values start (+ start length))))
 
+(defmethod set-selection-range ((view easygui::content-view-mixin) &optional position cursorpos)
+  (set-selection-range (content-view view) position cursorpos))
+
 (defmethod set-selection-range ((view view-text-mixin) &optional position cursorpos)
-  (awhen (inner-view-of view)
-    (return-from set-selection-range (set-selection-range it position cursorpos)))
   (destructuring-bind (position cursorpos) (if position
                                              (list position cursorpos)
                                              (list 0 0))
@@ -1008,7 +1028,7 @@
 (defmethod view-window ((view simple-view))
   (easygui::easygui-window-of view))
 
-(defmethod content-view ((view window))
+(defmethod content-view ((view easygui::content-view-mixin))
   (easygui:content-view view))
 
 (defmethod content-view ((view simple-view))
@@ -1302,7 +1322,7 @@
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
   (call-next-method the-event)
   (handle-keypress-in-editable-text
-    (outer-dialog-item
+    (view-container
       (easygui::easygui-view-of cocoa-self))
     the-event))
 
@@ -1645,6 +1665,9 @@
       (draw-string string))))
 
 ; Handling fonts and string width/height in pixels
+
+(defmethod view-font ((view easygui::content-view-mixin))
+  (view-font (content-view view)))
 
 (defmethod view-font ((view simple-view))
   (guard-!null-ptr

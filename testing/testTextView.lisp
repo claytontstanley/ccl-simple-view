@@ -14,10 +14,9 @@
       :dialog-item-text "abc"
       :view-size (make-point 100 50))))
 
+(event-dispatch)
 (left-mouse-click (view-position (front-window)))
-(left-mouse-click (add-points
-                    (view-position (front-window))
-                    (view-center (view-named :foo (front-window)))))
+(keypress #\tab)
 
 (let ((font (view-font (view-named :foo (front-window)))))
   (check (string-equal (font-name font) "Courier"))

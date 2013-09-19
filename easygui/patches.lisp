@@ -41,7 +41,7 @@
 ; easygui code. So adding a contained-view-specifically slot to the mixin class, defaulting it to the contained-view class
 ; defined in easygui. If you want to instantiate a different class for the contained view, just overwrite this default.
 (defclass easygui::content-view-mixin ()
-  ((easygui::content-view)
+  ((easygui::content-view :initarg :content-view)
    (easygui::flipped :initarg :flipped :initform easygui::*screen-flipped*)
    (easygui::contained-view-specifically :initarg :contained-view-specifically :initform 'easygui::contained-view)))
 

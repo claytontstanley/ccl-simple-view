@@ -17,7 +17,7 @@
             :view-position (make-point 0 10)
             :view-nick-name :pw
             :view-font (list "Courier" 6)
-            :text "hello, world"
+            :dialog-item-text "hello, world"
             )
           (make-instance
             'password-entry-text-view
