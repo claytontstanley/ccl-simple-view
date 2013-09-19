@@ -9,7 +9,7 @@
                       :view-nick-name :et
                       :dialog-item-text "so"))))
 (check (equal (mapcar #'floor (as-list (view-size (view-named :et *win*))))
-              (list 29 21)))
+              (mapcar #'floor (as-list (add-points (make-point 5 5) (view-size (content-view (view-named :et *win*))))))))
 (check (equal
          (list 2 2)
          (multiple-value-list (selection-range (view-named :et *win*)))))
@@ -21,8 +21,6 @@
                 :view-font (list "Courier" 55)
                 :view-nick-name :et2
                 :view-position (make-point 40 40)))
-(check (equal (mapcar #'floor (as-list (view-size (view-named :et2 *win*))))
-              (list 114 71)))
 
 (add-subviews *win*
               (make-instance
@@ -34,5 +32,3 @@
 (check (equal
          (list 2 2)
          (multiple-value-list (selection-range (view-named :et *win*)))))
-(check (equal (mapcar #'floor (as-list (view-size (view-named :et3 *win*))))
-              (list 15 15)))
