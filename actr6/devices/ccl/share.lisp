@@ -360,8 +360,7 @@
    (dialog-item-handle :accessor dialog-item-handle :initarg :dialog-item-handle :initform nil)
    (dialog-item-action :accessor dialog-item-action :initarg :dialog-item-action :initform nil)
    (allow-tabs :reader allow-tabs :initarg :allow-tabs :initform nil)
-   (compress-text :accessor compress-text :initarg :compress-text :initform nil)
-   (text-truncation :initarg :text-truncation :reader text-truncation :initform #$NSLineBreakByTruncatingTail))
+   (compress-text :accessor compress-text :initarg :compress-text :initform nil))
   (:default-initargs 
     :view-font '("Lucida Grande" 13 :SRCCOPY :PLAIN (:COLOR-INDEX 0))))
 
@@ -369,19 +368,10 @@
 ; with the object/view as an argument. So to enable this feature, wrap a :dialog-item-action 
 ; initarg function in a closure that takes zero arguments, and assign that clozure to the :action initarg
 
-(defmethod initialize-instance :around ((view dialog-item) &rest args &key text-truncation dialog-item-action)
+(defmethod initialize-instance :around ((view dialog-item) &rest args &key dialog-item-action)
   (let ((accum (parse-mcl-initargs
-                 (list :text-truncation text-truncation)
                  (list :dialog-item-action dialog-item-action :view view))))
     (apply #'call-next-method view (nconc accum args))))
-
-(defmethod parse-mcl-initarg ((keyword (eql :text-truncation)) val &key)
-  (list
-    :text-truncation
-    (etypecase val
-      (keyword (ecase val
-                 (:end #$NSLineBreakByTruncatingTail)))
-      (integer val))))
 
 (defmethod parse-mcl-initarg ((keyword (eql :dialog-item-action)) action &key view)
   (guard ((not (null view)) "dialog item action must be associated with a view"))
@@ -393,8 +383,6 @@
 (defmethod initialize-instance :after ((view dialog-item) &key)
   (guard ((null (dialog-item-handle view)) "Not utilizing dialog-item-handle"))
   (guard ((null (compress-text view)) "Not utilizing compress-text"))
-  (awhen (text-truncation view)
-    (#/setLineBreakMode: (#/cell (cocoa-ref view)) it))
   (size-to-fit view)
   (when (slot-boundp view 'part-color-list)
     (loop for (part color) in (group (part-color-list view) 2)
@@ -437,8 +425,29 @@
 
 (defclass static-text-dialog-item (easygui:static-text-view view-text-via-stringvalue-mixin dialog-item)
   ((bordered-p :reader bordered-p)
+   (text-truncation :initarg :text-truncation :reader text-truncation :initform #$NSLineBreakByTruncatingTail)
    (easygui::drawsbackground :initform nil))
   (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
+
+(defmethod initialize-instance :around ((view static-text-dialog-item) &rest args &key text-truncation)
+  (let ((accum (parse-mcl-initargs
+                 (list :text-truncation text-truncation :view view))))
+    (apply #'call-next-method view (nconc accum args))))
+
+; Default line break mode is to wrap and not tighten. Cocoa has a TighteningFactorForTruncation value that is set to .05.
+; And that threshold default is fine, but it doesn't kick in (tighten the text) unless the cell is set to truncate. 
+
+(defmethod initialize-instance :after ((view static-text-dialog-item) &key)
+  (awhen (text-truncation view)
+    (#/setLineBreakMode: (#/cell (cocoa-ref view)) it)))
+
+(defmethod parse-mcl-initarg ((keyword (eql :text-truncation)) val &key)
+  (list
+    :text-truncation
+    (etypecase val
+      (keyword (ecase val
+                 (:end #$NSLineBreakByTruncatingTail)))
+      (integer val))))
 
 ; Cocoa doesn't automatically determine the value of drawsbackground dependent on the background color.
 ; If the back color is clear, drawsbackground should be nil, otherwise t. So if a back-color is passed in
@@ -459,8 +468,7 @@
 (defclass editable-text-dialog-item (easygui::content-view-mixin easygui::editable-mixin easygui::mouse-tracking-mixin dialog-item) 
   ((allow-returns :initarg :allow-returns)
    (draw-outline :initarg :draw-outline)
-   (cocoa-text-view-specifically :reader cocoa-text-view-specifically :initarg :cocoa-text-view-specifically)
-   (text-truncation :initform nil))
+   (cocoa-text-view-specifically :reader cocoa-text-view-specifically :initarg :cocoa-text-view-specifically))
   (:default-initargs
     :specifically 'easygui::cocoa-scroll-view
     :cocoa-text-view-specifically 'easygui::cocoa-text-view))
@@ -473,8 +481,7 @@
           (apply #'make-instance
                  'inner-text-view
                  (nconc
-                   (list :specifically cocoa-text-view-specifically
-                         :text-truncation nil)
+                   (list :specifically cocoa-text-view-specifically)
                    (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification))))))
     (size-to-fit inner-text-view)
     ; Not removing :view-size, since the content-view-mixin should make use of this information as well, if available
