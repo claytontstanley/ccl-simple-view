@@ -480,15 +480,12 @@
   (let ((inner-text-view
           (apply #'make-instance
                  'inner-text-view
-                 (nconc
-                   (list :specifically cocoa-text-view-specifically)
-                   (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification))))))
+                 (nconc (list :specifically cocoa-text-view-specifically)
+                        (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification))))))
     (size-to-fit inner-text-view)
     ; Not removing :view-size, since the content-view-mixin should make use of this information as well, if available
-    (remf args :allow-tabs)
-    (remf args :view-font)
-    (remf args :dialog-item-text)
-    (remf args :text-justification)
+    (mapc (lambda (indicator) (remf args indicator))
+          (list :allow-tabs :view-font :dialog-item-text :text-justification))
     (unwind-protect (apply #'call-next-method view :content-view inner-text-view args)
       (setf (slot-value inner-text-view 'easygui::flipped)
             (slot-value view 'easygui::flipped)))))
@@ -505,15 +502,18 @@
     (setf (slot-value content-view 'easygui::parent) view)
     ))
 
+; I couldn't get #/sizeToFit to work for NSTextView objects, so doing things manually in this case
+; http://stackoverflow.com/questions/2654580/how-to-resize-nstextview-according-to-its-content
+
 (defmethod size-to-fit ((view inner-text-view))
   (when (and (slot-boundp view 'easygui::text)
              (not (slot-boundp view 'easygui::size)))
     (easygui::running-on-main-thread ()
-      (#/setFrameSize: (cocoa-ref view) (ns:make-ns-size 100000 10000))
+      (#/setFrameSize: (cocoa-ref view) (ns:make-ns-size 100000 10000)) ; Needed so that #/usedRectForTextContainer: doesn't return a size 0 frame; not sure why
       (let ((container (#/textContainer (cocoa-ref view))))
         (let ((manager (#/layoutManager (cocoa-ref view))))
           (#/ensureLayoutForTextContainer: manager container)
-          (let ((frame (#/usedRectForTextContainer: manager container)))
+          (let ((frame (#/usedRectForTextContainer: manager container))) ; The frame will be the size required to fit all of the view's current text
             (#/setFrameSize: (cocoa-ref view)
              (ns:make-ns-size (ns:ns-rect-width frame)
                               (ns:ns-rect-height frame)))
