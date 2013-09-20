@@ -468,14 +468,6 @@
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
   ())
 
-(defmethod getf-include-key (place key)
-  (aif (getf place key)
-    (list key it)))
-
-(defmethod getf-include-key (place (keys list))
-  (loop for key in keys
-        append (getf-include-key place key))) 
-
 (defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically)
   (let ((inner-text-view
           (apply #'make-instance
