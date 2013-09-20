@@ -430,8 +430,7 @@
   (:default-initargs :specifically 'easygui::cocoa-mouseable-text-field))
 
 (defmethod initialize-instance :around ((view static-text-dialog-item) &rest args &key text-truncation)
-  (let ((accum (parse-mcl-initargs
-                 (list :text-truncation text-truncation :view view))))
+  (let ((accum (parse-mcl-initargs (list :text-truncation text-truncation))))
     (apply #'call-next-method view (nconc accum args))))
 
 ; Default line break mode is to wrap and not tighten. Cocoa has a TighteningFactorForTruncation value that is set to .05.
