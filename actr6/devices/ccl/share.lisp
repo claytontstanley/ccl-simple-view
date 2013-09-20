@@ -474,7 +474,7 @@
 
 (defmethod getf-include-key (place (keys list))
   (loop for key in keys
-        append (aif (getf place key) (list key it))))
+        append (getf-include-key place key))) 
 
 (defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically)
   (let ((inner-text-view
