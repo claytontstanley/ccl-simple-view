@@ -1317,7 +1317,7 @@
 ; the fairly consistent technique across OS X Cocoa apps and web-browser apps
 
 (defparameter *view-of-keypress* nil)
- 
+
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-button) the-event)
   (let ((*view-of-keypress* (easygui::easygui-view-of cocoa-self)))
     (unwind-protect (call-next-method the-event)

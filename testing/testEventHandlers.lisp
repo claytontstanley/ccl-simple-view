@@ -143,9 +143,9 @@
                        (format nil "a~a" #\tab)))
   (check (equal (#/firstResponder (cocoa-ref (front-window)))
                 (cocoa-text-view (view-named :etdi (front-window))))))
-  
-  
-  
+
+
+
 #|
 (inspect *)
 (inspect (front-window))
