@@ -79,6 +79,7 @@
       :view-position (make-point 0 10)
       :pict-id "voteboxbg")))
 
+(event-dispatch)
 (let ((view (view-named :tv (front-window))))
   (check (equalp (as-list (view-size view))
                  (list 1024 768)))
@@ -92,6 +93,7 @@
   (make-instance
     'foo-svm
     :pict-id "voteboxbg")
+  (event-dispatch)
   (let ((view (get-image-view (front-window))))
     (set-view-pict (front-window) "voteboxbg")
     (check (eq view (get-image-view (front-window)))))
