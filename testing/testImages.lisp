@@ -92,11 +92,13 @@
 (progn
   (make-instance
     'foo-svm
+    :view-size (make-point 250 250)
     :pict-id "voteboxbg")
   (event-dispatch)
   (let ((view (get-image-view (front-window))))
     (set-view-pict (front-window) "voteboxbg")
-    (check (eq view (get-image-view (front-window)))))
+    (check (eq view (get-image-view (front-window))))
+    (check (equalp (list 250 250 0 0) (as-list (#/frame (cocoa-ref view))))))
   (sleep .5)
   (window-close (front-window))
   (sleep .5)

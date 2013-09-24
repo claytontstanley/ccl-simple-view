@@ -31,10 +31,8 @@
 
 #|
 (make-instance 'image-view)
-(#/sizeToFit (cocoa-ref (view-named :image *win*)))
 (set-view-size (view-named :image *win*) (make-point 30 30))
 (view-size (view-named :image *win*))
 (#/size (#/image (cocoa-ref (view-named :image *win*))))
-(open-resource-folder (choose-directory-dialog))
 
 |#
