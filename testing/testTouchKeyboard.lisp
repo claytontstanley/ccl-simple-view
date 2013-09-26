@@ -2,14 +2,27 @@
 
 (make-instance
   'window
+  :view-position (make-point 10 100)
   :view-subviews (list
-                   (make-instance 'phone-touch-keyboard
+                   (make-instance 'phone-portrait-touch-keyboard
                                   :view-nick-name :keyboard
+                                  :initial-layout :sd3
                                   :view-position (make-point 0 100)
-                                  :view-size (make-point 100 100)
+                                  :view-size (make-point (* 40 14) (* 27 14))
                                   ))
-  :view-size (make-point 100 200))
+  :view-size (make-point (* 40 14) (+ 100 (* 27 14))))
 
+(make-instance
+  'window
+  :view-position (make-point 10 100)
+  :view-subviews (list
+                   (make-instance 'phone-landscape-touch-keyboard
+                                  :view-nick-name :keyboard
+                                  :initial-layout :sd1-shift
+                                  :view-position (make-point 0 100)
+                                  :view-size (make-point (* 80 11) (* 27 11))
+                                  ))
+  :view-size (make-point (* 80 11) (+ 100 (* 27 11))))
 #|
 (remove-keys (view-named :keyboard (front-window)))
 (print-pool)
