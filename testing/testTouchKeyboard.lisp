@@ -6,7 +6,7 @@
   :view-subviews (list
                    (make-instance 'phone-portrait-touch-keyboard
                                   :view-nick-name :keyboard
-                                  :initial-layout :sd3
+                                  :initial-layout :sd1
                                   :view-position (make-point 0 100)
                                   :view-size (make-point (* 40 14) (* 27 14))
                                   ))
@@ -18,7 +18,7 @@
   :view-subviews (list
                    (make-instance 'phone-landscape-touch-keyboard
                                   :view-nick-name :keyboard
-                                  :initial-layout :sd1-shift
+                                  :initial-layout :sd3
                                   :view-position (make-point 0 100)
                                   :view-size (make-point (* 80 11) (* 27 11))
                                   ))
@@ -30,7 +30,7 @@
   :view-subviews (list
                    (make-instance 'tablet-portrait-touch-keyboard
                                   :view-nick-name :keyboard
-                                  :initial-layout :sd3
+                                  :initial-layout :sd1
                                   :view-position (make-point 0 100)
                                   :view-size (make-point (* 32 19) (* 11 19))
                                   ))
