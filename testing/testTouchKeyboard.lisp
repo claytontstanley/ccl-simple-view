@@ -1,4 +1,29 @@
 
+(defclass my-touch-keyboard (touch-keyboard)
+  ())
+
+(defclass phone-portrait-touch-keyboard (my-touch-keyboard phone-portrait-touch-keyboard-mixin)
+  ())
+
+(defclass phone-landscape-touch-keyboard (my-touch-keyboard phone-landscape-touch-keyboard-mixin)
+  ())
+
+(defclass tablet-portrait-touch-keyboard (my-touch-keyboard tablet-portrait-touch-keyboard-mixin)
+  ())
+
+(defclass tablet-landscape-touch-keyboard (my-touch-keyboard tablet-landscape-touch-keyboard-mixin)
+  ())
+
+; Write an :after method to fire custom code immediately after any view in the keyboard is changed/added/removed.
+; This method fires for example, after the layout changes from :sd1 to :sd2, after a popup key is displayed, after a popup key is removed, etc.
+(defmethod keyboard-views-changed :after ((view my-touch-keyboard))
+  (beep))
+
+; Write an :after method to run custom code that wants to be informed when a keypress happens (e.g., a key logger class)
+; layout changes are already handled in the base class
+(defmethod mouse-click-handled-on-key :after ((keyboard my-touch-keyboard) (layout touch-layout) (key touch-key) (val t))
+  ())
+    
 
 (make-instance
   'window
