@@ -19,3 +19,4 @@ testing/testDialogItemAction.lisp
 testing/testTextView.lisp
 testing/testPasswordEntryTextView.lisp
 testing/testEventHandlers.lisp
+testing/testTouchKeyboard.lisp
