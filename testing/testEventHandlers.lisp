@@ -94,7 +94,7 @@
   (let ((nicks (list :etdi :bdi :cdi :etdi :cdi :bdi)))
     (loop for nick in nicks
           for count from 1
-          for state = (if (<= count 3) #\tab #\em)
+          for state = (if (<= count 3) #\tab #\^Y)
           for view = (view-named nick (front-window))
           for cocoa-ref = (if (eq nick :etdi) (cocoa-text-view view) (cocoa-ref view))
           for responder = (#/firstResponder (cocoa-ref (front-window)))
