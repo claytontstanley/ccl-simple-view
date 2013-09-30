@@ -1325,7 +1325,7 @@
              (char (char str 0)))
         (case char
           (#\tab (select-next-key-view (easygui::easygui-view-of cocoa-self)))
-          (#\em (select-prev-key-view (easygui::easygui-view-of cocoa-self)))
+          (#\^Y (select-prev-key-view (easygui::easygui-view-of cocoa-self)))
           (#\space (#/performClick: cocoa-self ccl:+null-ptr+)))))))
 
 (objc:defmethod (#/keyDown: :void) ((cocoa-self easygui::cocoa-text-view) the-event)
