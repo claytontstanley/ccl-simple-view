@@ -34,7 +34,11 @@ gitFullUpdate = git remote update && git rebase && git submodule update --init -
 
 all: ${outFiles}
 
+all-builds-submodule:
+	make all actrPath='../submodules/ccl-simple-view-builds'
+
 ccl-simple-view.lisp:
+	mkdir -p ${path-${@}}
 	make -s outFileHeader > ${path-${@}}/$@
 	make -s file-list fileList="${fileList}" >> ${path-${@}}/$@
 
