@@ -27,11 +27,13 @@ test-files:
 check-dev-environment:
 	../check-dev-env.sh
 
-unit: clean-coverage clean-actr-compiled-files check-dev-environment
+unit: 
+	make clean-actr-compiled-files clean-coverage check-dev-environment
 	make -C ../build build-app all
 	make test-files testFiles=file-lists/Unit/testUnit.txt
 
-unit-1.8: clean-actr-compiled-files
+unit-1.8:
+	make clean-actr-compiled-files
 	make test-file testFile=testing/testUnit.lisp ccl=./ccl-1.8 cclSaveCoverage=''
 
 continuous-integration: unit
