@@ -3,3 +3,8 @@
 
 (load-as-lst ".." "bincarbon" "touch-keyboard.lisp")
 (load-as-lst ".." "bincarbon" "testing" "testTouchKeyboard.lisp")
+
+(load-as-lst ".." "bincarbon" "chil-ccl-utilities.lisp")
+(load-as-lst ".." "bincarbon" "direct-event-calls.lisp")
+(load-as-lst ".." "bincarbon" "password-entry-text-view.lisp")
+(load-as-lst ".." "bincarbon" "testing" "testPasswordEntryTextView.lisp")
