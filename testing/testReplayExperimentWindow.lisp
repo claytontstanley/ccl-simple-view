@@ -2,9 +2,3 @@
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
 (load-file-list "file-lists" "ReplayExperimentWindow" "loaded.txt")
-
-
-(replay-experiment
-  (load-eyetracking-experiment-window
-    :dat-file (path-as-lst ".." "bincarbon" "DMTracker" "ccl-dmtracker-data" "subj006-track.dat")
-    :lisp-file (path-as-lst ".." "bincarbon" "DMTracker" "ccl-dmtracker-data" "subj006.lisp")))
