@@ -8,3 +8,8 @@
 (load-as-lst ".." "bincarbon" "direct-event-calls.lisp")
 (load-as-lst ".." "bincarbon" "password-entry-text-view.lisp")
 (load-as-lst ".." "bincarbon" "testing" "testPasswordEntryTextView.lisp")
+
+(load-file-list "file-lists" "DMTracker" "testDMTracker.txt")
+
+(load-file-list "file-lists" "ReplayExperimentWindow" "loaded.txt")
+
