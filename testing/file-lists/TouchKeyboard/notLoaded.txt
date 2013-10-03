@@ -1,3 +1,4 @@
 testing/testBincarbon.lisp
 bincarbon/DMTracker
+bincarbon/touch-keyboard-images
 testing/file-lists/TouchKeyboard/loaded.txt
