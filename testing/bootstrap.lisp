@@ -21,7 +21,7 @@
                 (sandwich *path-separator* lst))))
 
 (defun load-as-lst (&rest lst)
-  (load (apply #'path-as-lst lst)))
+  (load-file (apply #'path-as-lst lst)))
 
 (defun replace-all (string part replacement &key (test #'char-equal))
   "Returns a new string in which all the occurrences of the part is replaced with replacement."
@@ -59,7 +59,7 @@
       (let ((file (replace-all file "/" *path-separator*)))
         (let ((file (format nil "~a~a" base-repo-namestring file)))
           (cond ((search "load-act-r-6.lisp" file)
-                 #-:act-r-6.0 (load file))
+                 #-:act-r-6.0 (load-file file))
                 (t
                  (load-file file))))))))
 

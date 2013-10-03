@@ -6,7 +6,5 @@ testing/testSound.lisp
 testing/testTutorials.lisp
 testing/testVotebox.lisp
 testing/testVoteboxKristen.lisp
-testing/testDMTracker.lisp
 testing/testTamboDisModel.lisp
 testing/testStanleyThesis.lisp
-testing/testReplayExperimentWindow.lisp

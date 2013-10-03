@@ -8,8 +8,6 @@
   (when (search "testTamboDisModel" file)
     (fmakunbound 'begin-experiment))
   (when (search "testStanleyThesis" file)
-    (fmakunbound 'begin-experiment))
-  (when (search "testReplayExperimentWindow" file)
     (fmakunbound 'begin-experiment)))
 
 ; Don't reload ccl-simple-view code anymore; already loaded.
