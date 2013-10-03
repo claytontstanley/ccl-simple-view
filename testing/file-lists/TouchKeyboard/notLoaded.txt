@@ -1,0 +1,3 @@
+testing/testBincarbon.lisp
+bincarbon/DMTracker
+testing/file-lists/TouchKeyboard/notLoaded.txt
