@@ -1,2 +1,3 @@
 bincarbon/defsystem-patched.lisp
 bincarbon/DMTracker-bootstrap.lisp
+bincarbon/DMTracker/testing/testDMTracker.lisp
