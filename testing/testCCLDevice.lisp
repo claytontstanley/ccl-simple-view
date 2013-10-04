@@ -165,7 +165,6 @@
 (make-instance 'windoid)
 (#/setStyleMask: (cocoa-ref *)
  #$NSBorderlessWindowMask)
-(#/close (cocoa-ref *))
 ***
 (window-close *)
 (cocoa-ref (view-named :et *win*))
