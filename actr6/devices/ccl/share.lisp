@@ -465,7 +465,7 @@
     (#/setBordered: (easygui:cocoa-ref view) (if bordered-p #$YES #$NO))))
 
 (defclass scroll-bar-dialog-item (easygui::content-view-mixin dialog-item)
-  ((scrollee :accessor scrollee)
+  ((scrollee :accessor scrollee :initarg :scrollee)
    (scrollee-class :initarg :scrollee-class))
   (:default-initargs
     :specifically 'easygui::cocoa-scroll-view
@@ -482,11 +482,13 @@
   (:default-initargs
     :specifically 'easygui::cocoa-text-view))
 
-(defmethod initialize-instance :around ((view scroll-bar-dialog-item) &rest args &key scrollee-class)
+(defmethod initialize-instance :around ((view scroll-bar-dialog-item) &rest args &key scrollee scrollee-class)
   (setf (scrollee view)
-        (apply #'make-instance
-               scrollee-class
-               (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification))))
+        (if scrollee
+          scrollee
+          (apply #'make-instance
+                 scrollee-class
+                 (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification)))))
   (size-to-fit (scrollee view))
   ; Not removing :view-size, since the content-view-mixin should make use of this information as well, if available
   (mapc (lambda (indicator) (remf args indicator))
@@ -495,7 +497,7 @@
     (setf (slot-value (scrollee view) 'easygui::flipped)
           (slot-value view 'easygui::flipped))))
 
-(defmethod easygui::initialize-view :after ((view editable-text-dialog-item))
+(defmethod easygui::initialize-view :after ((view scroll-bar-dialog-item))
   (let ((content-view (slot-value view 'easygui::content-view)))
     (#/setDocumentView: (cocoa-ref view) (cocoa-ref content-view))
     (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
