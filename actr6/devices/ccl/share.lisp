@@ -464,35 +464,36 @@
   (unwind-protect (setf (slot-value view 'bordered-p) bordered-p)
     (#/setBordered: (easygui:cocoa-ref view) (if bordered-p #$YES #$NO))))
 
-(defclass editable-text-dialog-item (easygui::content-view-mixin easygui::editable-mixin easygui::mouse-tracking-mixin dialog-item) 
-  ((allow-returns :initarg :allow-returns)
-   (draw-outline :initarg :draw-outline)
-   (cocoa-text-view-specifically :reader cocoa-text-view-specifically :initarg :cocoa-text-view-specifically))
+(defclass scroll-bar-dialog-item (dialog-item)
+  ((scrollee :accessor scrollee)
+   (scrollee-class :initarg :scrollee-class))
   (:default-initargs
     :specifically 'easygui::cocoa-scroll-view
-    :cocoa-text-view-specifically 'easygui::cocoa-text-view))
+    :objc-content-view-accessor #'#/documentView))
+
+(defclass editable-text-dialog-item (easygui::content-view-mixin easygui::editable-mixin easygui::mouse-tracking-mixin scroll-bar-dialog-item) 
+  ((allow-returns :initarg :allow-returns)
+   (draw-outline :initarg :draw-outline))
+  (:default-initargs
+    :scrollee-class 'inner-text-view))
 
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
-  ())
+  ()
+  (:default-initargs
+    :specifically 'easygui::cocoa-text-view))
 
-(defmethod initialize-instance :around ((view editable-text-dialog-item) &rest args &key cocoa-text-view-specifically)
-  (let ((inner-text-view
-          (apply #'make-instance
-                 'inner-text-view
-                 (nconc (list :specifically cocoa-text-view-specifically)
-                        (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification))))))
-    (size-to-fit inner-text-view)
-    ; Not removing :view-size, since the content-view-mixin should make use of this information as well, if available
-    (mapc (lambda (indicator) (remf args indicator))
-          (list :allow-tabs :view-font :dialog-item-text :text-justification))
-    (unwind-protect (apply #'call-next-method view :content-view inner-text-view args)
-      (setf (slot-value inner-text-view 'easygui::flipped)
-            (slot-value view 'easygui::flipped)))))
-
-(defmethod easygui::content-view ((view editable-text-dialog-item))
-  (assert (eql (cocoa-ref (slot-value view 'easygui::content-view))
-               (dcc (#/documentView (cocoa-ref view)))))
-  (slot-value view 'easygui::content-view))
+(defmethod initialize-instance :around ((view scroll-bar-dialog-item) &rest args &key scrollee-class)
+  (setf (scrollee view)
+        (apply #'make-instance
+               scrollee-class
+               (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification))))
+  (size-to-fit (scrollee view))
+  ; Not removing :view-size, since the content-view-mixin should make use of this information as well, if available
+  (mapc (lambda (indicator) (remf args indicator))
+        (list :allow-tabs :view-font :dialog-item-text :text-justification))
+  (unwind-protect (apply #'call-next-method view :content-view (scrollee view) args)
+    (setf (slot-value (scrollee view) 'easygui::flipped)
+          (slot-value view 'easygui::flipped))))
 
 (defmethod easygui::initialize-view :after ((view editable-text-dialog-item))
   (let ((content-view (slot-value view 'easygui::content-view)))

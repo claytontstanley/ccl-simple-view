@@ -36,14 +36,19 @@
       (dcc (#/setFrame: (cocoa-ref self) (easygui::view-content-rect self)))
       (dcc (#/setNeedsDisplay: (cocoa-ref self) t)))))
 
-
 ; I wanted to instantiate my own extended contained-view class, but I didn't see an easy way to do this given the current
 ; easygui code. So adding a contained-view-specifically slot to the mixin class, defaulting it to the contained-view class
 ; defined in easygui. If you want to instantiate a different class for the contained view, just overwrite this default.
 (defclass easygui::content-view-mixin ()
   ((easygui::content-view :initarg :content-view)
+   (easygui::objc-content-view-accessor :reader easygui::objc-content-view-accessor :initarg :objc-content-view-accessor :initform #'#/contentView)
    (easygui::flipped :initarg :flipped :initform easygui::*screen-flipped*)
    (easygui::contained-view-specifically :initarg :contained-view-specifically :initform 'easygui::contained-view)))
+
+(defmethod easygui::content-view ((view easygui::content-view-mixin))
+  (assert (eql (cocoa-ref (slot-value view 'easygui::content-view))
+               (dcc (funcall (easygui::objc-content-view-accessor view) (cocoa-ref view)))))
+  (slot-value view 'easygui::content-view))
 
 ; Added code to instantiate the contained view class that is stored as a slot on the mixin object
 (defmethod easygui::initialize-view :after ((view easygui::content-view-mixin))
