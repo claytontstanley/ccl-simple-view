@@ -464,14 +464,14 @@
   (unwind-protect (setf (slot-value view 'bordered-p) bordered-p)
     (#/setBordered: (easygui:cocoa-ref view) (if bordered-p #$YES #$NO))))
 
-(defclass scroll-bar-dialog-item (dialog-item)
+(defclass scroll-bar-dialog-item (easygui::content-view-mixin dialog-item)
   ((scrollee :accessor scrollee)
    (scrollee-class :initarg :scrollee-class))
   (:default-initargs
     :specifically 'easygui::cocoa-scroll-view
     :objc-content-view-accessor #'#/documentView))
 
-(defclass editable-text-dialog-item (easygui::content-view-mixin easygui::editable-mixin easygui::mouse-tracking-mixin scroll-bar-dialog-item) 
+(defclass editable-text-dialog-item (easygui::editable-mixin easygui::mouse-tracking-mixin scroll-bar-dialog-item) 
   ((allow-returns :initarg :allow-returns)
    (draw-outline :initarg :draw-outline))
   (:default-initargs
