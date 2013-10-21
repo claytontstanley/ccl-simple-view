@@ -103,6 +103,7 @@
   (window-close (front-window))
   (sleep .5)
   (make-instance 'foo-svm)
+  (event-dispatch)
   (check (not (get-image-view (front-window))))
   (set-view-pict (front-window) "voteboxbg")
   (sleep .5)
