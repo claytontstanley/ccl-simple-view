@@ -489,7 +489,6 @@
           (apply #'make-instance
                  scrollee-class
                  (getf-include-key args (list :view-size :allow-tabs :view-font :dialog-item-text :text-justification)))))
-  (size-to-fit (scrollee view))
   ; Not removing :view-size, since the content-view-mixin should make use of this information as well, if available
   (mapc (lambda (indicator) (remf args indicator))
         (list :allow-tabs :view-font :dialog-item-text :text-justification))
@@ -526,7 +525,7 @@
              (slot-boundp (content-view view) 'easygui::size))
     (set-view-size view (add-points (make-point 5 5) (view-size (content-view view))))))
 
-(defmethod size-to-fit ((view simple-view))
+(defmethod size-to-fit ((view dialog-item))
   (when (and (slot-boundp view 'easygui::text)
              (not (slot-boundp view 'easygui::size)))
     (#/sizeToFit (cocoa-ref view))
