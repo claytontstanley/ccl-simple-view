@@ -22,15 +22,15 @@
 ;;; Bugs        : 
 ;;; 
 ;;; --- History ---
-;;; 01.09.21 mdb [b2]
+;;; 01.09.21   mdb [b2]
 ;;;             : Fixed an infinite recursion bug in APPROACH-WIDTH.
 ;;; 2002.04.16 mdb [b6]
-;;;             : * Rolled in color text stuff.
-;;;             : * Added BUILD-FEATURES-FOR methods for radio buttons and
-;;;             : check boxes.
-;;; 2002.04.18  mdb
+;;;             : Rolled in color text stuff.
+;;;             : Added BUILD-FEATURES-FOR methods for radio buttons and
+;;;               check boxes.
+;;; 2002.04.18 mdb
 ;;;             : Fixed minor glitch created by color text stuff--if the part
-;;;             : color was not set, that passed NIL to the color parser.  No.
+;;;               color was not set, that passed NIL to the color parser.  No.
 ;;; 2002.05.17 mdb
 ;;;             : Moved COLOR-SYMBOL->MAC-COLOR here.
 ;;; 2002.06.05 mdb
@@ -38,14 +38,14 @@
 ;;; 
 ;;; 2002.06.21 Dan [b7]
 ;;;             : Changed the rpm-window class to rpm-real-window and
-;;;             : updated the methods accordingly.
+;;;               updated the methods accordingly.
 ;;; 2002.06.30 Dan
 ;;;             : Changed the COLOR-SYMBOL->MAC-COLOR and MAC-COLOR->SYMBOL
-;;;             : function names by replacing MAC with SYSTEM to be a little
-;;;             : more consistent (that way there aren't as many 'different'
-;;;             : function names floating around in these files).
+;;;               function names by replacing MAC with SYSTEM to be a little
+;;;               more consistent (that way there aren't as many 'different'
+;;;               function names floating around in these files).
 ;;;             : Moved the view-line stuff in here from the separate file and
-;;;             : documented it better.
+;;;               documented it better.
 ;;;             : Removed all of the UWI code from this file.
 ;;; 2002.07.03 mdb
 ;;;             : Makes sure that SPEECH-AVAILABLE-P is defined.
@@ -55,83 +55,83 @@
 ;;;             : Per DB's suggestion, cut back on EVENT-DISPATCHing. 
 ;;; 2003.06.18 mdb
 ;;;             : Turns out static text dialog items support multiple kinds
-;;;             : of justifications, though it's hard to get at it.  Now
-;;;             : handled properly. 
+;;;               of justifications, though it's hard to get at it.  Now
+;;;               handled properly. 
 ;;; 2003.06.23 mdb [2.1.3]
 ;;;             : Under-the-hood addition of RPM-OVERLAY class. 
 ;;; 2004.03.11 mdb [2.2]
 ;;;             : Added a VIEW-KEY-EVENT-HANDLER method for editable text dialog
-;;;             : items, which used to break.
+;;;               items, which used to break.
 ;;;
-;;; 04.10.19 Dan [Moved into ACT-R 6]
+;;; 04.10.19   Dan [Moved into ACT-R 6]
 ;;;             : Reset the version to 1.0a1
 ;;;             : added the packaging switches
 ;;;             : changed the name to device to be placed in a folder called MCL 
 ;;;             : removed references to *mp* and other minor
 ;;;             : ACT-R 6 updates
 ;;; 2006.09.07 Dan
-;;;             : * Removed the fill-default-dimensions method because it's
-;;;             :   now defined in the vision file.
+;;;             : Removed the fill-default-dimensions method because it's
+;;;               now defined in the vision file.
 ;;; 2007.07.02 Dan
-;;;             : * Converted things over for the new vision module.
+;;;             : Converted things over for the new vision module.
 ;;; 2007.07.05 Dan
-;;;             : * Rolled in the multi-line fix Mike made to the old MCL device.
+;;;             : Rolled in the multi-line fix Mike made to the old MCL device.
 ;;; 2010.03.11 mdb
 ;;;             : Fixed DEVICE-MOVE-CURSOR-TO for (R)MCL 5.2 under OS X.
 ;;; 2010.06.03 mdb
 ;;;             : Fixed XSTART for (R)MCL 5.2 under OS X, which uses NIL for 
-;;;             : left-justified text as a default (rather than :left).
+;;;               left-justified text as a default (rather than :left).
 ;;; 2011.11.21 Dan
-;;;             : * Using model-generated-action instead of *actr-enabled-p*
-;;;             :   in view-key-event-handler  for editable-text-dialog-items
-;;;             :   to determine when to hack the output.
+;;;             : Using model-generated-action instead of *actr-enabled-p*
+;;;               in view-key-event-handler  for editable-text-dialog-items
+;;;               to determine when to hack the output.
 ;;; 2012.08.07 cts
 ;;;             : Tweaked original MCL device.lisp code, and used it to build a
 ;;;               device for CCL that leverages ccl-simple-view.lisp.
-;;;               Note that for any code that is left in this file and is
-;;;               commented out, I did not fully understand exactly what is
-;;;               was meant for. But all tests are passing without adding the
-;;;               code back in. So I'm keeping it commented out. If someone
+;;;               Note that for any commented-out code that is left in this file,
+;;;               I do not fully understand exactly what it
+;;;               is meant for. But all tests are passing without adding the
+;;;               code back in. So I'm keeping it commented out for now. If someone
 ;;;               fully understands how these pieces should
 ;;;               work, and sees that the code isn't needed, feel free to
 ;;;               remove. Or if it is needed, please add it back in.
 ;;; 2012.08.27 Dan
-;;;             : * The device-handle-keypress method now selects the window
-;;;             :   before generating the events so that it goes to the right
-;;;             :   window.
-;;;             : * In the device-handle-keypress method it now waits on a 
-;;;             :   semaphore to be set by the view-key-event-handler method
-;;;             :   before returning to guarantee the press gets processed.
-;;;             :   It doesn't need to delay in the keypress action because of
-;;;             :   that so it passes nil for the delay.
+;;;             : The device-handle-keypress method now selects the window
+;;;               before generating the events so that it goes to the right
+;;;               window.
+;;;             : In the device-handle-keypress method it now waits on a 
+;;;               semaphore to be set by the view-key-event-handler method
+;;;               before returning to guarantee the press gets processed.
+;;;               It doesn't need to delay in the keypress action because of
+;;;               that so it passes nil for the delay.
 ;;; 2012.08.29 Dan
-;;;             : * Added a timeout to device-handle-keypress so that it doesn't
-;;;             :   hang if the semaphore never gets set.  If it's not set in
-;;;             :   500ms it prints a warning and just gives up.
+;;;             : Added a timeout to device-handle-keypress so that it doesn't
+;;;               hang if the semaphore never gets set.  If it's not set in
+;;;               500ms it prints a warning and just gives up.
 ;;; 2012.08.30 cts
-;;;             : * Added the semaphore method for mouse clicks. Wrapped the 
-;;;             :   timeout code into a function and using it for key presses
-;;;             :   and mouse clicks. 
-;;;             : * Calling event-dispatch one final time after semaphore is triggered,
-;;;             :   so that any events created during the keypress/mouseclick
-;;;             :   that were queued to run on the NSRunLoop are run before the
-;;;             :   keypress/mouseclick method returns.
+;;;             : Added the semaphore method for mouse clicks. Wrapped the 
+;;;               timeout code into a function and using it for key presses
+;;;               and mouse clicks. 
+;;;             : Calling event-dispatch one final time after semaphore is triggered,
+;;;               so that any events created during the keypress/mouseclick
+;;;               that were queued to run on the NSRunLoop are run before the
+;;;               keypress/mouseclick method returns.
 ;;; 2013.01.03 Dan
-;;;             : * Clipped the rpm-view-line function (which was already commented out)
-;;;             :   to avoid confusion since it isn't needed and contained outdated code.
-;;; 2013.02.01 Clayton
-;;;             : * Streamlined the device-move-cursor-to call.
-;;;             :   The function no longer pauses for a set time to ensure that the move
-;;;             :   is registered. Instead, it polls and checks that the move is registered
-;;;             :   and exits immediately after success.
+;;;             : Clipped the rpm-view-line function (which was already commented out)
+;;;               to avoid confusion since it isn't needed and contained outdated code.
+;;; 2013.02.01 cts 
+;;;             : Streamlined the device-move-cursor-to call.
+;;;               The function no longer pauses for a set time to ensure that the move
+;;;               is registered. Instead, it polls and checks that the move is registered
+;;;               and exits immediately after success.
 ;;; 2013.04.10 cts
-;;;             : * Feature was added in ccl device to change text color for buttons.
-;;;                 Visicon representation for buttons now shows text in appropriate color
+;;;             : Feature was added in ccl device to change text color for buttons.
+;;;               Visicon representation for buttons now shows text in appropriate color
 ;;; 2013.04.20 cts
-;;;           : Removed stray commented out code that is no longer necessary.
-;;;           : Now spell checking comments and strings in the code.
+;;;             : Removed stray commented out code that is no longer necessary.
+;;;             : Now spell checking comments and strings in the code.
 ;;; 2013.04.27 cts
-;;;           : Removed unnecessary code duplication when building visual objects for lines
+;;;             : Removed unnecessary code duplication when building visual objects for lines
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
