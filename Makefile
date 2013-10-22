@@ -44,7 +44,7 @@ reformat spelling:
 %-all: lst-cmd = (git ls-files && cd bincarbon && git ls-files | perl -pe 's|^|bincarbon/|')
 
 reformat-all spelling-all: %-all:
-	make $* list-cmd="${lst-cmd}" exclude-list="bincarbon/(CFBundle|base-trek-tasks|pict-svm|procedure-window2|timer).lisp$$"
+	make $* list-cmd="${lst-cmd}" exclude-list="bincarbon/(CFBundle|base-trek-tasks|pict-svm|procedure-window2|timer|touch-keyboard).lisp$$"
 
 reformat-builds spelling-builds: %-builds:
 	make $* list-cmd="cat build/file-list*"
