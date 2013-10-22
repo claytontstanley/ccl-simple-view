@@ -64,8 +64,6 @@
 
 (add-subviews *win* *view*)
 
-(sleep 1)
-
 (setf (pict-id *view*) "voteboxbg")
 
 (make-instance
@@ -79,7 +77,6 @@
       :view-position (make-point 0 10)
       :pict-id "voteboxbg")))
 
-(event-dispatch)
 (let ((view (view-named :tv (front-window))))
   (check (equalp (as-list (view-size view))
                  (list 1024 768)))
@@ -94,19 +91,14 @@
     'foo-svm
     :view-size (make-point 250 250)
     :pict-id "voteboxbg")
-  (event-dispatch)
   (let ((view (get-image-view (front-window))))
     (set-view-pict (front-window) "voteboxbg")
     (check (eq view (get-image-view (front-window))))
     (check (equalp (list 250 250 0 0) (as-list (#/frame (cocoa-ref view))))))
-  (sleep .5)
   (window-close (front-window))
-  (sleep .5)
   (make-instance 'foo-svm)
-  (event-dispatch)
   (check (not (get-image-view (front-window))))
   (set-view-pict (front-window) "voteboxbg")
-  (sleep .5)
   (let ((view (get-image-view (front-window))))
     (set-view-pict (front-window) "image")
     (check (not (eq view (get-image-view (front-window)))))))

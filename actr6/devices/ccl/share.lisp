@@ -233,20 +233,24 @@
     (guard ((eq 0 window-other-attributes) "non-zero window-other-attributes not currently implemented"))
     (guard ((null process) "process slot should be nil"))
     (guard ((member auto-position (list nil :noAutoCenter)) "auto-position not currently implemented")))
-  (setf (maintenance-thread win)
-        (process-run-function 
-          (format nil "maintenance thread for win ~a" win)
-          (lambda ()
-            (setf (initialized-p win) t)
-            (ccl::create-autorelease-pool)
-            (while (wptr win)
-              (cond ((close-requested-p win)
-                     (sv-log "closing ~a on thread ~a~%" win *current-process*)
-                     (funcall (window-close-fct win) win)
-                     (signal-semaphore (sema-finished-close win)))
-                    ((aand (front-window) (eq win it))
-                     (window-null-event-handler win)))
-              (timed-wait-on-semaphore (sema-request-close win) .1))))))
+  (let ((started-sema (make-semaphore)))
+    (setf (maintenance-thread win)
+          (process-run-function 
+            (format nil "maintenance thread for win ~a" win)
+            (lambda ()
+              (setf (initialized-p win) t)
+              (ccl::create-autorelease-pool)
+              (signal-semaphore started-sema)
+              (while (wptr win)
+                (cond ((close-requested-p win)
+                       (sv-log "closing ~a on thread ~a~%" win *current-process*)
+                       (funcall (window-close-fct win) win)
+                       (signal-semaphore (sema-finished-close win)))
+                      ((aand (front-window) (eq win it))
+                       (window-null-event-handler win)))
+                (timed-wait-on-semaphore (sema-request-close win) .1)))))
+    (guard-!nil
+      (timed-wait-on-semaphore started-sema 1))))
 
 ; Give each window a maintenance thread. In that thread,
 ; periodically check if the window is the frontmost window.

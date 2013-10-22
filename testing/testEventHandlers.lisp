@@ -25,7 +25,6 @@
       (make-instance 'my-etdi
                      :view-size (make-point 100 50)
                      :view-nick-name :et)))
-  (event-dispatch)
   (setf *chain* nil)
   (setf *keychain* nil)
   (left-mouse-click (view-center (front-window)))
@@ -47,7 +46,6 @@
   (setf *keychain* nil)
   (setf *chain* nil)
   (make-instance 'foo)
-  (event-dispatch)
   (left-mouse-click (view-center (front-window)))
   (keypress "b")
   (check (eq (pop *keychain*) #\b))
@@ -83,7 +81,6 @@
                          :view-nick-name :cdi
                          :dialog-item-action (lambda (obj) (push-to-end :cdi-action *chain*))
                          :view-position (make-point 40 100))))
-  (event-dispatch)
   (left-mouse-click (view-position (front-window)))
   (left-mouse-click (add-points
                       (view-position (front-window))
@@ -113,7 +110,6 @@
                  :view-subviews (list (make-instance 'editable-text-dialog-item
                                                      :view-nick-name :etdi
                                                      :view-size (make-point 100 20))))
-  (event-dispatch)
   (check (equal (#/firstResponder (cocoa-ref (front-window))) (cocoa-ref (front-window))))
   (left-mouse-click (view-center (front-window)))
   (check (equal (#/firstResponder (cocoa-ref (front-window))) (cocoa-ref (front-window))))
@@ -132,7 +128,6 @@
                                       (make-instance 'editable-text-dialog-item
                                                      :view-size (make-point 100 20)
                                                      :view-position (make-point 0 30))))
-  (event-dispatch)
   (left-mouse-click (view-center (front-window)))
   (keypress #\tab)
   (keypress #\a)

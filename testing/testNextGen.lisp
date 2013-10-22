@@ -182,10 +182,6 @@ internal-time-units-per-second
 (invalidate-view *win*)
 
 (setf (air-spd (view-window *speed*)) 30)
-(dolist (view (subviews *win*))
-  (print view) 
-  (sleep .11)
-  (invalidate-view view))
 
 (subviews *win*)
 

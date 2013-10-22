@@ -59,7 +59,6 @@
   (move-to *new-view* 100 0)
   (setf (polygon *new-view*) (get-polygon *win*)))
 
-(sleep 2)
 (add-subviews *win* *new-view*)
 #|
 (inspect *new-view*)

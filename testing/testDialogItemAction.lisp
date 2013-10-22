@@ -8,7 +8,6 @@
                                 :view-nick-name :click
                                 :dialog-item-action (lambda (obj)
                                                       (remove-subviews (front-window) obj)))))
-(sleep .5)
 (left-mouse-click (view-position (front-window)))
 (left-mouse-click (add-points
                     (view-position (front-window))

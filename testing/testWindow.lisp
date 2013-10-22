@@ -4,7 +4,6 @@
 (setf *win* (make-instance 'window))
 
 (let ((win (make-instance 'windoid)))
-  (sleep 1)
   (window-close win))
 
 (#/level (cocoa-ref *win*))
@@ -71,7 +70,6 @@
   (setf *win* (make-instance 'foo-window))
   (setf *win2* (make-instance 'window))
   (setf *win3* (make-instance 'windoid))
-  (sleep 1)
   (check (eq *win2* (front-window)))
   (check (eq *win3* (front-window :include-windoids t)))
   (check (eq *win3* (front-window :class 'windoid)))

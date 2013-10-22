@@ -23,7 +23,7 @@
     :height 50
     :width 50))
 
-(sleep 2)
+(sleep .4)
 (set-part-color
   (view-named :cb *win*)
   :text (color-symbol->system-color 'orange))

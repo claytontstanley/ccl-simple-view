@@ -23,8 +23,6 @@
                  :view-subviews 
                  (list *sv*)))
 
-(sleep .5)
-(window-close *win*)
 #|
 (invalidate-view *win*)
 

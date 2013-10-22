@@ -31,14 +31,12 @@
                                       (beep)
                                       (return-from-modal-dialog 5))))))))))))
 
-(sleep .2)
 (dotimes (i 2)
   (left-mouse-click
     (add-points 
       (view-position (front-window))
       (view-center
-        (first (subviews (front-window))))))
-  (sleep .5))
+        (first (subviews (front-window)))))))
 
 (while (not *t*)
   (spin-for-fct 100))

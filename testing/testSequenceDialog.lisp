@@ -27,7 +27,6 @@
   (lambda ()
     (sleep 1)
     (left-mouse-click (view-position (front-window)))
-    (sleep .3)
     (left-mouse-click
       (add-points
         (view-position (front-window))

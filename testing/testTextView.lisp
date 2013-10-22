@@ -14,7 +14,6 @@
       :dialog-item-text "abc"
       :view-size (make-point 100 50))))
 
-(event-dispatch)
 (check (equal (as-list (view-size (view-named :foo (front-window))))
               (list 100 50)))
 (left-mouse-click (view-position (front-window)))
@@ -26,7 +25,6 @@
   (check (string-equal (font-name font) "Courier"))
   (check (= (font-point font) 11)))
 
-(sleep .5)
 (progn
   (keypress #\a)
   (keypress #\return)
