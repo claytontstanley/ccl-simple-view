@@ -24,48 +24,48 @@
 ;;; 2002.06.30 Dan
 ;;;             : Added this header.
 ;;;             : Moved all of the UWI code from mcl-interface
-;;;             : to this file where it belongs.
-;;;             : Actually documented the code!
+;;;               to this file where it belongs.
+;;;               Actually documented the code!
 ;;; 2002.12.19 Dan
 ;;;             : Modified the window class and make-static-text-...
-;;;             : so that it can handle the color attribute.
-;;; 04.04.13 Dan [2.2] (previous change is "new" as of 2.2 as well)
+;;;               so that it can handle the color attribute.
+;;; 04.04.13   Dan [2.2] (previous change is "new" as of 2.2 as well)
 ;;;             : Changed the copyright notice and added the LGPL stuff.
 ;;;
-;;; 04.10.19 Dan [Moved into ACT-R 6]
+;;; 04.10.19   Dan [Moved into ACT-R 6]
 ;;;             : Reset the version to 1.0a1
 ;;;             : added the packaging switches
 ;;;             : changed the name to uwi to be placed in a folder called mcl
 ;;; 2007.07.13 Dan
-;;;             : * Added the color keyword to make-button-for-rpm-window
-;;;             :   though it's not actually used at this point.
-;;; 2012.08.07  cts
+;;;             : Added the color keyword to make-button-for-rpm-window
+;;;               though it's not actually used at this point.
+;;; 2012.08.07 cts
 ;;;             : Tweaked original MCL uwi.lisp code, and used it to build a
 ;;;               uwi.lisp for CCL that leverages ccl-simple-view.lisp.
 ;;; 2012.08.27 Dan
-;;;            : * In the view-key-event-handler, when it is a model generated
-;;;            :   keypress, signal the *keypress-wait* semaphore so that the
-;;;            :   device-handle-keypress method for the device can return.
+;;;             : In the view-key-event-handler, when it is a model generated
+;;;               keypress, signal the *keypress-wait* semaphore so that the
+;;;               device-handle-keypress method for the device can return.
 ;;; 2012.08.30 cts
-;;;            : * Created a post-view-(key|click)-event handler method that
-;;;                gets called after all view-(key|click)-event handler methods
-;;;                are called. 'Even the around methods on the most specific class'.
-;;;                This post method calls the rpm handler methods. This guarantees
-;;;                that all view-(key|click)-event handler methods and rpm
-;;;                handler methods are called before the semaphore is triggered.
-;;;                Using this technique for both keypress and mouse clicks
+;;;             : Created a post-view-(key|click)-event handler method that
+;;;               gets called after all view-(key|click)-event handler methods
+;;;               are called. 'Even the around methods on the most specific class'.
+;;;               This post method calls the rpm handler methods. This guarantees
+;;;               that all view-(key|click)-event handler methods and rpm
+;;;               handler methods are called before the semaphore is triggered.
+;;;               Using this technique for both keypress and mouse clicks
 ;;; 2012.09.04 Dan
-;;;            : * Changed it so the rpm-window-click-event-handler is called
-;;;            :   with a vector of the mouse position.
+;;;             : Changed it so the rpm-window-click-event-handler is called
+;;;               with a vector of the mouse position.
 ;;; 2013.04.20 cts
-;;;           : Now spell checking comments and strings in the code.
+;;;             : Now spell checking comments and strings in the code.
 ;;; 2013.04.27 cts
-;;;           : Added make-liner-from-points utility function that can create a 
-;;;             liner object or subclassed liner object.
-;;;             Refactored make-line-for-rpm-window to call the utility function
+;;;             : Added make-liner-from-points utility function that can create a 
+;;;               liner object or subclassed liner object.
+;;;               Refactored make-line-for-rpm-window to call the utility function
 ;;; 2013.05.13 cts
-;;;           : Suppressed compiler warning in make-button-for-rpm-window when not
-;;;             in development mode
+;;;             : Suppressed compiler warning in make-button-for-rpm-window when not
+;;;               in development mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
