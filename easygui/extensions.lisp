@@ -269,4 +269,3 @@
 (defmethod (setf easygui::view-text) (new-text (view easygui::view-text-via-string-mixin))
   (#/setString: (cocoa-ref view) (objc:make-nsstring new-text))
   new-text)
-
