@@ -4,12 +4,14 @@
 (defun test-dialog (fun &optional title)
   (process-run-function "foo"
                         (lambda ()
-                          (sleep 1)
-                          (let ((ns-panel (#/modalWindow (#/sharedApplication ns:ns-application))))
-                            (when title
-                              (check (string-equal title (objc:lisp-string-from-nsstring (#/title ns-panel)))))
-                            (#/abortModal (#/sharedApplication ns:ns-application))
-                            )))
+                          (labels ((get-modal-window ()
+                                     (loop for panel = (#/modalWindow (#/sharedApplication ns:ns-application))
+                                           when (not (equal panel ccl:+null-ptr+)) return panel
+                                           do (sleep 1))))
+                            (let ((ns-panel (get-modal-window)))
+                              (when title
+                                (check (string-equal title (objc:lisp-string-from-nsstring (#/title ns-panel)))))))
+                          (#/abortModal (#/sharedApplication ns:ns-application))))
   (check
     (search "error code -1001"
             (easygui::running-on-main-thread ()
