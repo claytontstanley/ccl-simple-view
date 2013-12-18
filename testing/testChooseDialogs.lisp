@@ -6,8 +6,8 @@
                         (lambda ()
                           (labels ((get-modal-window ()
                                      (loop for panel = (#/modalWindow (#/sharedApplication ns:ns-application))
-                                           when (not (equal panel ccl:+null-ptr+)) return panel
-                                           do (sleep 1))))
+                                           unless (ccl:%null-ptr-p panel) return panel
+                                           do (sleep .5))))
                             (let ((ns-panel (get-modal-window)))
                               (when title
                                 (check (string-equal title (objc:lisp-string-from-nsstring (#/title ns-panel)))))))
