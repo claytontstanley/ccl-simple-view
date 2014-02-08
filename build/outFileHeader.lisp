@@ -115,11 +115,12 @@
 ;;;             : Fixed a bug where incorrect mouse locations were passed to view-click-event-handler for views.
 ;;;               All locations where correct for view-click-event-handlers defined on windows, and for 
 ;;;               rpm-window-click-event-handlers (since those are defined on the window).
+;;;               So this does not apply to act-r models using the act-r device interface (i.e., rpm-window-click-event-handler).
 ;;;               This only applied to view-click-event-handlers defined on views (e.g., buttons).
 ;;;               MCL spec sets location for view-click-event-handler to the mouse click location relative to that 
 ;;;               view's local coordinate system, not relative to the window's coordinate system. So if a button
 ;;;               responds to a mouse click that is 10 by 10 pixels within that button's view rectangle, then
 ;;;               the location for view-click-event-handler will by 10 by 10, and not 10 by 10 plus that view's
 ;;;               position within the window for example.
-;;;               The prior code passed 10 by 10 plus the view's position to view-click-event-handler.
+;;;               The prior code e.g., passed 10 by 10 plus the view's position to view-click-event-handler, regardless of view type.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
