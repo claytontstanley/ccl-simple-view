@@ -107,7 +107,3 @@
           (window-close win))))))
 
 (test-close-box-p)
-
-;(make-instance 'window)
-;(logtest #$NSMiniaturizableWindowMask (#/styleMask (cocoa-ref (front-window))))
-;(slot-value (front-window) 'easygui::minimizable-p)
