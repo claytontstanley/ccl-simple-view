@@ -100,20 +100,18 @@
 
 (defmethod easygui::click-location ((cocoa-self ns:ns-view) (the-event ns:ns-event))
   (let* ((ns-point (#/locationInWindow the-event))
-         (window (#/superview cocoa-self)))
+         (window (#/window cocoa-self)))
     (unless (ccl:%null-ptr-p window)
-      (let* ((ns-converted-point (#/convertPoint:fromView: window
-                                  ns-point
-                                  nil))
-             (where (easygui::point-from-ns-point ns-converted-point)))
-        where))))
+      (let* ((content-view (#/contentView window)))
+        (let* ((ns-converted-point (#/convertPoint:fromView: content-view ns-point nil))
+               (where (easygui::point-from-ns-point ns-converted-point)))
+          where)))))
 
 (objc:defmethod (#/mouseDown: :void) ((self easygui::cocoa-button) the-event)
   (call-next-method the-event)
   (let ((click-location (easygui::click-location self the-event)))
-    (unless (null click-location) ; Could be nil if view was removed when :dialog-item-action fired
-      (easygui::mouse-down (easygui::easygui-view-of self)
-                           :location (easygui::click-location self the-event)))))
+    (when click-location ; Could be nil if view or view parent was removed when :dialog-item-action fired
+      (easygui::mouse-down (easygui::easygui-view-of self) :location click-location)))) 
 
 ; ----------------------------------------------------------------------
 ; Providing a mixin class that keeps a view from implicitly redrawing each

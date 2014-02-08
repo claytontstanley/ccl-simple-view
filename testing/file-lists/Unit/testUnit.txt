@@ -19,3 +19,4 @@ testing/testDialogItemAction.lisp
 testing/testTextView.lisp
 testing/testEventHandlers.lisp
 testing/testBincarbon.lisp
+testing/testViewClickEventHandler.lisp

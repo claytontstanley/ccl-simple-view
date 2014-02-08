@@ -109,4 +109,11 @@
 ;;;               http://superuser.com/questions/473143/how-to-tab-between-buttons-on-an-mac-os-x-dialog-box
 ;;;               then a user can work through most tasks involving editing text views and pressing buttons
 ;;;               using only the keyboard. #\tab to navigate and #\space to select
+;;; 2014.02.08 cts
+;;;             : Implemented :close-box-p initarg for windows, so that the red close button does not display
+;;;               when this is set to t when initializing the window
+;;;             : Fixed bug where incorrect mouse locations were passsed to view-click-event-handler for views
+;;;               that were nested greater than one level deep in the view hierarchy. None of the act-r models
+;;;               in the tutorials place buttons/dialog-items as anything other than direct subviews of the window,
+;;;               so this bug did not affect any of those models.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

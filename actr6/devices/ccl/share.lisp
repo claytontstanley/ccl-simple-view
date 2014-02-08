@@ -207,12 +207,11 @@
    (theme-background :initarg :theme-background)
    (window-show :initarg :window-show)
    (window-type :initarg :window-type)
-   (close-box-p :accessor close-box-p :initarg :close-box-p :initform t)
+   (easygui::closable-p :initarg :close-box-p)
    (maintenance-thread :accessor maintenance-thread)
    (initialized-p :accessor initialized-p :initform nil)
    (easygui::background :initform (color-symbol->system-color 'white))
    (close-requested-p :accessor close-requested-p :initform nil)
-   (window-close-fct :reader window-close-fct :initform #'easygui:perform-close)
    (sema-finished-close :accessor sema-finished-close :initform (make-semaphore))
    (sema-request-close :accessor sema-request-close :initform (make-semaphore))
    (window-do-first-click :initarg :window-do-first-click :initform nil)
@@ -302,16 +301,18 @@
   ()
   (:default-initargs :contained-view-specifically 'static-contained-view)) 
 
-(defclass not-closable-window-mixin (window)
-  ((window-close-fct :initform (lambda (win) (#/close (cocoa-ref win))))))
+; You could return easygui::perform-close (which calls #/performClose:), but this doesn't close the window when the window doesn't have a close box.
+; So to keep things simple, bypass easygui's perform-close method (so bypass #/preformClose:) and go directly to #/close.
+(defmethod window-close-fct ((win window))
+  (lambda (win) (#/close (cocoa-ref win))))
 
-(defclass windoid (not-closable-window-mixin window)
+(defclass windoid (window)
   ((easygui::level :initform 1)
    (easygui::resizable-p :initform nil)
    (easygui::minimizable-p :initform nil)
    (easygui::closable-p :initform nil)))
 
-(defclass borderless-window (not-closable-window-mixin window)
+(defclass borderless-window (window)
   ((easygui::resizable-p :initform nil)
    (easygui::minimizable-p :initform nil)
    (easygui::closable-p :initform nil)

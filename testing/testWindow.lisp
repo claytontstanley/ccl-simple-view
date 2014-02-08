@@ -92,3 +92,22 @@
       (window-close foo-win))))
 
 (test-find-window)
+
+(defun test-close-box-p ()
+  (labels ((is-closable (win)
+             (logtest #$NSClosableWindowMask (#/styleMask (cocoa-ref win)))))
+    (let ((win (make-instance 'window)))
+      (check (is-closable win))
+      (window-close win)
+      (let ((win (make-instance 'window :close-box-p nil)))
+        (check (not (is-closable win))) 
+        (window-close win)
+        (let ((win (make-instance 'borderless-window)))
+          (check (not (is-closable win))) 
+          (window-close win))))))
+
+(test-close-box-p)
+
+;(make-instance 'window)
+;(logtest #$NSMiniaturizableWindowMask (#/styleMask (cocoa-ref (front-window))))
+;(slot-value (front-window) 'easygui::minimizable-p)
