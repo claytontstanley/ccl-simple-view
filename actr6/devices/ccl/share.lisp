@@ -1192,8 +1192,8 @@
                (guard-!null-ptr
                  (view-window view)))))
     (view-click-event-handler view location)
-    (view-click-event-handler win location)
-    (post-view-click-event-handler win location)))
+    (view-click-event-handler win (local-to-global view location))
+    (post-view-click-event-handler win (local-to-global view location))))
 
 (defmethod post-view-click-event-handler ((view window) position)
   (declare (ignore position))

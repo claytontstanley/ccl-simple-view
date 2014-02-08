@@ -7,9 +7,16 @@
 (defmethod view-click-event-handler ((view custom-button) location)
   (setf *click-location* location))
 
+(defclass custom-window (window) ())
+
+(defparameter *win-click-location* nil)
+
+(defmethod view-click-event-handler ((win custom-window) location)
+  (setf *win-click-location* location))
+
 (defun check-click-location ()
   (make-instance
-    'window
+    'custom-window
     :view-size (make-point 300 300)
     :view-subviews
     (list 
@@ -23,7 +30,9 @@
   (loop for (point expected) in (list (list (make-point 30 30) (make-point 20 20))
                                       (list (make-point 90 130) (make-point 10 10)))
         do (left-mouse-click (add-points (view-position (front-window)) point))
+        do (event-dispatch)
         do (check (equalp (as-list expected) (as-list *click-location*)))
+        do (check (equalp (as-list point) (as-list *win-click-location*)))
         finally (window-close (front-window))))
 
 (check-click-location)
