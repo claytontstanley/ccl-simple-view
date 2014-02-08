@@ -1,7 +1,9 @@
 (defun easygui::point-from-ns-point (point)
-  (easygui::point 
+  (easygui::point
     (ns:ns-point-x point)
-    (ns:ns-point-y point)))
+    (ns:ns-point-y point)
+    :allow-negative-p t
+    ))
 
 ; easygui by default starts position 0,0 at bottom left, going to the right and up for positive values
 ; This flips the screen vertically, so that it matches MCL's default. That is, position 0,0 is at top left
@@ -99,19 +101,16 @@
 (easygui::define-useful-mouse-event-handling-routines easygui::cocoa-mouseable-text-field)
 
 (defmethod easygui::click-location ((cocoa-self ns:ns-view) (the-event ns:ns-event))
-  (let* ((ns-point (#/locationInWindow the-event))
-         (window (#/window cocoa-self)))
-    (unless (ccl:%null-ptr-p window)
-      (let* ((content-view (#/contentView window)))
-        (let* ((ns-converted-point (#/convertPoint:fromView: content-view ns-point nil))
-               (where (easygui::point-from-ns-point ns-converted-point)))
-          where)))))
+  (let* ((ns-point (#/locationInWindow the-event)))
+    (let* ((ns-converted-point (#/convertPoint:fromView: cocoa-self ns-point nil)))
+      (let ((where (easygui::point-from-ns-point ns-converted-point)))
+        where))))
 
 (objc:defmethod (#/mouseDown: :void) ((self easygui::cocoa-button) the-event)
   (call-next-method the-event)
   (let ((click-location (easygui::click-location self the-event)))
-    (when click-location ; Could be nil if view or view parent was removed when :dialog-item-action fired
-      (easygui::mouse-down (easygui::easygui-view-of self) :location click-location)))) 
+    (unless (ccl:%null-ptr-p (#/window self)) ; Could be nil if view or view parent was removed when :dialog-item-action fired
+      (easygui::mouse-down (easygui::easygui-view-of self) :location click-location))))
 
 ; ----------------------------------------------------------------------
 ; Providing a mixin class that keeps a view from implicitly redrawing each

@@ -7,7 +7,8 @@
                  (make-instance 'button-dialog-item
                                 :view-nick-name :click
                                 :dialog-item-action (lambda (obj)
-                                                      (remove-subviews (front-window) obj)))
+                                                      (remove-subviews (front-window) obj)
+                                                      ))
                  (make-instance 'view
                                 :view-position (make-point 40 40)
                                 :view-size (make-point 80 80)
@@ -17,7 +18,8 @@
                                         'button-dialog-item
                                         :view-nick-name :click-nested
                                         :dialog-item-action (lambda (obj)
-                                                              (remove-subviews (front-window) (view-named :view (view-window obj)))))))))
+                                                              (remove-subviews (front-window) (view-named :view (view-window obj)))
+                                                              ))))))
 
 (left-mouse-click (view-position (front-window)))
 (left-mouse-click (add-points
