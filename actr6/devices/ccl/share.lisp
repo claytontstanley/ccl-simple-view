@@ -1191,9 +1191,10 @@
   (let ((win (guard-!nil
                (guard-!null-ptr
                  (view-window view)))))
-    (view-click-event-handler view location)
-    (view-click-event-handler win (local-to-global view location))
-    (post-view-click-event-handler win (local-to-global view location))))
+    (let ((global-location (local-to-global view location)))
+      (view-click-event-handler view location)
+      (view-click-event-handler win global-location)
+      (post-view-click-event-handler win global-location)))) 
 
 (defmethod post-view-click-event-handler ((view window) position)
   (declare (ignore position))
