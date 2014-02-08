@@ -4,7 +4,7 @@
 
 (defparameter *click-location* nil)
 
-(defmethod view-click-event-handler ((view custom-button) location)
+(defmethod view-click-event-handler ((view view) location)
   (setf *click-location* location))
 
 (defclass custom-window (window) ())
@@ -27,8 +27,9 @@
         :view-size (make-point 100 100)
         :view-subviews
         (list (make-instance 'custom-button :view-position (make-point 20 20))))))
-  (loop for (point expected) in (list (list (make-point 30 30) (make-point 20 20))
-                                      (list (make-point 90 130) (make-point 10 10)))
+  (loop for (point expected) in (list (list (make-point 30 30) (make-point 20 20))  ; Check click on button as subview at top level 
+                                      (list (make-point 90 130) (make-point 10 10)) ; Check click on nested button
+                                      (list (make-point 1 1) (make-point 1 1)))     ; Check click on content-view of window
         do (left-mouse-click (add-points (view-position (front-window)) point))
         do (event-dispatch)
         do (check (equalp (as-list expected) (as-list *click-location*)))
