@@ -1143,8 +1143,15 @@
 (defmethod wptr ((view window))
   (slot-boundp view 'easygui::ref))
 
+(defmethod local-to-global ((win window) local-pos)
+  (add-points (view-position win) local-pos))
+
 (defmethod local-to-global ((view simple-view) local-pos)
-  (add-points (view-position view) local-pos))
+  (let* ((ns-converted-point (#/convertPoint:fromView:
+                              (cocoa-ref (content-view (view-window view)))
+                              (ns:make-ns-point (point-h local-pos) (point-v local-pos))
+                              (cocoa-ref view))))
+    (easygui::point-from-ns-point ns-converted-point)))
 
 (defmethod part-color ((view view-text-mixin) (part (eql :text)))
   (declare (ignore part))
