@@ -14,7 +14,7 @@
              collect (make-line-for-rpm-window *win* start-point end-point)))
 (install-device *win*)
 (check
-  (equal (list (list 0 10) (list 0 10) (list 40 20) (list 20 40) (list 20 20) (list 40 60) (list 10 20) (list 60 80))
+  (equalp (list (list 0 10) (list 0 10) (list 40 20) (list 20 40) (list 20 20) (list 40 60) (list 10 20) (list 60 80))
          (let ((loc-avg ()))
            (with-shadow (loc-avg (lambda (x y)
                                    (push (list x y) loc-avg)
