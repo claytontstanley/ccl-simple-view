@@ -142,7 +142,6 @@
 
 (defun loc-avg (x y)
   "Return the 'location' (integer) average of <x> and <y>."
-  (declare (fixnum x) (fixnum y))
   (floor (/ (+ x y) 2)))
 
 
