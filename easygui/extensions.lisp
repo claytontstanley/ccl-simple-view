@@ -1,7 +1,15 @@
+(defmacro guard-integer (val)
+  `(progn
+     (guard ((< (abs it1) .00001) "guard failed: ~a is not close to an integer" ,val)
+       (multiple-value-bind (res err) (round ,val)
+         (declare (ignore res))
+         err))
+     ,val))
+
 (defun easygui::point-from-ns-point (point)
   (easygui::point
-    (ns:ns-point-x point)
-    (ns:ns-point-y point)
+    (round (guard-integer (ns:ns-point-x point)))
+    (round (guard-integer (ns:ns-point-y point)))
     :allow-negative-p t
     ))
 
