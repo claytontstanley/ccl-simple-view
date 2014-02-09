@@ -205,7 +205,7 @@
                                             it
                                             *black-color*))))
         (multiple-value-bind (ascent descent) (font-info font-spec)
-          (setf start-y (point-v (view-position self)))
+          (setf start-y (point-v (view-global-position self)))
           (dolist (item textlines)
             (push
               (build-string-feats vis-mod :text item
@@ -224,7 +224,7 @@
           (setf (chunk-visual-object x) self))))))
 
 (defmethod xstart ((self static-text-dialog-item))
-  (let ((left-x (point-h (view-position self)))
+  (let ((left-x (point-h (view-global-position self)))
         (text-width (string-width (dialog-item-text self)
                                   (view-font self)))
         (text-justification (text-just self))
@@ -259,14 +259,14 @@
            (<= (point-v cpos) (point-v size))))))
 
 (defmethod view-loc ((self view))
-  (let ((pos (view-position self))
+  (let ((pos (view-global-position self))
         (size (view-size self)))
     (vector (round (+ (point-h pos) (/ (point-h size) 2)))
             (round (+ (point-v pos) (/ (point-v size) 2))))))
 
 
 (defmethod view-loc ((self simple-view))
-  (let ((pos (view-position self))
+  (let ((pos (view-global-position self))
         (size (view-size self)))
     (vector (round (+ (point-h pos) (/ (point-h size) 2)))
             (round (+ (point-v pos) (/ (point-v size) 2))))))

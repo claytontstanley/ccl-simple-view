@@ -984,6 +984,9 @@
                 (point-y (view-size window))))))
       (setf (slot-value window 'easygui::position) position))))
 
+(defmethod view-global-position ((view simple-view))
+  (local-to-global view (make-point 0 0)))
+
 (defmethod view-center ((view simple-view))
   (destructuring-bind (x y) (as-list (view-position view))
     (destructuring-bind (sizex sizey) (as-list (view-size view))
