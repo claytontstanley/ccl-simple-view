@@ -132,6 +132,12 @@
 ;;;             : Now spell checking comments and strings in the code.
 ;;; 2013.04.27 cts
 ;;;             : Removed unnecessary code duplication when building visual objects for lines
+;;; 2014.02.08 cts
+;;;             : Removed the fixmum decl in loc-avg since it's not needed b/c the function rounds
+;;;               to the nearest whole number anyways. It was also causing ccl to crash when a
+;;;               double type floating point was passed to it that function, which kept happening in
+;;;               some of the more complicated, closer-to-real-world regression tests.
+;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
