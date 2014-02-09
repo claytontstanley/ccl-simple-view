@@ -57,3 +57,8 @@ lastSVNPushGitID = 2c657888e2d506d7e9556cc680c58762dc9890
 diff-since-last-actr-svn-push:
 	git df ${lastSVNPushGitID} build/outFileHeader.lisp actr6/devices/ccl/{device.lisp,uwi.lisp} 
 
+testing-headers-good:
+	! make -s show-testing-headers-summary | grep -i 'no header'
+
+show-testing-headers-summary:
+	find testing -mindepth 0 -maxdepth 1 -name '*.lisp' ! -name bootstrap.lisp -print -exec bash -ic "if grep -li 'bootstrap.lisp' {}; then True; else echo 'No Header'; fi" \;

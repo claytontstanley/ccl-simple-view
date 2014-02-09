@@ -87,6 +87,7 @@ deploy-bincarbon:
 deploy:
 	make deploy-bincarbon	
 	cd .. && ${gitIsClean} && git push
+	make -C .. testing-headers-good
 	make update-remote-repositories
 	ssh ${server} 'cd ${depdir} && ${gitFullUpdate} && ${gitIsClean}'
 	ssh ${server} 'cd ${depdir} && make -C build rebuild-kernel rebuildKernelP=true'
