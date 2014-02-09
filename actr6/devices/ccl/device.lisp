@@ -137,6 +137,7 @@
 ;;;               to the nearest whole number anyways. It was also causing ccl to crash when a
 ;;;               double type floating point was passed to it that function, which kept happening in
 ;;;               some of the more complicated, closer-to-real-world regression tests.
+;;;             : Visicon positions now correct for nested views.
 ;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
