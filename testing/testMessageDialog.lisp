@@ -37,13 +37,3 @@
   (test-message-dialog)
   (test-message-dialog-custom-lambda))
 
-
-(defun test-message-dialog ()
-  (let ((win (front-window)))
-    (let ((did-fire-lambda))
-
-(dotimes (i 10)
-  (test-message-dialog))
-
-
-
