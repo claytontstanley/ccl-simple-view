@@ -113,6 +113,10 @@
                                (modal t)   ; if not modal its callers job to select
                                (title "Warning")
                                window-type
+                               (on-ok-click
+                                 #'(lambda (item)
+                                     (declare (ignore item))
+                                     (return-from-modal-dialog t)))
                                (back-color *tool-back-color*)
                                (theme-background t)
                                (position (list :top (+ *menubar-bottom* 10))))
@@ -143,9 +147,8 @@
                             (subtract-points size #@(75 35))
                             #@(62 25)
                             ok-text
-                            #'(lambda (item)
-                                (declare (ignore item))
-                                (return-from-modal-dialog t)))))))))
+                            on-ok-click
+                            )))))))
     (if modal
       (modal-dialog new-dialog)
       new-dialog)))
