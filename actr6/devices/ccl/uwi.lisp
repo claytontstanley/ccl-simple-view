@@ -66,6 +66,9 @@
 ;;; 2013.05.13 cts
 ;;;             : Suppressed compiler warning in make-button-for-rpm-window when not
 ;;;               in development mode
+;;; 2014.02.11 cts
+;;;             : Added uwi-layer method for mouse scrolling:
+;;;               rpm-window-scroll-event-handler
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)

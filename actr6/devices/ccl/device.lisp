@@ -138,6 +138,9 @@
 ;;;               double type floating point was passed to it that function, which kept happening in
 ;;;               some of the more complicated, closer-to-real-world regression tests.
 ;;;             : Visicon positions now correct for nested views.
+;;; 2014.02.11 cts
+;;;             : Added device-layer methods for mouse scrolling:
+;;;               device-handle-scroll-up and device-handle-scroll-down
 ;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
