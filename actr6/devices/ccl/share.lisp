@@ -505,9 +505,7 @@
   ; Not removing :view-size, since the content-view-mixin should make use of this information as well, if available
   (mapc (lambda (indicator) (remf args indicator))
         (list :allow-tabs :view-font :dialog-item-text :text-justification))
-  (unwind-protect (apply #'call-next-method view :content-view (scrollee view) args)
-    (setf (slot-value (scrollee view) 'easygui::flipped)
-          (slot-value view 'easygui::flipped))))
+  (apply #'call-next-method view :content-view (scrollee view) args))
 
 (defmethod easygui::initialize-view :after ((view scroll-bar-dialog-item))
   (let ((content-view (slot-value view 'easygui::content-view)))
