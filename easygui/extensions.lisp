@@ -274,5 +274,5 @@
                      (when easygui::*report-flipping-errors* (format t "'isFlipped ~s' ignores error~%" self))
                      (values (if easygui::*screen-flipped* #$YES #$NO) condition)))))
 
-; Are there others that need to be defined? git grep defclass.*cocoa-extension-mixin ???
+; Are there others that need to be defined? For example, use git grep defclass.*cocoa-extension-mixin ???
 (define-is-flipped-method easygui::cocoa-image-view)

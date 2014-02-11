@@ -302,7 +302,7 @@
   (:default-initargs :contained-view-specifically 'static-contained-view)) 
 
 ; You could return easygui::perform-close (which calls #/performClose:), but this doesn't close the window when the window doesn't have a close box.
-; So to keep things simple, bypass easygui's perform-close method (so bypass #/preformClose:) and go directly to #/close.
+; So to keep things simple, bypass easygui's perform-close method (so bypass #/performClose:) and go directly to #/close.
 (defmethod window-close-fct ((win window))
   (lambda (win) (#/close (cocoa-ref win))))
 
