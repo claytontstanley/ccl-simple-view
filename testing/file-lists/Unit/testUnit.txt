@@ -21,3 +21,5 @@ testing/testEventHandlers.lisp
 testing/testBincarbon.lisp
 testing/testViewClickEventHandler.lisp
 testing/testLocalToGlobal.lisp
+testing/testScrollView.lisp
+testing/testScrolling.lisp
