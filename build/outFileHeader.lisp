@@ -126,4 +126,5 @@
 ;;; 2014.02.11 cts
 ;;;             : Added mcl-GUI-layer methods to scroll the mouse up and down. When executed, mouse scroll events
 ;;;               are sent to the OS to relay to the front application, similar to how mouse clicks and keypresses are done.
+;;;             : Added a guard to ensure that all views are using proper "flipped" MCL-style (top-left to bottom-right) coordinate systems.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
