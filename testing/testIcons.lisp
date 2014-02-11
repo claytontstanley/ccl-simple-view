@@ -12,18 +12,21 @@
 (add-subviews *win* 
               (make-instance 'icon-dialog-item
                              :icon "voteboxbg"
-                             :view-size (make-point 20 20)
+                             :view-position (make-point 20 30)
+                             :view-size (make-point 20 70)
                              :view-nick-name :image))
 
-
-(view-window (view-named :image *win*))
+(view-window (view-named :image *win*)) 
 
 (defparameter *clicked* nil)
 
 (defmethod view-click-event-handler ((view icon-dialog-item) location)
   (setf *clicked* t))
 
-(destructuring-bind (x y) (as-list (add-points (view-position *win*) (make-point 10 10)))
+(destructuring-bind (x y) (as-list
+                            (add-points
+                              (view-position (front-window))
+                              (view-global-center (view-named :image (front-window)))))
   (left-mouse-click (make-point x y))
   (left-mouse-click (make-point x y)))
 

@@ -993,6 +993,11 @@
       (make-point (+ x (/ sizex 2))
                   (+ y (/ sizey 2))))))
 
+(defmethod view-global-center ((view simple-view))
+  (local-to-global
+    view
+    (subtract-points (view-center view) (view-position view))))
+
 ; FIXME: This seems to work properly, but I don't currently understand why,
 ; or what view-origin is supposed to do in MCL
 (defmethod view-origin ((view simple-view))
