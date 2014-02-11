@@ -120,11 +120,15 @@
     (guard ((points-equal-p view-scroll-position
                             (make-point 0 0)) "non-(0,0) view-scroll-position is not currently implemented"))))
 
-(defmethod cocoa-is-flipped ((self ns:ns-view))
-  (and (slot-value self 'easygui::flipped)
-       (#/isFlipped self)))
 
-(defmethod cocoa-is-flipped ((self ns:ns-window))
+(defmethod cocoa-is-flipped :around ((self easygui::cocoa-extension-mixin))
+  (and (slot-value self 'easygui::flipped)
+       (call-next-method)))
+
+(defmethod cocoa-is-flipped ((self ns:ns-view))
+  (#/isFlipped self))
+
+(defmethod cocoa-is-flipped ((self t))
   t)
 
 ; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
