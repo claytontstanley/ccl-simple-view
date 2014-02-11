@@ -85,6 +85,14 @@
   ()
   (:metaclass ns:+ns-object))
 
+(defmacro define-is-flipped-method (class)
+  `(objc::defmethod (#/isFlipped :<BOOL>) ((self ,class))
+     (handler-case (if (slot-value self 'easygui::flipped) #$YES #$NO)
+       (simple-error (condition)
+                     (when easygui::*report-flipping-errors* (format t "'isFlipped ~s' ignores error~%" self))
+                     (values (if easygui::*screen-flipped* #$YES #$NO) condition)))))
+
+
 (define-is-flipped-method easygui::cocoa-image-view)
 
 (defclass easygui::image-view (easygui::view)
@@ -266,11 +274,4 @@
 (defmethod (setf easygui::view-text) (new-text (view easygui::view-text-via-string-mixin))
   (#/setString: (cocoa-ref view) (objc:make-nsstring new-text))
   new-text)
-
-(defmacro define-is-flipped-method (class)
-  `(objc::defmethod (#/isFlipped :<BOOL>) ((self ,class))
-     (handler-case (if (slot-value self 'easygui::flipped) #$YES #$NO)
-       (simple-error (condition)
-                     (when easygui::*report-flipping-errors* (format t "'isFlipped ~s' ignores error~%" self))
-                     (values (if easygui::*screen-flipped* #$YES #$NO) condition)))))
 
