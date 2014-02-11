@@ -3,6 +3,10 @@
   (shadowing-import 'easygui:dcc)
   (shadowing-import 'easygui::running-on-main-thread))
 
+(defclass easygui::cocoa-extension-mixin ()
+  ((easygui::easygui-view :initarg :eg-view :reader easygui::easygui-view-of)
+   (easygui::flipped :initarg :flipped :initform easygui::*screen-flipped*)))
+
 ; Providing a keyword argument to allow negative points; used for mouse coordinates
 (defun easygui::point (x y &key (allow-negative-p nil))
   (unless allow-negative-p

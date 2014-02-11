@@ -10,6 +10,7 @@
 (setf easygui::*screen-flipped* t)
 
 (setf easygui::*debug-cocoa-calls* nil)
+(setf easygui::*report-flipping-errors* t)
 
 ; There are particular window configurations that keep the window from becoming key or main (borderless windows for example).
 ; And this causes odd behavior for these types of windows (can't select the win when using command `, window is backgrounded behind
@@ -157,9 +158,6 @@
 
 (defmethod easygui::link-cocoa-view ((cocoa-view easygui::cocoa-extension-mixin) view)
   (setf (slot-value cocoa-view 'easygui::easygui-view) view))
-
-(defmethod easygui::link-cocoa-view :after ((cocoa-view easygui::cocoa-drawing-view) view)
-  (setf (slot-value cocoa-view 'easygui::flipped) (slot-value view 'easygui::flipped)))
 
 (defmethod easygui::initialize-view :after ((view easygui::simple-view))
   (easygui::link-cocoa-view (easygui:cocoa-ref view) view))
