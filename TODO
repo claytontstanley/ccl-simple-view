@@ -1,2 +1,1 @@
-add tests for mouse scrolling
-fix failing ci test; most likely view-global-position change
+fix thermometer implementation after properly flipping view
