@@ -436,6 +436,25 @@
   (event-dispatch)
   (sv-log-n 1 "ending move cursor"))
 
+(defparameter *mousescroll-wait* (make-semaphore))
+
+(defmethod device-handle-scroll-up ((device window) (speed number))
+  (window-select device)
+  (sv-log-n 1 "scrolling cursor up with speed ~a" speed)
+  (scroll-mouse-up speed)
+  (unless (wait-n-times-on-semaphore *mousescroll-wait* 10 .05)
+    (print-warning "Model mouse scroll was not handled correctly within 500ms."))
+  (sv-log-n 1 "ending scroll up"))
+
+(defmethod device-handle-scroll-down ((device window) (speed number))
+  (window-select device)
+  (sv-log-n 1 "scrolling cursor up with speed ~a" speed)
+  (scroll-mouse-down speed)
+  (unless (wait-n-times-on-semaphore *mousescroll-wait* 10 .05)
+    (print-warning "Model mouse scroll was not handled correctly within 500ms."))
+  (sv-log-n 1 "ending scroll down"))
+
+
 ;;; DEVICE-SPEAK-STRING      [Method]
 ;;; Description : If the Mac Speech Manager is installed, actually speak the
 ;;;             : string.

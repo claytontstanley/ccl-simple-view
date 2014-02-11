@@ -1,0 +1,2 @@
+add tests for mouse scrolling
+fix failing ci test; most likely view-global-position change

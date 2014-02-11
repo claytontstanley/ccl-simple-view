@@ -128,6 +128,14 @@
   (declare (ignore device position))
   (call-next-method))
 
+(defmethod post-view-scroll-event-handler ((device rpm-real-window))
+  (sv-log-n 1 "Finished calling all view-scroll-event-handlers for ~a" device)
+  (rpm-window-scroll-event-handler device)
+  (when (model-generated-action)
+    (signal-semaphore *mousescroll-wait*)))
+
+(defmethod rpm-window-scroll-event-handler ((device rpm-real-window))
+  ())
 
 ;;;; ---------------------------------------------------------------------- ;;;;
 ;;;; These are the UWI Methods.

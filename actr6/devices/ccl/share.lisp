@@ -1216,8 +1216,47 @@
   ; Default primary method is to do nothing
   (values))
 
+(objc:defmethod (#/reflectScrolledClipView: :void) ((self easygui::cocoa-scroll-view) (clip :ID))
+  (call-next-method clip)
+  (let ((view (easygui::easygui-view-of self)))
+    (view-scroll-event-handler view) 
+    (let ((win (#/window self)))
+      (unless (ccl:%null-ptr-p win)
+        (let ((win (easygui::easygui-window-of win)))
+          (view-scroll-event-handler win)
+          (post-view-scroll-event-handler win))))))
+
+(defmethod view-scroll-event-handler ((view simple-view))
+  ())
+
+(defmethod post-view-scroll-event-handler ((view simple-view))
+  ())
+
 (defmethod view-mouse-position ((view simple-view))
   (easygui:view-mouse-position view :allow-negative-position-p t))
+
+(defparameter *default-scroll-speed* 5)
+
+(defun create-scroll-event (speed)
+  (let ((event
+          (#_CGEventCreateScrollWheelEvent
+           ccl:+null-ptr+
+           #$kCGScrollEventUnitLine
+           1
+           speed)))
+    event))
+
+(defun scroll-mouse-up (&optional (speed *default-scroll-speed*))
+  (guard ((>= speed 0)))
+  (let ((event (create-scroll-event speed)))
+    (#_CGEventPost 0 event)
+    (#_CFRelease event)))
+
+(defun scroll-mouse-down (&optional (speed *default-scroll-speed*))
+  (guard ((>= speed 0)))
+  (let ((event (create-scroll-event (* -1 speed))))
+    (#_CGEventPost 0 event)
+    (#_CFRelease event)))
 
 (defun create-mouse-event (event pos)
   (#_CGEventCreateMouseEvent
