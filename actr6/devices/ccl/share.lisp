@@ -112,11 +112,19 @@
     (apply #'call-next-method view (nconc accum args))))
 
 (defmethod initialize-instance :after ((view simple-view) &key)
+  (guard ((cocoa-is-flipped (cocoa-ref view))))
+  (guard ((slot-value view 'easygui::flipped)))
   (with-slots (direction wptr view-scroll-position) view
     (guard ((eq direction :output) "only :output for direction slot is allowed"))
     (guard ((eq wptr nil) "only nil for wptr slot is allowed"))
     (guard ((points-equal-p view-scroll-position
                             (make-point 0 0)) "non-(0,0) view-scroll-position is not currently implemented"))))
+
+(defmethod cocoa-is-flipped ((view ns:ns-view))
+  (#/isFlipped view))
+
+(defmethod cocoa-is-flipped ((view ns:ns-window))
+  t)
 
 ; Parsing MCL initarg lists, and converting to CCL/Easygui equivalents
 
