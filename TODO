@@ -1,1 +1,2 @@
 fix thermometer implementation after properly flipping view
+clean up littered set-slot-value flipped stuff; make it automatic
