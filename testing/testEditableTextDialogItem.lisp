@@ -14,6 +14,9 @@
          (list 2 2)
          (multiple-value-list (selection-range (view-named :et *win*)))))
 
+(check (null (#/hasVerticalScroller (cocoa-ref (view-named :et *win*)))))
+(check (null (v-scroll-p (view-named :et *win*))))
+
 (add-subviews *win*
               (make-instance
                 'editable-text-dialog-item

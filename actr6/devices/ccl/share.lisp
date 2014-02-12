@@ -484,8 +484,10 @@
 
 (defclass scroll-bar-dialog-item (easygui::content-view-mixin dialog-item)
   ((scrollee :accessor scrollee :initarg :scrollee)
-   (scrollee-class :initarg :scrollee-class))
+   (scrollee-class :initarg :scrollee-class)
+   (v-scroll-p :reader v-scroll-p :initarg :v-scroll-p))
   (:default-initargs
+    :v-scroll-p t
     :specifically 'easygui::cocoa-scroll-view
     :objc-content-view-accessor #'#/documentView))
 
@@ -493,6 +495,7 @@
   ((allow-returns :initarg :allow-returns)
    (draw-outline :initarg :draw-outline))
   (:default-initargs
+    :v-scroll-p nil
     :scrollee-class 'inner-text-view))
 
 (defclass inner-text-view (dialog-item easygui::view-text-via-string-mixin easygui::text-coloring-mixin easygui::text-fonting-mixin)
@@ -518,6 +521,10 @@
     (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
     (setf (slot-value content-view 'easygui::parent) view)
     ))
+
+(defmethod initialize-instance :after ((view scroll-bar-dialog-item) &key v-scroll-p)
+  (when v-scroll-p
+    (#/setHasVerticalScroller: (cocoa-ref view) #$YES)))
 
 ; I couldn't get #/sizeToFit to work for NSTextView objects, so doing things manually in this case
 ; http://stackoverflow.com/questions/2654580/how-to-resize-nstextview-according-to-its-content
