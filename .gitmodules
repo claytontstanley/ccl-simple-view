@@ -46,3 +46,6 @@
 [submodule "submodules/ccl-simple-view-builds"]
 	path = submodules/ccl-simple-view-builds
 	url = ssh://chil/srv/git/ccl-simple-view-builds.git
+[submodule "submodules/actr6"]
+	path = submodules/actr6
+	url = ssh://chil/srv/git/actr6
