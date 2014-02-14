@@ -41,6 +41,12 @@
                          (sgp :v t)))
      ,@body))
 
+(defmacro with-static-default-to (val &body body)
+  `(with-shadow (reset (lambda ()
+                         (funcall fun-orig)
+                         (ssp-fct (list :static-default ,val))))
+     ,@body))
+
 (do-agi-example "multiple-models-single-window.lisp")
 (do-agi-example "multiple-models-multiple-windows.lisp")
 (do-agi-example "single-model-multiple-windows.lisp")
