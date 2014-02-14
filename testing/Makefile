@@ -33,7 +33,7 @@ unit:
 	make test-files testFiles=file-lists/Unit/testUnit.txt
 
 unit-1.8:
-	make clean-actr-compiled-files
+	make clean-actr-compiled-files check-dev-environment
 	make test-file testFile=testing/testUnit.lisp ccl=./ccl-1.8 cclSaveCoverage=''
 
 continuous-integration: unit
