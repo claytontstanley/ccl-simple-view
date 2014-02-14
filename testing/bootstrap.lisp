@@ -91,7 +91,7 @@
 
 (setf *break-on-fail-p* t)
 
-(let ((coverage-file (format nil "~a~a" (directory-namestring *load-truename*) "../.coverage.temp")))
-  (when ccl:*compile-code-coverage*
-    (when (probe-file coverage-file)
-      (restore-coverage-from-file coverage-file))))
+#+:clozure (let ((coverage-file (format nil "~a~a" (directory-namestring *load-truename*) "../.coverage.temp")))
+             (when ccl:*compile-code-coverage*
+               (when (probe-file coverage-file)
+                 (restore-coverage-from-file coverage-file))))
