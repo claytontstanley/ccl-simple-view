@@ -46,7 +46,7 @@ checkDependency "checkNoPassword chil" "chil not good: use ssh-copy-id to enable
 checkDependency "[[ -n '$(which latexmk)' ]]" "Install TexLive suite (suggestion: sudo port install texlive +full)"
 checkDependency "checkFont 'Avant Garde'" "Install 'Avant Garde' font (suggestion: run fonts/fix-attributes.sh, then double click ./fonts/Avant Guarde)"
 checkDependency "checkFont 'Charcoal'" "Install 'Charcoal' font (suggestion: double click ./fonts/Charcoal.ttf"
-checkDependency "[ '$(defaults read ~/Library/Preferences/.GlobalPreferences.plist "AppleKeyboardUIMode")' == 2 ]" "Enable full keywoard access (tab changes focus) in keyboard->shortcuts preferences pane"
+checkDependency "[ '$(defaults read ~/Library/Preferences/.GlobalPreferences "AppleKeyboardUIMode")' == 2 ]" "Enable full keywoard access (tab changes focus) in keyboard->shortcuts preferences pane"
 
 echo "Initializing and updating submodules"
 ( cd "$pathToThisDir" && git submodule update --init --recursive )
