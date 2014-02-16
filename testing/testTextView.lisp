@@ -30,8 +30,7 @@
   (keypress #\return)
   (keypress-on-view (view-named :foo (front-window)) (format nil "~%"))
   (keypress-on-view (view-named :foo (front-window)) #\newline)
-  (keypress #\b)
-  )
+  (keypress #\b))
 
 (check (string-equal (dialog-item-text (view-named :foo (front-window)))
                      (format nil "abca~%~%~%b")))

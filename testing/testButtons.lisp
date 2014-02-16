@@ -48,6 +48,5 @@
                      (list 
                        (chunk-slot-value-fct  chunk 'kind) 
                        (chunk-slot-value-fct  chunk 'value)
-                       (chunk-slot-value-fct  chunk 'color) 
-                       ))
+                       (chunk-slot-value-fct  chunk 'color)))
                    (visicon-chunks (get-module :vision) t)))))

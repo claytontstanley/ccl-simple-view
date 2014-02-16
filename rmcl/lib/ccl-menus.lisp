@@ -147,8 +147,7 @@
                             (subtract-points size #@(75 35))
                             #@(62 25)
                             ok-text
-                            on-ok-click
-                            )))))))
+                            on-ok-click)))))))
     (if modal
       (modal-dialog new-dialog)
       new-dialog)))

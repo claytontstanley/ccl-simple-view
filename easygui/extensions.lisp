@@ -2,8 +2,7 @@
   (easygui::point
     (ns:ns-point-x point)
     (ns:ns-point-y point)
-    :allow-negative-p t
-    ))
+    :allow-negative-p t))
 
 ; easygui by default starts position 0,0 at bottom left, going to the right and up for positive values
 ; This flips the screen vertically, so that it matches MCL's default. That is, position 0,0 is at top left

@@ -13,8 +13,7 @@
     (format *sv* "hello"))
   (move-to *sv* 10 30)
   (with-font-focused-view view
-    (#_drawstring (objc:make-nsstring "yellow")))
-  )
+    (#_drawstring (objc:make-nsstring "yellow"))))
 
 (defparameter *win*
   (make-instance 'window

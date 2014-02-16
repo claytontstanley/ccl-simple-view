@@ -8,8 +8,7 @@
   ;:snum 1
   :eyetracking t
   :allowing-quit t
-  ;:short-stack 20
-  )
+  ;:short-stack 20)
 |#
 
 #|

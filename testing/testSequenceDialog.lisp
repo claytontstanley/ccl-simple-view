@@ -19,8 +19,7 @@
                             :view-font *fred-default-font-spec*
                             :table-sequence (list "}}}" "--" "*")
                             :cell-size (make-point 100 20)
-                            :view-nick-name :sdi
-                            ))))
+                            :view-nick-name :sdi))))
 
 (process-run-function
   "foo"

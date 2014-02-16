@@ -44,8 +44,7 @@
               :height 400
               :x 20
               :y 600
-              :title *win-title*
-              ))
+              :title *win-title*))
 
 (view-mouse-position *win*)
 

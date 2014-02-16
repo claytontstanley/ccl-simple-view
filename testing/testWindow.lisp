@@ -58,8 +58,7 @@
     (window-show win)
     (sleep 3)
     (check (window-shown-p win))
-    (window-close win)
-    ))
+    (window-close win)))
 
 (test-window-state)
 
@@ -76,8 +75,7 @@
   (check (eq *win* (front-window :class 'foo-window)))
   (window-close *win*)
   (window-close *win2*)
-  (window-close *win3*)
-  )
+  (window-close *win3*))
 
 (test-front-window)
 

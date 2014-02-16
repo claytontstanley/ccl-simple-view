@@ -24,8 +24,7 @@
   ;(with-focused-view view
   ;  (with-fore-color *blue-color*
   ;(#/set *red-color*)
-  (paint-rect view #@(0 0) (view-size view))
-  )
+  (paint-rect view #@(0 0) (view-size view)))
 ;  )
 ;)
 

@@ -49,8 +49,7 @@
   (left-mouse-click (view-center (front-window)))
   (keypress "b")
   (check (eq (pop *keychain*) #\b))
-  (check (equal *chain* (list 'window)))
-  )
+  (check (equal *chain* (list 'window))))
 
 (defclass bar (window) ())
 (defclass m-etdi (editable-text-dialog-item) ())

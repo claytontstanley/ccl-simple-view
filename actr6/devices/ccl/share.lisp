@@ -519,8 +519,7 @@
   (let ((content-view (slot-value view 'easygui::content-view)))
     (#/setDocumentView: (cocoa-ref view) (cocoa-ref content-view))
     (#/setBorderType: (cocoa-ref view) #$NSBezelBorder)
-    (setf (slot-value content-view 'easygui::parent) view)
-    ))
+    (setf (slot-value content-view 'easygui::parent) view)))
 
 (defmethod initialize-instance :after ((view scroll-bar-dialog-item) &key v-scroll-p)
   (when v-scroll-p

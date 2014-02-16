@@ -129,8 +129,7 @@ internal-time-units-per-second
 (mapc #'invalidate-view
       (list 
         (third *svs*)
-        (fourth *svs*)
-        ))
+        (fourth *svs*)))
 
 (mapcar #'#/frame (list (cocoa-ref *win*)))
 (set-origin (third (subviews *win*)) 0 0)
