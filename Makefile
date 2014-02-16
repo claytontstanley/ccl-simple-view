@@ -62,3 +62,11 @@ testing-headers-good:
 
 show-testing-headers-summary:
 	find testing -mindepth 0 -maxdepth 1 -name '*.lisp' ! -name bootstrap.lisp -print -exec bash -ic "if grep -li 'bootstrap.lisp' {}; then True; else echo 'No Header'; fi" \;
+
+show-clippings:
+	git gpx -E -n '^\s*\)+\s*$$'
+
+replace-clippings-%:
+	perl -p -i -0 -e 's/\s*\n\s*(\)+)/$$1/g' $* 
+
+
