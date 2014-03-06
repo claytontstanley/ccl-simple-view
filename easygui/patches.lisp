@@ -7,8 +7,8 @@
   ((easygui::easygui-view :initarg :eg-view :reader easygui::easygui-view-of)
    (easygui::flipped :initarg :flipped :initform easygui::*screen-flipped*)))
 
-; Providing a keyword argument to allow negative points; used for mouse coordinates
-(defun easygui::point (x y &key (allow-negative-p nil))
+; Providing a keyword argument to allow negative points
+(defun easygui::point (x y &key (allow-negative-p t))
   (unless allow-negative-p
     (assert (>= x 0))
     (assert (>= y 0)))
