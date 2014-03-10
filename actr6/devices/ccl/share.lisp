@@ -908,7 +908,8 @@
   (easygui:view-text view))
 
 (defmethod set-dialog-item-text ((view view-text-mixin) text)
-  (setf (easygui:view-text view) text))
+  (easygui::running-on-main-thread ()
+    (setf (easygui:view-text view) text)))
 
 (defmethod easygui::view-text ((view editable-text-dialog-item))
   (easygui::view-text (content-view view)))
@@ -949,12 +950,14 @@
   (destructuring-bind (position cursorpos) (if position
                                              (list position cursorpos)
                                              (list 0 0))
-    (#/setSelectedRange: (cocoa-ref view)
-     (ns:make-ns-range position (- cursorpos position)))))
+    (easygui::running-on-main-thread ()
+      (#/setSelectedRange: (cocoa-ref view)
+       (ns:make-ns-range position (- cursorpos position))))))
 
 (defmethod set-selection-range :after ((view editable-text-dialog-item) &optional position cursorpos)
   (declare (ignore position cursorpos))
-  (#/becomeFirstResponder (cocoa-ref view)))
+  (easygui::running-on-main-thread ()
+    (#/becomeFirstResponder (cocoa-ref view))))
 
 (defmethod dialog-item-enable ((view action-view-mixin))
   (easygui:set-dialog-item-enabled-p view t))
