@@ -7,3 +7,4 @@
 /Volumes/RedGiant/X Support/bincarbon-ccl-rmcl
 /Volumes/RedGiant/Projects/stanley-thesis
 /Volumes/RedGiant/Projects/mcl-migration
+/Volumes/RedGiant/X Support/ccl-simple-view-builds
