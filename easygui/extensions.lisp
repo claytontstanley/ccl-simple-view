@@ -120,7 +120,8 @@
   (call-next-method the-event)
   (let ((click-location (easygui::click-location self the-event)))
     (unless (ccl:%null-ptr-p (#/window self)) ; Could be nil if view or view parent was removed when :dialog-item-action fired
-      (easygui::mouse-down (easygui::easygui-view-of self) :location click-location))))
+      (when (#/isVisible (#/window self)) ; Check for if window is closed and run loop hasn't refreshed
+        (easygui::mouse-down (easygui::easygui-view-of self) :location click-location)))))
 
 ; ----------------------------------------------------------------------
 ; Providing a mixin class that keeps a view from implicitly redrawing each
