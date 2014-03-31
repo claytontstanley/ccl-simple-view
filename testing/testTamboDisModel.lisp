@@ -3,8 +3,15 @@
 
 (load-file-list "file-lists" "TamboDisModel" "testPhaser.txt")
 
-(run-all-models :rt nil)
-;(run-a-model 0 :rt nil) 
+(with-shadow (reset (lambda ()
+                      (funcall fun-orig)
+                      ; Set :static-default to nil, otherwise retrieval error and model hangs; should work though
+                      ; Dan is probably still working through the issues with the new static default chunking mechanism
+                      ; cts: 2014-03-31
+                      (ssp :static-default nil)))
+  (run-all-models :rt nil) 
+  ;(run-a-model 0 :rt nil) 
+  )
 
 (setf *experiment* nil)
 
