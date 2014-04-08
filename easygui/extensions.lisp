@@ -1,5 +1,5 @@
 (defun easygui::point-from-ns-point (point)
-  (easygui::point
+  (easygui::point 
     (ns:ns-point-x point)
     (ns:ns-point-y point)
     :allow-negative-p t))
@@ -274,4 +274,3 @@
 (defmethod (setf easygui::view-text) (new-text (view easygui::view-text-via-string-mixin))
   (#/setString: (cocoa-ref view) (objc:make-nsstring new-text))
   new-text)
-

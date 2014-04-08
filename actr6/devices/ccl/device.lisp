@@ -132,6 +132,21 @@
 ;;;             : Now spell checking comments and strings in the code.
 ;;; 2013.04.27 cts
 ;;;             : Removed unnecessary code duplication when building visual objects for lines
+;;; 2014.01.24 Dan
+;;;             : * Updated the build-vis-locs-for methods for text and button
+;;;             :   items so that they use the updated build-string-feats to
+;;;             :   deal with newlines in the text.
+;;;             : * Added an optional parameter to startx to provide a string to
+;;;             :   use instead of the whole dialog-item-text so that when there
+;;;             :   are multiple lines each gets justified appropriately.
+;;; 2014.01.27 Dan
+;;;             : * Fixed some bugs with the last update.
+;;;             : * Round all the string-width and ascent/descent values because
+;;;             :   they return floats.
+;;;             : * Fix the y-coordinate for button text because it shifted when
+;;;             :   I updated build-string-feats.
+;;; 2014.02.10 Dan
+;;;             : * Read a button's color out of the background slot.
 ;;; 2014.02.08 cts
 ;;;             : Removed the fixmum declaration in loc-avg since it's not needed b/c the function rounds
 ;;;               to the nearest whole number anyways. It was also causing ccl to crash when a
@@ -201,38 +216,34 @@
   (let ((text (dialog-item-text self)))
     (unless (equal text "")
       (let* ((font-spec (view-font self))
-             (start-y nil)
              (accum nil)
-             (textlines (string-to-lines text))
-             (width-fct #'(lambda (str) (string-width str font-spec)))
+             (width-fct #'(lambda (str) (round (string-width str font-spec))))
              (color (system-color->symbol (aif (part-color self :text)
                                             it
-                                            *black-color*))))
+                                               *black-color*))))
+        
         (multiple-value-bind (ascent descent) (font-info font-spec)
-          (setf start-y (point-v (view-global-position self)))
-          (dolist (item textlines)
-            (push
-              (build-string-feats vis-mod :text item
-                                  :start-x (xstart self)                               
+          (setf accum (build-string-feats vis-mod :text text
+                                  :start-x 0
+                                  :x-fct (lambda (string startx obj)
+                                           (+ startx (xstart obj string)))
                                   :y-pos 
-                                  (+ start-y (round (+ ascent descent) 2))
+                                  (+ (point-v (view-position self)) (round (+ ascent descent) 2))
                                   :width-fct width-fct 
-                                  :height ascent
-                                  :obj self)
-              accum)
-            (incf start-y (+ ascent descent))))
+                                  :height (round ascent)
+                                  :obj self
+                                  :line-height (round (+ ascent descent)))))
 
-        (setf accum (flatten (nreverse accum)))
+        
         (dolist (x accum accum)
           (set-chunk-slot-value-fct x 'color color)
           (setf (chunk-visual-object x) self))))))
 
-(defmethod xstart ((self static-text-dialog-item))
-  (let ((left-x (point-h (view-global-position self)))
-        (text-width (string-width (dialog-item-text self)
-                                  (view-font self)))
-        (text-justification (text-just self))
-        )
+(defmethod xstart ((self static-text-dialog-item) &optional string)
+  (let* ((left-x (point-h (view-position self)))
+         (text (if (stringp string) string (dialog-item-text self)))
+         (text-width (round (string-width text (view-font self))))
+         (text-justification (text-just self)))
     (ecase text-justification
       (#.#$tejustleft (1+ left-x))
       (#.#$tejustcenter (+ 1 left-x (round (/ (- (width self) text-width) 2))))

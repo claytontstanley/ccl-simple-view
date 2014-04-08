@@ -66,6 +66,10 @@
 ;;; 2013.05.13 cts
 ;;;             : Suppressed compiler warning in make-button-for-rpm-window when not
 ;;;               in development mode
+;;; 2014.02.10 Dan
+;;;             : * Save the color of the button in the background slot.  It 
+;;;             :   doesn't actually change the button's color, but the model 
+;;;             :   can read it from there for consistency with other devices.
 ;;; 2014.02.11 cts
 ;;;             : Added uwi-layer method for mouse scrolling:
 ;;;               rpm-window-scroll-event-handler
@@ -233,13 +237,15 @@
 (defmethod make-button-for-rpm-window ((win rpm-real-window) &key (x 0) (y 0) 
                                                              (text "Ok") (action nil) (height 25)
                                                              (width 60) (color 'gray))
-  #-:sv-dev (declare (ignore color))
-  (make-dialog-item 'button-dialog-item
-                    (make-point x y)
-                    (make-point width height)
-                    text
-                    action
-                    :default-button nil))
+  ;#-:sv-dev (declare (ignore color))
+  (let ((item (make-dialog-item 'button-dialog-item
+                                (make-point x y)
+                                (make-point width height)
+                                text
+                                action
+                                :default-button nil)))
+    (set-back-color item (color-symbol->system-color color))
+    item))
 
 ;;; MAKE-STATIC-TEXT-FOR-RPM-WINDOW  [Method]
 ;;; Description : Build and return a static-text-dialog-item based on the
