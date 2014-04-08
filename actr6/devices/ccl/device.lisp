@@ -228,7 +228,7 @@
                                   :x-fct (lambda (string startx obj)
                                            (+ startx (xstart obj string)))
                                   :y-pos 
-                                  (+ (point-v (view-position self)) (round (+ ascent descent) 2))
+                                  (+ (point-v (view-global-position self)) (round (+ ascent descent) 2))
                                   :width-fct width-fct 
                                   :height (round ascent)
                                   :obj self
@@ -240,7 +240,7 @@
           (setf (chunk-visual-object x) self))))))
 
 (defmethod xstart ((self static-text-dialog-item) &optional string)
-  (let* ((left-x (point-h (view-position self)))
+  (let* ((left-x (point-h (view-global-position self)))
          (text (if (stringp string) string (dialog-item-text self)))
          (text-width (round (string-width text (view-font self))))
          (text-justification (text-just self)))
