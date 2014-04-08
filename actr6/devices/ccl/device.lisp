@@ -220,21 +220,21 @@
              (width-fct #'(lambda (str) (round (string-width str font-spec))))
              (color (system-color->symbol (aif (part-color self :text)
                                             it
-                                               *black-color*))))
-        
+                                            *black-color*))))
+
         (multiple-value-bind (ascent descent) (font-info font-spec)
           (setf accum (build-string-feats vis-mod :text text
-                                  :start-x 0
-                                  :x-fct (lambda (string startx obj)
-                                           (+ startx (xstart obj string)))
-                                  :y-pos 
-                                  (+ (point-v (view-global-position self)) (round (+ ascent descent) 2))
-                                  :width-fct width-fct 
-                                  :height (round ascent)
-                                  :obj self
-                                  :line-height (round (+ ascent descent)))))
+                                          :start-x 0
+                                          :x-fct (lambda (string startx obj)
+                                                   (+ startx (xstart obj string)))
+                                          :y-pos 
+                                          (+ (point-v (view-global-position self)) (round (+ ascent descent) 2))
+                                          :width-fct width-fct 
+                                          :height (round ascent)
+                                          :obj self
+                                          :line-height (round (+ ascent descent)))))
 
-        
+
         (dolist (x accum accum)
           (set-chunk-slot-value-fct x 'color color)
           (setf (chunk-visual-object x) self))))))
