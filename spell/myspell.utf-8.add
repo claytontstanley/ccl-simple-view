@@ -756,3 +756,11 @@ isFlipped
 git
 grep
 fixmum
+rgb
+objs
+ominx
+ominy
+omaxx
+omaxy
+locs
+startx
