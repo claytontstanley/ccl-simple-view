@@ -123,6 +123,13 @@
 ;;;               the location for view-click-event-handler will by 10 by 10, and not 10 by 10 plus that view's
 ;;;               position within the window for example.
 ;;;               The prior code e.g., passed 10 by 10 plus the view's position to view-click-event-handler, regardless of view type.
+;;; 2014.02.10 Dan Bothell
+;;;             : Swapped the order of grey and gray in rgb-list because ACT-R
+;;;               uses gray as the color name for things and this: 
+;;;               (system-color->symbol (color-symbol->system-color 'gray))
+;;;               should return gray.  [Since those are basically ACT-R 
+;;;               interface functions they should probably be moved to the uwi
+;;;               file.]
 ;;; 2014.02.11 cts
 ;;;             : Added mcl-GUI-layer methods to scroll the mouse up and down. When executed, mouse scroll events
 ;;;               are sent to the OS to relay to the front application, similar to how mouse clicks and keypresses are done.
