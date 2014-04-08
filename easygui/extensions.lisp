@@ -248,7 +248,7 @@
 ; All cocoa windows will auto recalculate the key view loop, since this works most of the time, and isn't computed in the inner loop of a program
 ; http://stackoverflow.com/questions/4271115/how-should-i-subclass-nswindow-initialization-in-objective-c
 
-; Warning: Calling #'call-next-method within this method causes a compile-time segfault in the testing environment when a custom ccl app is built using ccl-1.9 on OS X Mavericks.
+; FIXME: Calling #'call-next-method within this method causes a compile-time segfault in the testing environment when a custom ccl app is built using ccl-1.9 on OS X Mavericks.
 ; Still works fine on OS X Mavericks and ccl-1.9 in a non-deployed setting when the custom app isn't built, and still works in 10.6, 10.8 when the custom app is built.
 ; so not worrying about this, yet. The fix is probably to do away with or modify the custom app building, as that was a hack anyways. CTS: 2014-04-08
 (objc:defmethod (#/initWithContentRect:styleMask:backing:defer: :id) ((cocoa-win easygui::cocoa-window) (content-rect :<NSR>ECT) (style-mask :<NSUI>NTEGER)
