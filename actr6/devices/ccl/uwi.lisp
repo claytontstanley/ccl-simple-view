@@ -67,9 +67,9 @@
 ;;;             : Suppressed compiler warning in make-button-for-rpm-window when not
 ;;;               in development mode
 ;;; 2014.02.10 Dan
-;;;             : * Save the color of the button in the background slot.  It 
-;;;             :   doesn't actually change the button's color, but the model 
-;;;             :   can read it from there for consistency with other devices.
+;;;             : Save the color of the button in the background slot.  It 
+;;;               doesn't actually change the button's color, but the model 
+;;;               can read it from there for consistency with other devices.
 ;;; 2014.02.11 cts
 ;;;             : Added uwi-layer method for mouse scrolling:
 ;;;               rpm-window-scroll-event-handler

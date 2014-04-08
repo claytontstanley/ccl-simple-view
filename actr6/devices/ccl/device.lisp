@@ -133,20 +133,20 @@
 ;;; 2013.04.27 cts
 ;;;             : Removed unnecessary code duplication when building visual objects for lines
 ;;; 2014.01.24 Dan
-;;;             : * Updated the build-vis-locs-for methods for text and button
-;;;             :   items so that they use the updated build-string-feats to
-;;;             :   deal with newlines in the text.
-;;;             : * Added an optional parameter to startx to provide a string to
-;;;             :   use instead of the whole dialog-item-text so that when there
-;;;             :   are multiple lines each gets justified appropriately.
+;;;             : Updated the build-vis-locs-for methods for text and button
+;;;               items so that they use the updated build-string-feats to
+;;;               deal with newlines in the text.
+;;;             : Added an optional parameter to startx to provide a string to
+;;;               use instead of the whole dialog-item-text so that when there
+;;;               are multiple lines each gets justified appropriately.
 ;;; 2014.01.27 Dan
-;;;             : * Fixed some bugs with the last update.
-;;;             : * Round all the string-width and ascent/descent values because
-;;;             :   they return floats.
-;;;             : * Fix the y-coordinate for button text because it shifted when
-;;;             :   I updated build-string-feats.
+;;;             : Fixed some bugs with the last update.
+;;;             : Round all the string-width and ascent/descent values because
+;;;               they return floats.
+;;;             : Fix the y-coordinate for button text because it shifted when
+;;;               I updated build-string-feats.
 ;;; 2014.02.10 Dan
-;;;             : * Read a button's color out of the background slot.
+;;;             : Read a button's color out of the background slot.
 ;;; 2014.02.08 cts
 ;;;             : Removed the fixmum declaration in loc-avg since it's not needed b/c the function rounds
 ;;;               to the nearest whole number anyways. It was also causing ccl to crash when a
