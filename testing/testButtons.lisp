@@ -35,13 +35,12 @@
 
 (proc-display)
 (print-visicon)
-
 (check
-  (equal '((oval oval light-gray)
+  (equal '((oval oval black) ; Black b/c default back-color for make-instance for 'button-dialog-item
            (text text red)
            (visual-object box light-gray)
            (text text orange)
-           (oval oval light-gray)
+           (oval oval gray)  ; Gray b/c default back-color for #'make-button-for-rpm-window
            (text text black))
          (print
            (mapcar (lambda (chunk)
