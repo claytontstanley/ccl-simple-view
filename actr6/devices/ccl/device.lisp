@@ -153,10 +153,6 @@
 ;;;               double type floating point was passed to it that function, which kept happening in
 ;;;               some of the more complicated, closer-to-real-world regression tests.
 ;;;             : Visicon positions now correct for nested views.
-;;; 2014.02.11 cts
-;;;             : Added device-layer methods for mouse scrolling:
-;;;               device-handle-scroll-up and device-handle-scroll-down
-;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
@@ -449,24 +445,6 @@
     (print-warning "Model cursor movement was not handled correctly within 500ms."))
   (event-dispatch)
   (sv-log-n 1 "ending move cursor"))
-
-(defparameter *mousescroll-wait* (make-semaphore))
-
-(defmethod device-handle-scroll-up ((device window) (speed number))
-  (window-select device)
-  (sv-log-n 1 "scrolling cursor up with speed ~a" speed)
-  (scroll-mouse-up speed)
-  (unless (wait-n-times-on-semaphore *mousescroll-wait* 10 .05)
-    (print-warning "Model mouse scroll was not handled correctly within 500ms."))
-  (sv-log-n 1 "ending scroll up"))
-
-(defmethod device-handle-scroll-down ((device window) (speed number))
-  (window-select device)
-  (sv-log-n 1 "scrolling cursor up with speed ~a" speed)
-  (scroll-mouse-down speed)
-  (unless (wait-n-times-on-semaphore *mousescroll-wait* 10 .05)
-    (print-warning "Model mouse scroll was not handled correctly within 500ms."))
-  (sv-log-n 1 "ending scroll down"))
 
 
 ;;; DEVICE-SPEAK-STRING      [Method]
