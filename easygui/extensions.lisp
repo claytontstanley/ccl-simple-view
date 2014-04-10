@@ -1,7 +1,12 @@
+(defun round-if-integer (double)
+  (if (equalp double (round double))
+    (round double)
+    double))
+
 (defun easygui::point-from-ns-point (point)
   (easygui::point 
-    (ns:ns-point-x point)
-    (ns:ns-point-y point)
+    (round-if-integer (ns:ns-point-x point))
+    (round-if-integer (ns:ns-point-y point))
     :allow-negative-p t))
 
 ; easygui by default starts position 0,0 at bottom left, going to the right and up for positive values

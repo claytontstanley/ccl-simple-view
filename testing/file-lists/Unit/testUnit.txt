@@ -25,3 +25,4 @@ testing/testScrollView.lisp
 testing/testScrolling.lisp
 testing/testBuildVisLocsFor.lisp
 testing/testScrollBarDialogItem.lisp
+testing/testFloats.lisp
