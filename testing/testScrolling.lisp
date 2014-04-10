@@ -1,6 +1,8 @@
 ; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
 (load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
 
+(load-as-lst ".." "bincarbon" "actr-scrolling.lisp")
+
 (defclass custom-window (rpm-real-window) ())
 (defclass custom-etdi (editable-text-dialog-item) ())
 
