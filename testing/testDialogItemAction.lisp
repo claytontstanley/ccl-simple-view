@@ -29,4 +29,5 @@
                       (view-position (view-named :view (front-window))))
                     (view-center (view-named :click-nested (view-named :view (front-window))))))
 
+(event-dispatch)
 (check (null (view-subviews (front-window))))
