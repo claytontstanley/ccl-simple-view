@@ -95,9 +95,23 @@
 ;;;             : set the semaphore so that the device knows it
 ;;;             : has been dealt with.
 
+(defun get-listener-output-stream ()
+  (two-way-stream-output-stream *terminal-io*))
+
+(defparameter *listener-output* (get-listener-output-stream))
+
+;;; INITIALIZE-INSTANCE :after [Method]
+;;; Description : Update *listener-output* when an 'rpm-real-window instance is created
+;;;             : This update handles the case that a user has launched a new
+;;;             : lisp listener before running/rerunning a model
+
+(defmethod initialize-instance :after ((win rpm-real-window) &key)
+  (setf *listener-output* (get-listener-output-stream)))
+
 (defmethod post-view-key-event-handler ((device rpm-real-window) key)
   (sv-log-n 1 "Finished calling all view-key-event-handlers for ~a" device)
-  (rpm-window-key-event-handler device key)
+  (let ((*standard-output* *listener-output*))
+    (rpm-window-key-event-handler device key))
   (when (model-generated-action)
     (signal-semaphore *keypress-wait*)))
 
@@ -119,7 +133,8 @@
 
 (defmethod post-view-click-event-handler ((device rpm-real-window) position)
   (sv-log-n 1 "Finished calling all view-click-event-handlers for ~a" device)
-  (rpm-window-click-event-handler device (vector (point-h position) (point-v position)))
+  (let ((*standard-output* *listener-output*))
+    (rpm-window-click-event-handler device (vector (point-h position) (point-v position))))
   (when (model-generated-action)
     (signal-semaphore *mouseclick-wait*)))
 
