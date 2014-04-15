@@ -15,11 +15,11 @@
 (running-on-main-thread ()
   (let ((*listener-output* *listener-output*))
     (post-view-click-event-handler (front-window) (make-point 1 1))))
-(check (eq *so-test* *standard-output*))
+(check (eq *so-test* (get-listener-output-stream)))
 (running-on-main-thread ()
   (let ((*listener-output* *standard-output*))
     (post-view-click-event-handler (front-window) (make-point 1 1))))
-(check (not (eq *so-test* *standard-output*)))
+(check (not (eq *so-test* (get-listener-output-stream))))
 
 (window-close (front-window))
 
