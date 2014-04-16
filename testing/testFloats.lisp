@@ -8,7 +8,7 @@
     (add-subviews
       win
       (make-static-text-for-rpm-window
-        win :x 10 :y 20 :text "fooo")
+        win :x 10 :y 20 :text "foo")
       (make-button-for-rpm-window
         win :x 10 :y 40 :text "bar")
       (make-line-for-rpm-window
@@ -25,9 +25,10 @@
                         (chunk-slot-value-fct chunk 'screen-x) 
                         (chunk-slot-value-fct chunk 'screen-y)))
                     (visicon-chunks (get-module :vision) t))))
-      (assert (equal `((10 100) (25 28) (40 52) (40 52))
+      (print res)
+      (assert (equal `((10 100) (21 28) (40 52) (40 52))
                      res))
-      (print res))))
+      )))
 
 (test-floats)
 
