@@ -646,13 +646,24 @@
 (defclass image-view (easygui::image-view view)
   ((pict-id :reader pict-id :initarg :pict-id)))
 
+(defmethod size-to-fit ((view image-view))
+  (let ((view-size
+          (cond ((not (slot-boundp view 'easygui::size))
+                 (let ((ns-size (#/size (#/image (cocoa-ref view)))))
+                   (destructuring-bind (width height) (as-list ns-size)
+                     (make-point width height))))
+                (t
+                 (view-size view)))))
+    (set-view-size view view-size)))
+
 (defmethod initialize-instance :after ((view image-view) &key)
   (when (slot-boundp view 'pict-id)
     (setf (pict-id view) (pict-id view)))
-  (unless (slot-boundp view 'easygui::size)
-    (let ((ns-size (#/size (#/image (cocoa-ref view)))))
-      (destructuring-bind (width height) (as-list ns-size)
-        (set-view-size view (make-point width height))))))
+  (size-to-fit view))
+
+(defmethod (setf easygui::view-size) :after (size (view image-view))
+  (destructuring-bind (width height) (as-list size)
+    (#/setSize: (#/image (cocoa-ref view)) (ns:make-ns-size width height))))
 
 (defmethod (setf pict-id) (pict-id (view image-view))
   (unwind-protect (setf (slot-value view 'pict-id) pict-id)
