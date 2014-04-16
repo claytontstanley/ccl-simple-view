@@ -70,6 +70,9 @@
 ;;;             : Save the color of the button in the background slot.  It 
 ;;;               doesn't actually change the button's color, but the model 
 ;;;               can read it from there for consistency with other devices.
+;;; 2014.04.15 cts
+;;;             : Ensure that print output within the rpm-window-(view|click)-event-handler
+;;;               methods goes to the same stream that the ACT-R model is running on.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+:packaged-actr (in-package :act-r)
