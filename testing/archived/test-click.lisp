@@ -15,13 +15,13 @@
   (setf *pos* pos))
 
 (defun do-demo2 (&optional who)
-  
+
   (reset)
 
-   (if (eq who 'human)
-      (setf *model* nil)
+  (if (eq who 'human)
+    (setf *model* nil)
     (setf *model* t))
-  
+
   (setf s1 *standard-output*)
   (setf s2 (make-string-output-stream))
 
@@ -31,20 +31,20 @@
                               "X" "Y" "Z")))
          (text1 (first lis))
          (window (open-exp-window "Letter recognition")))
-    
+
     (add-text-to-exp-window :text text1 :x 125 :y 150)
-    
+
     (setf *response* nil) 
-         
+
     (if *model*
-        (progn
-          (install-device window)
-          (proc-display)
-          (run 10 :real-time t))
-      
+      (progn
+        (install-device window)
+        (proc-display)
+        (run 10 :real-time t))
+
       (while (null *response*)
         (allow-event-manager window)))
-    
+
     (get-output-stream-string s2)))
 
 
@@ -53,125 +53,125 @@
 
 (define-model demo2
 
-(sgp :seed (123456 0))
-(sgp :v t :needs-mouse t :show-focus t :trace-detail high)
-  
-(chunk-type read-letters state)
-(chunk-type array letter loc)
+  (sgp :seed (123456 0))
+  (sgp :v t :needs-mouse t :show-focus t :trace-detail high)
 
-(add-dm 
- (start isa chunk) (attend isa chunk)
- (respond isa chunk) (done isa chunk)
- (goal isa read-letters state start))
+  (chunk-type read-letters state)
+  (chunk-type array letter loc)
 
-(P find-unattended-letter
-   =goal>
-      ISA         read-letters
-      state       start
- ==>
-   +visual-location>
-      ISA         visual-location
-      :attended    nil
-   =goal>
-      state       find-location
-)
+  (add-dm 
+    (start isa chunk) (attend isa chunk)
+    (respond isa chunk) (done isa chunk)
+    (goal isa read-letters state start))
 
-(P attend-letter
-   =goal>
-      ISA         read-letters
-      state       find-location
-   =visual-location>
-      ISA         visual-location
-   
-   ?visual>
-      state       free
-   
-==>
-   +visual>
-      ISA         move-attention
-      screen-pos  =visual-location
-   =goal>
-      state       attend
-)
+  (P find-unattended-letter
+     =goal>
+     ISA         read-letters
+     state       start
+     ==>
+     +visual-location>
+     ISA         visual-location
+     :attended    nil
+     =goal>
+     state       find-location
+     )
 
-(P encode-letter
-   =goal>
-      ISA         read-letters
-      state       attend
-   =visual>
-      ISA         text
-      value       =letter
-   ?imaginal>
-      state       free
-==>
-   =goal>
-      state       respond
-   +imaginal>
-      isa         array
-      letter      =letter
-      loc         =visual
-)
+  (P attend-letter
+     =goal>
+     ISA         read-letters
+     state       find-location
+     =visual-location>
+     ISA         visual-location
+
+     ?visual>
+     state       free
+
+     ==>
+     +visual>
+     ISA         move-attention
+     screen-pos  =visual-location
+     =goal>
+     state       attend
+     )
+
+  (P encode-letter
+     =goal>
+     ISA         read-letters
+     state       attend
+     =visual>
+     ISA         text
+     value       =letter
+     ?imaginal>
+     state       free
+     ==>
+     =goal>
+     state       respond
+     +imaginal>
+     isa         array
+     letter      =letter
+     loc         =visual
+     )
 
 
-(P respond
-   =goal>
-      ISA         read-letters
-      state       respond
-   =imaginal>
-      isa         array
-      letter      =letter
-   ?manual>   
-      state       free
-==>
-   =imaginal>
-   =goal>
-      state       done
-   +manual>
-      ISA         press-key
-      key         =letter
-)
+  (P respond
+     =goal>
+     ISA         read-letters
+     state       respond
+     =imaginal>
+     isa         array
+     letter      =letter
+     ?manual>   
+     state       free
+     ==>
+     =imaginal>
+     =goal>
+     state       done
+     +manual>
+     ISA         press-key
+     key         =letter
+     )
 
-(p to-mouse
-  =goal>
-   isa read-letters
-   state done
-  ?manual>
-   state free
-==>
-  +manual>
-   isa hand-to-mouse
-  =goal>
-   state move)
+  (p to-mouse
+     =goal>
+     isa read-letters
+     state done
+     ?manual>
+     state free
+     ==>
+     +manual>
+     isa hand-to-mouse
+     =goal>
+     state move)
 
-(p move
-  =goal>
-   isa read-letters
-   state move
-  =imaginal>
-   isa array
-   loc =loc
- ?manual>
-   state free
-==>
-  +manual>
-   isa move-cursor
-   object =loc
-  =goal>
-   state click)
-(p click
-  =goal>
-   isa read-letters
-   state click
-  
- ?manual>
-   state free
-==>
-  +manual>
-   isa click-mouse
-  -goal>)
-(goal-focus goal)
+  (p move
+     =goal>
+     isa read-letters
+     state move
+     =imaginal>
+     isa array
+     loc =loc
+     ?manual>
+     state free
+     ==>
+     +manual>
+     isa move-cursor
+     object =loc
+     =goal>
+     state click)
+  (p click
+     =goal>
+     isa read-letters
+     state click
 
-)
+     ?manual>
+     state free
+     ==>
+     +manual>
+     isa click-mouse
+     -goal>)
+  (goal-focus goal)
+
+  )
 
 #|
 (do-demo2)
