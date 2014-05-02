@@ -137,4 +137,9 @@
 ;;; 2014.04.09 cts
 ;;;             : Using integers for points when possible, even after converting positions from local to window coordinates, adding
 ;;;               and subtracting points, etc.
+;;; 2014.05.02 cts
+;;;             : Added ability to extend color symbol rgb mapping by turning data structure into a hash table
+;;;             : Ensured gray is always returned for gray/grey rgb color, regardless of order in the rgb-list.
+;;;               This is needed since the color data structure is now a hash table and
+;;;               insertion order is not guaranteed to be consistent in a cl hash table
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
