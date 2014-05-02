@@ -5,3 +5,6 @@
            'gray))
 (check (eq (system-color->symbol (color-symbol->system-color 'grey))
            'gray))
+(check (eq (system-color->symbol (color-symbol->system-color 'blue))
+           'blue))
+(check (null (system-color->symbol (make-color 1 1 1))))
