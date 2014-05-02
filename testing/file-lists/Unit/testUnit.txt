@@ -27,3 +27,4 @@ testing/testBuildVisLocsFor.lisp
 testing/testScrollBarDialogItem.lisp
 testing/testFloats.lisp
 testing/test-handler-stream.lisp
+testing/testColors.lisp
