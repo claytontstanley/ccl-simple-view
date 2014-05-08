@@ -85,7 +85,7 @@ deploy-bincarbon:
 	cd ../bincarbon && ${gitIsClean} && git push
 
 deploy-snow-leopard:
-	make deploy server=chilNebula2
+	make deploy server=chilSL
 
 deploy:
 	make deploy-bincarbon	
