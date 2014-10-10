@@ -9,7 +9,8 @@ coverageTempFile = ${TOP}/.coverage.temp
 cclQuit = -e '(quit)'
 cclSaveCoverage = -e '(save-coverage-in-file "${coverageTempFile}")'
 
-ccl = rlwrap "${pathToCCL}/Clozure CL64.app/Contents/MacOS/dx86cl64" -e '(gui::start-cocoa-ide)'
+#ccl = rlwrap "${pathToCCL}/Clozure CL64.app/Contents/MacOS/dx86cl64" -e '(gui::start-cocoa-ide)'
+ccl = ./ccl
 
 binaryFileLst = ade adp bat chm cmd com cpl exe hta ins isp jse lib mde msc msp mst pif scr sct shb sys vb vbe vbs vxd wsc wsf wsh
 
