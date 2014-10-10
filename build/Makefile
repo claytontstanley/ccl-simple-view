@@ -18,7 +18,7 @@ rrepos = remote-deployed-repositories.txt
 
 cclOrigFiles = ${pathToCCL}/dx86cl64 ${pathToCCL}/dx86cl64.image
 
-deployTest = unit-1.8 continuous-integration
+deployTest = unit-1.8 unit-1.9 continuous-integration
 rebuildKernelP = true
 
 ccl-simple-view.lisp : fileList = file-list.txt

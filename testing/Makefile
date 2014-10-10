@@ -32,9 +32,9 @@ unit:
 	make -C ../build build-app all
 	make test-files testFiles=file-lists/Unit/testUnit.txt
 
-unit-1.8:
+unit-1.%:
 	make clean-actr-compiled-files check-dev-environment
-	make test-file testFile=testing/testUnit.lisp ccl=./ccl-1.8 cclSaveCoverage=''
+	make test-file testFile=testing/testUnit.lisp ccl=./ccl-1.$* cclSaveCoverage=''
 
 continuous-integration: unit
 	make test-files testFiles=file-lists/CI/testCI.txt
