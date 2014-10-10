@@ -7,10 +7,8 @@ actr6 = ../submodules/actr6
 
 coverageTempFile = ${TOP}/.coverage.temp
 cclQuit = -e '(quit)'
-#cclStartCoverage = -e '(setf ccl:*compile-code-coverage* t)'
-cclStartCoverage =
-#cclSaveCoverage = -e '(save-coverage-in-file "${coverageTempFile}")'
-cclSaveCoverage =
+cclStartCoverage = -e '(setf ccl:*compile-code-coverage* t)'
+cclSaveCoverage = -e '(save-coverage-in-file "${coverageTempFile}")'
 
 ccl = rlwrap "${pathToCCL}/Clozure CL64.app/Contents/MacOS/dx86cl64" -e '(gui::start-cocoa-ide)'
 #ccl = ./ccl
