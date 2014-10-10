@@ -51,4 +51,4 @@
 	url = ssh://chil/srv/git/actr6
 [submodule "submodules/ccl-1.10"]
 	path = submodules/ccl-1.10
-	url = ssh://raid/srv/git/ccl-1.10
+	url = ssh://chil/srv/git/ccl-1.10
