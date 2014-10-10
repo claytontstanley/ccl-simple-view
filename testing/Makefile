@@ -7,6 +7,7 @@ actr6 = ../submodules/actr6
 
 coverageTempFile = ${TOP}/.coverage.temp
 cclQuit = -e '(quit)'
+cclStartCoverage = -e '(setf ccl:*compile-code-coverage* t)'
 cclSaveCoverage = -e '(save-coverage-in-file "${coverageTempFile}")'
 
 #ccl = rlwrap "${pathToCCL}/Clozure CL64.app/Contents/MacOS/dx86cl64" -e '(gui::start-cocoa-ide)'
@@ -19,7 +20,7 @@ binaryFileStr = ${binaryFileLst:%= -o -name '*.%'}
 test-file:
 	-@echo ""	
 	-@echo "Running tests for file ${testFile}"
-	${ccl} -l "../${testFile}" ${cclSaveCoverage} ${cclQuit}
+	${ccl} ${cclStartCoverage} -l "../${testFile}" ${cclSaveCoverage} ${cclQuit}
 	-@echo ""
 
 test-files:
@@ -35,7 +36,7 @@ unit:
 
 unit-1.%:
 	make clean-actr-compiled-files check-dev-environment
-	make test-file testFile=testing/testUnit.lisp ccl=./ccl-1.$* cclSaveCoverage=''
+	make test-file testFile=testing/testUnit.lisp ccl=./ccl-1.$* cclSaveCoverage='' cclStartCoverage=''
 
 continuous-integration: unit
 	make test-files testFiles=file-lists/CI/testCI.txt
