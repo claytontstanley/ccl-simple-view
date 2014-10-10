@@ -30,7 +30,7 @@ path-uwi.lisp = ${path-device.lisp}
 path-ccl-simple-view.lisp = ${actrPath}/support
 
 gitIsClean = [[ -z "$$(git status --porcelain)" ]]
-gitFullUpdate = git remote update && git rebase && git submodule update --init --recursive
+gitFullUpdate = git remote update && git rebase && git submodule sync --recursive && git submodule update --init --recursive
 
 all: ${outFiles}
 
