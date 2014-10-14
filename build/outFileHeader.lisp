@@ -142,4 +142,6 @@
 ;;;             : Ensured gray is always returned for gray/grey rgb color, regardless of order in the rgb-list.
 ;;;               This is needed since the color data structure is now a hash table and
 ;;;               insertion order is not guaranteed to be consistent in a cl hash table
+;;; 2014.10.14 cts
+;;;             : Code is compatible with ccl-1.8 thru ccl-1.10 on OS X SL thru Mavericks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
