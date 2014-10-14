@@ -7,6 +7,11 @@ actr6 = ../submodules/actr6
 
 coverageTempFile = ${TOP}/.coverage.temp
 cclQuit = -e '(quit)'
+
+# FIXME: Code coverage is currently disabled, as coverage code does not work when (require :cocoa) is loaded.
+# The fix is probably just to wait until the newest ccl is updated to work with the cocoa code.
+# Once that happens, uncommend these two coverage lines and update the coverage target. CTS: 2014-10-14 
+
 #cclStartCoverage = -e '(setf ccl:*compile-code-coverage* t)'
 #cclSaveCoverage = -e '(save-coverage-in-file "${coverageTempFile}")'
 cclStartCoverage =
