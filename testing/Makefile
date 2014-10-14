@@ -7,8 +7,10 @@ actr6 = ../submodules/actr6
 
 coverageTempFile = ${TOP}/.coverage.temp
 cclQuit = -e '(quit)'
-cclStartCoverage = -e '(setf ccl:*compile-code-coverage* t)'
-cclSaveCoverage = -e '(save-coverage-in-file "${coverageTempFile}")'
+#cclStartCoverage = -e '(setf ccl:*compile-code-coverage* t)'
+#cclSaveCoverage = -e '(save-coverage-in-file "${coverageTempFile}")'
+cclStartCoverage =
+cclSaveCoverage =
 
 ccl = rlwrap "${pathToCCL}/Clozure CL64.app/Contents/MacOS/dx86cl64" -e '(gui::start-cocoa-ide)'
 #ccl = ./ccl
@@ -48,4 +50,5 @@ clean-coverage:
 	rm -f ${coverageTempFile}
 
 coverage:
-	${ccl} -l "make-coverage.lisp" ${cclQuit}
+	# ${ccl} -l "make-coverage.lisp" ${cclQuit}
+	exit 0
