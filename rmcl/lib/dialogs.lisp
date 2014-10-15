@@ -4,6 +4,8 @@
 ; found to communicate between threads is to use a shared global
 (defparameter *modal-dialog-ret* nil)
 
+; Use #/abortModal and not #/stopModal
+; https://groups.google.com/forum/#!msg/wx-commits-diffs/fB0pl10Kw90/jZtHXQkkVxEJ
 (defun stop-modal ()
   (#/abortModal (#/sharedApplication ns:ns-application))
   )
