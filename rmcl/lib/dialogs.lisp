@@ -4,6 +4,10 @@
 ; found to communicate between threads is to use a shared global
 (defparameter *modal-dialog-ret* nil)
 
+(defun stop-modal ()
+  (#/abortModal (#/sharedApplication ns:ns-application))
+  )
+
 ; Form could be (values ...), which is why this is a macro. Don't eval form
 ; until it's wrapped in a multiple-value-list call
 (defmacro return-from-modal-dialog (form)
@@ -14,7 +18,7 @@
              *current-process*
              *modal-dialog-ret*) ())
      (setf *modal-dialog-ret* (cons :return (multiple-value-list ,form)))
-     (#/stopModal (#/sharedApplication ns:ns-application))
+     (stop-modal)
      (pop *modal-dialog-on-top*)
      (values)))
 
