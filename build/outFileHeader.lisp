@@ -144,4 +144,11 @@
 ;;;               insertion order is not guaranteed to be consistent in a cl hash table
 ;;; 2014.10.14 cts
 ;;;             : Code is compatible with ccl-1.8 thru ccl-1.10 on OS X SL thru Mavericks
+;;;             : Using #/abortModal instead of #/stopModal to close modal dialog windows so
+;;;               that close requests can be made on any thread, and not just the new modal dialog window thread.
+;;;               Otherwise, strange things were happening on SL and ML where the modal window would not close after a request when that request
+;;;               was made on a thread other than the modal dialog's thread (e.g., the REPL ACT-R thread).
+;;;               In this case, the window did close once the mouse moved or keyboard was pressed after that request was made.
+;;;               Using #/abortModal instead of #/stopModal ensures that the window closes in all cases tested.
+;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
