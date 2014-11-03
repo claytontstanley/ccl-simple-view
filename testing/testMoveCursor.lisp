@@ -1,0 +1,25 @@
+; Bootstrap all needed packages (loads ACT-R, Cocoa framework, etc.)
+(load (format nil "~a~a" (directory-namestring *load-truename*) "bootstrap.lisp"))
+
+(let ((win (make-instance 'window)))
+  (let ((out (make-array
+               '(0)
+               :element-type 'base-char
+               :fill-pointer 0
+               :adjustable t)))
+    (with-output-to-string (*error-output* out)
+      (device-move-cursor-to win (vector 10 .4)))
+    (check (string-equal out ""))
+    (check (equalp (as-list (view-mouse-position win))
+                   (list 10 0)))
+    (with-output-to-string (*error-output* out)
+      (device-move-cursor-to win (vector 10 .6)))
+    (check (string-equal out ""))
+    (check (equalp (as-list (view-mouse-position win))
+                   (list 10 1)))
+    (with-output-to-string (*error-output* out)
+      (device-move-cursor-to win (vector 10 1)))
+    (check (string-equal out ""))
+    (check (equalp (as-list (view-mouse-position win))
+                   (list 10 1)))
+    (window-close win)))

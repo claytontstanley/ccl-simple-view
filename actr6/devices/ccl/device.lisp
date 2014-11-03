@@ -424,28 +424,30 @@
   (sv-log-n 1 "ending device-handle-click"))
 
 ;;; DEVICE-MOVE-CURSOR-TO      [Method]
-;;; Date        : 97.02.18 [revised 98.10.29]
-;;; Description : Since moving the mouse is considered a Bad Thing by 
-;;;             : Apple's HI police, you can't just make a simple call
-;;;             : to do it.  First, there's moving the cursor, which
-;;;             : involves blasting into low memory.  Then, if the cursor
-;;;             : is being tracked by the system, we have to make sure that 
-;;;             : the cursor move has really been registered (#$CrsrNew 
-;;;             : changes from -1 to 255 when this happens) by the OS.  Then 
-;;;             : make sure it's been registered by MCL with UPDATE-CURSOR.
+;;; Date        : 2014-11-03
+;;; Description : Uses the Quartz framework to move the cursor across the screen.
+;;;             : Polls after the cursor moves to confirm that the cursor has moved
+;;;               to the new location. If it has, return quickly. If it hasn't, keep
+;;;               polling for 500 ms and bail if it hasn't within 500 ms.
+;;;             : Since the cursor can only move to integer positions, make sure that the
+;;;               xyloc passed to the method specifies an integer location, and round if not.
+;;;               Otherwise, the check to ensure that the cursor moved to the specified position
+;;;               will not work, since the cursor will move to an integer location, and xyloc will
+;;;               be expecting a non-integer location
 
 (defmethod device-move-cursor-to ((device window) (xyloc vector))
-  (window-select device)
-  (sv-log-n 1 "moving cursor to ~a" xyloc)
-  (easygui::running-on-main-thread ()
-    (let ((xyloc (local-to-global device (vpt2p xyloc))))
-      (#_CGWarpMouseCursorPosition
-       (ns:make-ns-point (point-h xyloc) (point-v xyloc)))))
-  (unless (wait-n-times (lambda () (vpt= xyloc (p2vpt (view-mouse-position device)))) 10 .05)
-    (print-warning "Model cursor movement was not handled correctly within 500ms."))
-  (event-dispatch)
-  (sv-log-n 1 "ending move cursor"))
-
+  (let ((xyloc (map 'vector #'round xyloc)))
+    (window-select device)
+    (sv-log-n 1 "moving cursor to ~a" xyloc)
+    (easygui::running-on-main-thread ()
+      (let ((xyloc (local-to-global device (vpt2p xyloc))))
+        (#_CGWarpMouseCursorPosition   
+         (ns:make-ns-point (point-h xyloc) (point-v xyloc)))))
+    (unless (wait-n-times (lambda ()
+                            (vpt= xyloc (p2vpt (view-mouse-position device)))) 10 .05)
+      (print-warning "Model cursor movement was not handled correctly within 500ms."))
+    (event-dispatch)
+    (sv-log-n 1 "ending move cursor")))
 
 ;;; DEVICE-SPEAK-STRING      [Method]
 ;;; Description : If the Mac Speech Manager is installed, actually speak the
